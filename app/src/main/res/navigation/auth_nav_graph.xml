@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_auth"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.ptithcm.apt.fragments.auth.LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_forgotEmailFragment"
+            app:destination="@id/forgotEmailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/forgotEmailFragment"
+        android:name="com.ptithcm.apt.fragments.auth.ForgotEmailFragment"
+        tools:layout="@layout/fragment_forgot_email">
+        <action
+            android:id="@+id/action_forgotEmailFragment_to_otpFragment"
+            app:destination="@id/otpFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/otpFragment"
+        android:name="com.ptithcm.apt.fragments.auth.OtpFragment"
+        tools:layout="@layout/fragment_otp">
+        <action
+            android:id="@+id/action_otpFragment_to_resetPasswordFragment"
+            app:destination="@id/resetPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/resetPasswordFragment"
+        android:name="com.ptithcm.apt.fragments.auth.ResetPasswordFragment"
+        tools:layout="@layout/fragment_reset_password">
+        <action
+            android:id="@+id/action_resetPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+</navigation>
