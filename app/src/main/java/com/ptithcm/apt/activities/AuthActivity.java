@@ -2,16 +2,25 @@ package com.ptithcm.apt.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.navigation.NavController;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.utils.SessionManager;
+import com.ptithcm.apt.viewmodel.LoginViewModel;
+import com.ptithcm.apt.viewmodel.LoginViewModelFactory;
 
 public class AuthActivity extends AppCompatActivity {
+
+    private LoginViewModel viewModel;
+    private ProgressBar progressBar;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,19 +28,49 @@ public class AuthActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_auth);
 
-        SessionManager sessionManager = SessionManager.getInstance(this);
-        if (sessionManager.isLoggedIn()) {
-            navigateToMain();
-            return;
-        }
+        progressBar = findViewById(R.id.progress_bar);
+        sessionManager = SessionManager.getInstance(this);
 
-        // Setup NavController cho luồng auth (Login → ForgotPassword → OTP →
-        // ResetPassword)
+        // Khởi tạo ViewModel qua Factory (GIỐNG Fragment)
+        LoginViewModelFactory factory = new LoginViewModelFactory(this);
+        viewModel = new ViewModelProvider(this, factory).get(LoginViewModel.class);
+
+        observeViewModel();
+
+        // Kiểm tra Auto-Login
+        String refreshToken = sessionManager.getRefreshToken();
+        if (refreshToken != null) {
+            viewModel.checkSession(refreshToken);
+        } else {
+            setupNavigation();
+        }
+    }
+
+    private void observeViewModel() {
+        viewModel.isRefreshing.observe(this, isLoading -> {
+            progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        });
+
+        viewModel.refreshResult.observe(this, response -> {
+            if (response != null) {
+                navigateToMain();
+            }
+        });
+
+        viewModel.refreshError.observe(this, error -> {
+            if (error != null) {
+                sessionManager.clearSession();
+                setupNavigation();
+            }
+        });
+    }
+
+    private void setupNavigation() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
 
         if (navHostFragment != null) {
-            NavController navController = navHostFragment.getNavController();
+            // navHostFragment sẽ tự nạp startDestination từ auth_nav_graph (LoginFragment)
         }
     }
 

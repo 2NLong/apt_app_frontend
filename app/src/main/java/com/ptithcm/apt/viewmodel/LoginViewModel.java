@@ -13,7 +13,7 @@ import com.ptithcm.apt.repositoris.AuthRepository;
 public class LoginViewModel extends ViewModel {
 
     private final AuthRepository authRepository;
-
+    // Login
     private final MutableLiveData<LoginResponse> _loginResult = new MutableLiveData<>();
     private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
@@ -22,6 +22,15 @@ public class LoginViewModel extends ViewModel {
     public final LiveData<LoginResponse> loginResult = _loginResult;
     public final LiveData<String> errorMessage = _errorMessage;
     public final LiveData<Boolean> isLoading = _isLoading;
+
+    // Refresh Token
+    private final MutableLiveData<LoginResponse> _refreshResult = new MutableLiveData<>();
+    private final MutableLiveData<String> _refreshError = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> _isRefreshing = new MutableLiveData<>();
+
+    public final LiveData<LoginResponse> refreshResult = _refreshResult;
+    public final LiveData<String> refreshError = _refreshError;
+    public final LiveData<Boolean> isRefreshing = _isRefreshing;
 
     public LoginViewModel(AuthRepository authRepository) {
         this.authRepository = authRepository;
@@ -48,10 +57,15 @@ public class LoginViewModel extends ViewModel {
                 _loginResult, _errorMessage, _isLoading);
     }
 
-    /**
-     * Xoá thông báo lỗi (tránh hiển thị lại khi rotate screen).
-     */
     public void clearError() {
         _errorMessage.setValue(null);
+    }
+
+    public void checkSession(String refreshToken) {
+        authRepository.refreshToken(refreshToken, _refreshResult, _refreshError, _isRefreshing);
+    }
+
+    public void clearRefreshError() {
+        _refreshError.setValue(null);
     }
 }
