@@ -18,34 +18,47 @@ public class SessionManager {
     private static final String KEY_ROLE = "role";
     private static final String KEY_USER_ID = "user_id";
 
+    private static volatile SessionManager instance;
     private final SharedPreferences prefs;
 
-    public SessionManager(Context context) {
+    private SessionManager(Context context) {
+        Context appContext = context.getApplicationContext();
         SharedPreferences encryptedPrefs;
         try {
-            MasterKey masterKey = new MasterKey.Builder(context)
+            MasterKey masterKey = new MasterKey.Builder(appContext)
                     .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
                     .build();
 
             encryptedPrefs = EncryptedSharedPreferences.create(
-                    context,
+                    appContext,
                     PREF_NAME,
                     masterKey,
                     EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
         } catch (GeneralSecurityException | IOException e) {
-            // Fallback sang SharedPreferences thường nếu thiết bị không hỗ trợ
-            encryptedPrefs = context.getSharedPreferences(PREF_NAME + "_fallback", Context.MODE_PRIVATE);
+            // Fallback sang SharedPreferences thường nếu thiết bị không hỗ trợ (hoặc lỗi
+            // cấu hình)
+            encryptedPrefs = appContext.getSharedPreferences(PREF_NAME + "_fallback", Context.MODE_PRIVATE);
         }
         prefs = encryptedPrefs;
+    }
+
+    public static SessionManager getInstance(Context context) {
+        if (instance == null) {
+            synchronized (SessionManager.class) {
+                if (instance == null) {
+                    instance = new SessionManager(context);
+                }
+            }
+        }
+        return instance;
     }
 
     /**
      * Lưu toàn bộ session sau khi đăng nhập thành công.
      */
     public void saveSession(String accessToken, String refreshToken,
-                            Long userId, String username, String role) {
+            Long userId, String username, String role) {
         prefs.edit()
                 .putString(KEY_ACCESS_TOKEN, accessToken)
                 .putString(KEY_REFRESH_TOKEN, refreshToken)
@@ -73,7 +86,7 @@ public class SessionManager {
     }
 
     public boolean isLoggedIn() {
-        return getAccessToken() != null;
+        return getRefreshToken() != null;
     }
 
     public String getAccessToken() {

@@ -23,8 +23,8 @@ public class LoginViewModel extends ViewModel {
     public final LiveData<String> errorMessage = _errorMessage;
     public final LiveData<Boolean> isLoading = _isLoading;
 
-    public LoginViewModel(Context context) {
-        authRepository = new AuthRepository(context);
+    public LoginViewModel(AuthRepository authRepository) {
+        this.authRepository = authRepository;
     }
 
     /**

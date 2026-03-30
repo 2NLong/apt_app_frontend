@@ -2,6 +2,8 @@ package com.ptithcm.apt.network.interceptor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -11,6 +13,7 @@ import com.ptithcm.apt.models.auth.request.RefreshTokenRequest;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.LoginResponse;
 import com.ptithcm.apt.network.api.AuthApiService;
+import com.ptithcm.apt.network.retrofit.RetrofitClient;
 import com.ptithcm.apt.utils.SessionManager;
 
 import java.io.IOException;
@@ -21,7 +24,6 @@ import okhttp3.Response;
 import okhttp3.Route;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
 
 public class TokenAuthenticator implements Authenticator {
 
@@ -38,55 +40,78 @@ public class TokenAuthenticator implements Authenticator {
     @Nullable
     @Override
     public Request authenticate(@Nullable Route route, @NonNull Response response) throws IOException {
-        // Tránh vòng lặp vô hạn: nếu refresh cũng 401 thì dừng
-        if (responseCount(response) >= 2) {
-            onSessionExpired();
-            return null;
-        }
+        // Tên thread hiện tại để debug nếu cần
+        // System.out.println("Authenticator running on: " +
+        // Thread.currentThread().getName());
 
-        String refreshToken = sessionManager.getRefreshToken();
-        if (refreshToken == null) {
-            onSessionExpired();
-            return null;
-        }
+        synchronized (this) {
+            // Kiểm tra xem token hiện tại trong SessionManager đã khác với token trong
+            // request bị lỗi chưa.
+            // Nếu đã khác, nghĩa là một thread khác đã refresh thành công rồi.
+            String currentToken = sessionManager.getAccessToken();
+            String failedToken = response.request().header("Authorization");
 
-        // Gọi refresh API đồng bộ (KHÔNG dùng enqueue — đang ở background thread)
-        AuthApiService authService = buildPublicRetrofit().create(AuthApiService.class);
-        try {
-            retrofit2.Response<ApiResponse<LoginResponse>> refreshResponse =
-                    authService.refreshToken(new RefreshTokenRequest(refreshToken)).execute();
-
-            if (refreshResponse.isSuccessful()
-                    && refreshResponse.body() != null
-                    && refreshResponse.body().getStatus() == 200) {
-
-                LoginResponse newTokens = refreshResponse.body().getData();
-                sessionManager.updateTokens(
-                        newTokens.getAccessToken(),
-                        newTokens.getRefreshToken()
-                );
-
-                // Retry request gốc với token mới
+            if (currentToken != null && failedToken != null
+                    && !currentToken.equals(failedToken.replace("Bearer ", ""))) {
+                // Token đã được cập nhật bởi thread khác, dùng luôn token mới để retry
                 return response.request().newBuilder()
-                        .header("Authorization", "Bearer " + newTokens.getAccessToken())
+                        .header("Authorization", "Bearer " + currentToken)
                         .build();
             }
-        } catch (Exception e) {
-            // Network error hoặc parse error khi refresh
-        }
 
-        onSessionExpired();
-        return null;
+            // Tránh vòng lặp vô hạn: nếu đã thử refresh mà vẫn 401 thì dừng
+            if (responseCount(response) >= 2) {
+                onSessionExpired();
+                return null;
+            }
+
+            String refreshToken = sessionManager.getRefreshToken();
+            if (refreshToken == null) {
+                onSessionExpired();
+                return null;
+            }
+
+            // Gọi refresh API đồng bộ từ Public Client
+            AuthApiService authService = RetrofitClient.getInstance().createPublicService(AuthApiService.class);
+            try {
+                retrofit2.Response<ApiResponse<LoginResponse>> refreshResponse = authService
+                        .refreshToken(new RefreshTokenRequest(refreshToken)).execute();
+
+                if (refreshResponse.isSuccessful()
+                        && refreshResponse.body() != null
+                        && refreshResponse.body().getStatus() == 200) {
+
+                    LoginResponse newTokens = refreshResponse.body().getData();
+                    sessionManager.updateTokens(
+                            newTokens.getAccessToken(),
+                            newTokens.getRefreshToken());
+
+                    // Retry request gốc với token mới
+                    return response.request().newBuilder()
+                            .header("Authorization", "Bearer " + newTokens.getAccessToken())
+                            .build();
+                }
+            } catch (Exception e) {
+                // Lỗi mạng khi refresh
+            }
+
+            // Refresh thất bại hoàn toàn
+            onSessionExpired();
+            return null;
+        }
     }
 
     /**
      * Xoá session và đưa user về màn login.
+     * Đảm bảo chạy trên Main Thread.
      */
     private void onSessionExpired() {
         sessionManager.clearSession();
-        Intent intent = new Intent(context, AuthActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        context.startActivity(intent);
+        new Handler(Looper.getMainLooper()).post(() -> {
+            Intent intent = new Intent(context, AuthActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            context.startActivity(intent);
+        });
     }
 
     /**
@@ -98,15 +123,5 @@ public class TokenAuthenticator implements Authenticator {
             count++;
         }
         return count;
-    }
-
-    /**
-     * Retrofit riêng KHÔNG có AuthInterceptor để tránh đệ quy.
-     */
-    private Retrofit buildPublicRetrofit() {
-        return new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
     }
 }

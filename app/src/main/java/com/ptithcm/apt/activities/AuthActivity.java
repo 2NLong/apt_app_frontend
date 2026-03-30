@@ -19,14 +19,14 @@ public class AuthActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_auth);
 
-        // Kiểm tra nếu đã có token hợp lệ → chuyển thẳng vào MainActivity
-        SessionManager sessionManager = new SessionManager(this);
+        SessionManager sessionManager = SessionManager.getInstance(this);
         if (sessionManager.isLoggedIn()) {
             navigateToMain();
             return;
         }
 
-        // Setup NavController cho luồng auth (Login → ForgotPassword → OTP → ResetPassword)
+        // Setup NavController cho luồng auth (Login → ForgotPassword → OTP →
+        // ResetPassword)
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.nav_host_fragment);
 

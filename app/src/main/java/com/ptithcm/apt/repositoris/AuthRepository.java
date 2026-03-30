@@ -20,9 +20,9 @@ public class AuthRepository {
     private final AuthApiService authApiService;
     private final SessionManager sessionManager;
 
-    public AuthRepository(Context context) {
-        authApiService = RetrofitClient.getInstance().createService(AuthApiService.class);
-        sessionManager = new SessionManager(context);
+    public AuthRepository(AuthApiService authApiService, SessionManager sessionManager) {
+        this.authApiService = authApiService;
+        this.sessionManager = sessionManager;
     }
 
     /**

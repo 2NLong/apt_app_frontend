@@ -24,13 +24,6 @@ public class AuthInterceptor implements Interceptor {
     @Override
     public Response intercept(@NonNull Chain chain) throws IOException {
         Request original = chain.request();
-        String path = original.url().encodedPath();
-
-        // Bỏ qua login và refresh — không cần token
-        if (path.contains("/auth/login") || path.contains("/auth/refresh-token")) {
-            return chain.proceed(original);
-        }
-
         String bearerToken = sessionManager.getBearerToken();
         if (bearerToken == null) {
             return chain.proceed(original);

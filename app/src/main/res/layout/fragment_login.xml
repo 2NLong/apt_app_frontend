@@ -174,7 +174,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="© 2024 Hệ thống quản lý cư dân APT"
+                android:text="© 2026 Hệ thống quản lý cư dân APT"
                 android:textColor="#B0B0B0"
                 android:textSize="12sp"
                 app:layout_constraintBottom_toBottomOf="parent"
