@@ -1,11 +1,15 @@
 package com.ptithcm.apt.repositoris;
 
+import android.content.Context;
+
 import androidx.lifecycle.MutableLiveData;
 
 import com.ptithcm.apt.models.auth.request.LoginRequest;
+import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.LoginResponse;
 import com.ptithcm.apt.network.api.AuthApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
+import com.ptithcm.apt.utils.SessionManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -14,13 +18,15 @@ import retrofit2.Response;
 public class AuthRepository {
 
     private final AuthApiService authApiService;
+    private final SessionManager sessionManager;
 
-    public AuthRepository() {
+    public AuthRepository(Context context) {
         authApiService = RetrofitClient.getInstance().createService(AuthApiService.class);
+        sessionManager = new SessionManager(context);
     }
 
     /**
-     * Gọi API đăng nhập.
+     * Gọi API đăng nhập, tự lưu session nếu thành công.
      *
      * @param loginRequest  Thông tin username và password
      * @param loginResult   LiveData trả về LoginResponse khi thành công
@@ -34,30 +40,50 @@ public class AuthRepository {
 
         isLoading.postValue(true);
 
-        authApiService.login(loginRequest).enqueue(new Callback<LoginResponse>() {
+        authApiService.login(loginRequest).enqueue(new Callback<ApiResponse<LoginResponse>>() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+            public void onResponse(Call<ApiResponse<LoginResponse>> call,
+                                   Response<ApiResponse<LoginResponse>> response) {
                 isLoading.postValue(false);
+
                 if (response.isSuccessful() && response.body() != null) {
-                    loginResult.postValue(response.body());
-                } else {
-                    // Xử lý lỗi HTTP (401, 403, v.v.)
-                    String msg;
-                    if (response.code() == 401) {
-                        msg = "Sai tên đăng nhập hoặc mật khẩu";
-                    } else if (response.code() == 403) {
-                        msg = "Tài khoản không có quyền truy cập";
+                    ApiResponse<LoginResponse> apiResponse = response.body();
+
+                    if (apiResponse.getStatus() == 200 && apiResponse.getData() != null) {
+                        LoginResponse loginResponse = apiResponse.getData();
+
+                        LoginResponse.UserInfo user = loginResponse.getUser();
+                        sessionManager.saveSession(
+                                loginResponse.getAccessToken(),
+                                loginResponse.getRefreshToken(),
+                                user != null ? user.getId() : null,
+                                user != null ? user.getUsername() : null,
+                                user != null ? user.getRole() : null
+                        );
+
+                        loginResult.postValue(loginResponse);
                     } else {
-                        msg = "Đăng nhập thất bại (lỗi " + response.code() + ")";
+                        errorMessage.postValue(
+                                apiResponse.getMessage() != null
+                                        ? apiResponse.getMessage()
+                                        : "Đăng nhập thất bại"
+                        );
+                    }
+                } else {
+                    String msg;
+                    switch (response.code()) {
+                        case 401: msg = "Sai tên đăng nhập hoặc mật khẩu"; break;
+                        case 403: msg = "Tài khoản bị khoá hoặc không có quyền"; break;
+                        default:  msg = "Đăng nhập thất bại (Lỗi: " + response.code() + ")";
                     }
                     errorMessage.postValue(msg);
                 }
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<LoginResponse>> call, Throwable t) {
                 isLoading.postValue(false);
-                errorMessage.postValue("Không thể kết nối đến server: " + t.getMessage());
+                errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
             }
         });
     }

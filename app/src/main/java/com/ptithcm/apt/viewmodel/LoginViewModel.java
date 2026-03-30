@@ -1,5 +1,7 @@
 package com.ptithcm.apt.viewmodel;
 
+import android.content.Context;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -17,19 +19,18 @@ public class LoginViewModel extends ViewModel {
     private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
 
     // Expose read-only LiveData ra ngoài
-    public LiveData<LoginResponse> loginResult = _loginResult;
-    public LiveData<String> errorMessage = _errorMessage;
-    public LiveData<Boolean> isLoading = _isLoading;
+    public final LiveData<LoginResponse> loginResult = _loginResult;
+    public final LiveData<String> errorMessage = _errorMessage;
+    public final LiveData<Boolean> isLoading = _isLoading;
 
-    public LoginViewModel() {
-        authRepository = new AuthRepository();
+    public LoginViewModel(Context context) {
+        authRepository = new AuthRepository(context);
     }
 
     /**
-     * Validate input rồi gọi Repository để đăng nhập
+     * Validate input rồi gọi Repository để đăng nhập.
      */
     public void login(String username, String password) {
-        // Validate input
         if (username == null || username.isEmpty()) {
             _errorMessage.setValue("Vui lòng nhập tên đăng nhập");
             return;
@@ -43,12 +44,12 @@ public class LoginViewModel extends ViewModel {
             return;
         }
 
-        LoginRequest loginRequest = new LoginRequest(username, password);
-        authRepository.login(loginRequest, _loginResult, _errorMessage, _isLoading);
+        authRepository.login(new LoginRequest(username, password),
+                _loginResult, _errorMessage, _isLoading);
     }
 
     /**
-     * Xoá thông báo lỗi (tránh hiển thị lại khi rotate screen)
+     * Xoá thông báo lỗi (tránh hiển thị lại khi rotate screen).
      */
     public void clearError() {
         _errorMessage.setValue(null);
