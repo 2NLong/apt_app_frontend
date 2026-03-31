@@ -31,7 +31,6 @@ public class AuthActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
         sessionManager = SessionManager.getInstance(this);
 
-        // Khởi tạo ViewModel qua Factory (GIỐNG Fragment)
         LoginViewModelFactory factory = new LoginViewModelFactory(this);
         viewModel = new ViewModelProvider(this, factory).get(LoginViewModel.class);
 

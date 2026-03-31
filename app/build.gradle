@@ -53,6 +53,8 @@ dependencies {
 
     // EncryptedSharedPreferences — lưu token an toàn
     implementation "androidx.security:security-crypto:1.1.0-alpha06"
+    implementation libs.cardview
+    implementation libs.legacy.support.v4
 
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
