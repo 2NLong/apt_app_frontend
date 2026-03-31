@@ -1,5 +1,4 @@
-package com.ptithcm.apt.adapters.profileuser;
-
+package com.ptithcm.apt.adapters.profile;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.profileuser.FamilyMember;
 
@@ -19,9 +17,24 @@ import java.util.List;
 public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapter.FamilyMemberViewHolder> {
 
     private List<FamilyMember> familyMemberList;
+    private OnItemClickListener listener;
+    private boolean isExpanded = false;
+
+    public interface OnItemClickListener {
+        void onItemClick(FamilyMember familyMember);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    }
 
     public FamilyMemberAdapter(List<FamilyMember> familyMemberList) {
         this.familyMemberList = familyMemberList;
+    }
+
+    public void setExpanded(boolean expanded) {
+        this.isExpanded = expanded;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -38,13 +51,17 @@ public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapte
         holder.iconPerson.setImageResource(member.getIconResId());
         holder.tvMemberName.setText(member.getName());
         holder.tvMemberRelation.setText(member.getRelation());
-        // Có thể thêm xử lý click listener tại đây nếu cần
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onItemClick(member);
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        // Hiển thị tối đa 3 item (Preview mode)
-        return Math.min(familyMemberList.size(), 3);
+        return Math.min(familyMemberList.size(), isExpanded ? 10 : 3);
     }
 
     public static class FamilyMemberViewHolder extends RecyclerView.ViewHolder {

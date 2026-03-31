@@ -1,4 +1,4 @@
-package com.ptithcm.apt.viewmodel;
+package com.ptithcm.apt.viewmodel.auth;
 
 import android.content.Context;
 

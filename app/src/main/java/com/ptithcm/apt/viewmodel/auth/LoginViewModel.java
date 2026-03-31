@@ -1,6 +1,4 @@
-package com.ptithcm.apt.viewmodel;
-
-import android.content.Context;
+package com.ptithcm.apt.viewmodel.auth;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

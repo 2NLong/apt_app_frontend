@@ -58,55 +58,45 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_current_apartment" />
 
-        <TextView
-            android:id="@+id/btn_see_all_apartments"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:text="Xem tất cả"
-            android:textColor="@color/primary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_owned_apartments_title"
-            app:layout_constraintBottom_toBottomOf="@id/tv_owned_apartments_title" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_owned_apartments"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:nestedScrollingEnabled="false"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_owned_apartments_title"
             tools:listitem="@layout/item_apartment" />
+
+        <TextView
+            android:id="@+id/tv_show_more_apartments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:text="@string/see_more"
+            android:textColor="@color/secondary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_owned_apartments"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_family_members_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="24dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="16dp"
             android:text="Thành viên gia đình"
             android:textColor="@color/text_title"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_owned_apartments" />
-
-        <TextView
-            android:id="@+id/btn_see_all_family"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="24dp"
-            android:text="Xem tất cả"
-            android:textColor="@color/primary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/tv_family_members_title"
-            app:layout_constraintBottom_toBottomOf="@id/tv_family_members_title" />
+            app:layout_constraintTop_toBottomOf="@id/tv_show_more_apartments" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_family_members"
@@ -114,20 +104,36 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:nestedScrollingEnabled="false"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_family_members_title"
             tools:listitem="@layout/item_family_member" />
+
+        <TextView
+            android:id="@+id/tv_show_more_family_members"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:padding="8dp"
+            android:text="@string/see_more"
+            android:textColor="@color/secondary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_family_members"
+            tools:visibility="visible" />
 
         <include
             android:id="@+id/layout_settings"
             layout="@layout/layout_profile_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_family_members" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_show_more_family_members" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

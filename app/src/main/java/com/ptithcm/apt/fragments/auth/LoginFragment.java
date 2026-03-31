@@ -17,8 +17,8 @@ import androidx.navigation.Navigation;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.activities.MainActivity;
 import com.ptithcm.apt.databinding.FragmentLoginBinding;
-import com.ptithcm.apt.viewmodel.LoginViewModel;
-import com.ptithcm.apt.viewmodel.LoginViewModelFactory;
+import com.ptithcm.apt.viewmodel.auth.LoginViewModel;
+import com.ptithcm.apt.viewmodel.auth.LoginViewModelFactory;
 
 public class LoginFragment extends Fragment {
 
@@ -38,7 +38,7 @@ public class LoginFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Dùng Factory để inject Context — không dùng AndroidViewModel
+        // Dùng Factory để inject Context
         LoginViewModelFactory factory = new LoginViewModelFactory(requireContext());
         loginViewModel = new ViewModelProvider(this, factory).get(LoginViewModel.class);
 
