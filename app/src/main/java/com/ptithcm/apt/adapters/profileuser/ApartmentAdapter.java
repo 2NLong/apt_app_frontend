@@ -43,7 +43,8 @@ public class ApartmentAdapter extends RecyclerView.Adapter<ApartmentAdapter.Apar
 
     @Override
     public int getItemCount() {
-        return apartmentList.size();
+        // Hiển thị tối đa 3 item (Preview mode)
+        return Math.min(apartmentList.size(), 3);
     }
 
     public static class ApartmentViewHolder extends RecyclerView.ViewHolder {

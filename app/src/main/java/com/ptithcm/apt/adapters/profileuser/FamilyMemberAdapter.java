@@ -43,7 +43,8 @@ public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapte
 
     @Override
     public int getItemCount() {
-        return familyMemberList.size();
+        // Hiển thị tối đa 3 item (Preview mode)
+        return Math.min(familyMemberList.size(), 3);
     }
 
     public static class FamilyMemberViewHolder extends RecyclerView.ViewHolder {
