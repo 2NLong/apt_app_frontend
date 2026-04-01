@@ -6,4 +6,5 @@
     <color name="secondary">#EB959D</color>
     <color name="text_title">#1A1A1A</color>
     <color name="text_body">#666666</color>
+    <color name="background_color">#F8F8F8</color>
 </resources>

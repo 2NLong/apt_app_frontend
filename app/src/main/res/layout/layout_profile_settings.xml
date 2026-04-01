@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_settings_support_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:text="Cài đặt &amp; Hỗ trợ"
+        android:textColor="@color/text_title"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_change_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="12dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Đổi mật khẩu"
+            android:textColor="@color/text_title"
+            android:textSize="16sp"
+            android:drawablePadding="16dp"
+            app:drawableStartCompat="@drawable/ic_lock"
+            app:drawableEndCompat="@drawable/ic_arrow_right"
+            android:gravity="center_vertical" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_notification_settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Cài đặt thông báo"
+            android:textColor="@color/text_title"
+            android:textSize="16sp"
+            android:drawablePadding="16dp"
+            app:drawableStartCompat="@drawable/ic_notifications"
+            app:drawableEndCompat="@drawable/ic_arrow_right"
+            android:gravity="center_vertical" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_help"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="16dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="2dp">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="Trợ giúp"
+            android:textColor="@color/text_title"
+            android:textSize="16sp"
+            android:drawablePadding="16dp"
+            app:drawableStartCompat="@drawable/ic_help"
+            app:drawableEndCompat="@drawable/ic_arrow_right"
+            android:gravity="center_vertical" />
+    </androidx.cardview.widget.CardView>
+
+    <Button
+        android:id="@+id/btn_logout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="24dp"
+        android:layout_marginTop="32dp"
+        android:background="@drawable/bg_button_auth"
+        android:drawableStart="@drawable/ic_logout"
+        android:drawablePadding="12dp"
+        android:paddingVertical="12dp"
+        android:paddingHorizontal="24dp"
+        android:text="Đăng xuất"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:backgroundTint="@null" />
+
+</LinearLayout>
