@@ -9,4 +9,36 @@
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">14sp</item>
     </style>
+
+    <style name="DetailRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingVertical">8dp</item>
+    </style>
+
+    <style name="DetailLabel">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:textColor">#757575</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DetailValue">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DetailValueBold" parent="DetailValue">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">#EEEEEE</item>
+    </style>
 </resources>
