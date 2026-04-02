@@ -86,8 +86,8 @@ public class BillsFragment extends Fragment {
 
         // INIT VIEW
         rvBills = view.findViewById(R.id.rvBills);
-        tabUnpaid = view.findViewById(R.id.tabUnpaid);
-        tabHistory = view.findViewById(R.id.tabHistory);
+//        tabUnpaid = view.findViewById(R.id.tabUnpaid);
+//        tabHistory = view.findViewById(R.id.tabHistory);
         tvDebt = view.findViewById(R.id.tvDebt);
         tvPaid = view.findViewById(R.id.tvPaid);
 
@@ -101,20 +101,20 @@ public class BillsFragment extends Fragment {
 
         // SET SUMMARY
 
-        // TAB CLICK
-        tabUnpaid.setOnClickListener(v -> {
-            adapter.updateList(unpaidList);
-            // Sửa tại đây
-            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
-            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
-        });
+//        // TAB CLICK
+//        tabUnpaid.setOnClickListener(v -> {
+//            adapter.updateList(unpaidList);
+//            // Sửa tại đây
+//            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+//            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
+//        });
 
-        tabHistory.setOnClickListener(v -> {
-            adapter.updateList(paidList);
-            // Sửa tại đây
-            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
-            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
-        });
+//        tabHistory.setOnClickListener(v -> {
+//            adapter.updateList(paidList);
+//            // Sửa tại đây
+//            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
+//            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
+//        });
 
         return view;
     }
@@ -122,12 +122,12 @@ public class BillsFragment extends Fragment {
 
 
     private void initData() {
-        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
-        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
-        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
-
-        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
-        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
-        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
+//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
+//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
+//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
+//
+//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
+//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
+//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
     }
 }
