@@ -73,7 +73,13 @@ public class AuthActivity extends AppCompatActivity {
     }
 
     private void navigateToMain() {
-        Intent intent = new Intent(this, MainActivity.class);
+        String role = sessionManager.getRole();
+        Intent intent;
+        if ("ROLE_USER".equals(role)) {
+            intent = new Intent(this, MainActivity.class);
+        } else {
+            intent = new Intent(this, AdminActivity.class);
+        }
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

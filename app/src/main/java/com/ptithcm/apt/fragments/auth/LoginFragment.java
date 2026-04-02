@@ -15,6 +15,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.activities.AdminActivity;
 import com.ptithcm.apt.activities.MainActivity;
 import com.ptithcm.apt.databinding.FragmentLoginBinding;
 import com.ptithcm.apt.viewmodel.auth.LoginViewModel;
@@ -59,8 +60,16 @@ public class LoginFragment extends Fragment {
     private void observeViewModel() {
         // Kết quả đăng nhập thành công — session đã được lưu trong Repository
         loginViewModel.loginResult.observe(getViewLifecycleOwner(), loginResponse -> {
-            if (loginResponse != null) {
-                Intent intent = new Intent(requireContext(), MainActivity.class);
+            if (loginResponse != null && loginResponse.getUser() != null) {
+                String role = loginResponse.getUser().getRole();
+                Intent intent;
+                
+                if ("ROLE_USER".equals(role)) {
+                    intent = new Intent(requireContext(), MainActivity.class);
+                } else {
+                    intent = new Intent(requireContext(), AdminActivity.class);
+                }
+                
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
