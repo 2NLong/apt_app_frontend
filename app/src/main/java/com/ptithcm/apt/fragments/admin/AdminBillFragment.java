@@ -1,66 +1,87 @@
 package com.ptithcm.apt.fragments.admin;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.NumberPicker;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
 import com.ptithcm.apt.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AdminBillFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AdminBillFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int currentSelectedMonth = 4;
+    private int currentSelectedYear = 2026;
 
     public AdminBillFragment() {
-        // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AdminBillsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AdminBillFragment newInstance(String param1, String param2) {
-        AdminBillFragment fragment = new AdminBillFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Nạp layout fragment_admin_bill
+        return inflater.inflate(R.layout.fragment_admin_bill, container, false);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Tìm ChipDateFilter sau khi View đã được tạo thành công
+        Chip chipDate = view.findViewById(R.id.chipDateFilter);
+
+        if (chipDate != null) {
+            chipDate.setOnClickListener(v -> showMonthYearPicker());
         }
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_bill, container, false);
+    private void showMonthYearPicker() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_month_year_picker, null);
+
+        NumberPicker pickerMonth = dialogView.findViewById(R.id.pickerMonth);
+        NumberPicker pickerYear = dialogView.findViewById(R.id.pickerYear);
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+
+        if (pickerMonth != null) {
+            pickerMonth.setMinValue(1);
+            pickerMonth.setMaxValue(12);
+            pickerMonth.setValue(currentSelectedMonth);
+        }
+
+        if (pickerYear != null) {
+            pickerYear.setMinValue(2020);
+            pickerYear.setMaxValue(2030);
+            pickerYear.setValue(currentSelectedYear);
+        }
+
+        if (btnConfirm != null) {
+            btnConfirm.setOnClickListener(v -> {
+                if (pickerMonth != null && pickerYear != null) {
+                    currentSelectedMonth = pickerMonth.getValue();
+                    currentSelectedYear = pickerYear.getValue();
+
+                    // Cập nhật lại text cho Chip
+                    View view = getView();
+                    if (view != null) {
+                        Chip chipDate = view.findViewById(R.id.chipDateFilter);
+                        if (chipDate != null) {
+                            chipDate.setText("Tháng " + currentSelectedMonth + "/" + currentSelectedYear);
+                        }
+                    }
+
+                    // TODO: Gọi hàm reload dữ liệu hóa đơn tại đây
+                }
+                dialog.dismiss();
+            });
+        }
+
+        dialog.setContentView(dialogView);
+        dialog.show();
     }
 }
