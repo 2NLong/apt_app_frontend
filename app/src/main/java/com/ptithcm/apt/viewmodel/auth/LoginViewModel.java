@@ -30,6 +30,10 @@ public class LoginViewModel extends ViewModel {
     public final LiveData<String> refreshError = _refreshError;
     public final LiveData<Boolean> isRefreshing = _isRefreshing;
 
+    // Logout
+    private final MutableLiveData<Boolean> _logoutResult = new MutableLiveData<>();
+    public final LiveData<Boolean> logoutResult = _logoutResult;
+
     public LoginViewModel(AuthRepository authRepository) {
         this.authRepository = authRepository;
     }
@@ -65,5 +69,12 @@ public class LoginViewModel extends ViewModel {
 
     public void clearRefreshError() {
         _refreshError.setValue(null);
+    }
+
+    /**
+     * Thực hiện đăng xuất.
+     */
+    public void logout() {
+        authRepository.logout(_logoutResult, _errorMessage);
     }
 }
