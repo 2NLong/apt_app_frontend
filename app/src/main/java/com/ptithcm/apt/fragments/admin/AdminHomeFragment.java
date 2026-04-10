@@ -3,12 +3,16 @@ package com.ptithcm.apt.fragments.admin;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.fragments.apartment.ManageApartmentFragment;
+import com.ptithcm.apt.fragments.ManageContractFragment;
+import com.ptithcm.apt.fragments.ManageResidentFragment;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,6 +21,8 @@ import com.ptithcm.apt.R;
  */
 public class AdminHomeFragment extends Fragment {
 
+//    private Button btnManageApartment, btnManageResident, btnContract;
+    private androidx.cardview.widget.CardView btnManageApartment, btnManageResident, btnContract;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -60,7 +66,25 @@ public class AdminHomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_home, container, false);
+        View view  = inflater.inflate(R.layout.fragment_admin_home,container,false);
+
+        btnManageApartment = view.findViewById(R.id.btn_manage_apartment);
+        btnManageResident = view.findViewById(R.id.btn_manage_resident);
+        btnContract = view.findViewById(R.id.btn_contract);
+
+        btnManageApartment.setOnClickListener(v -> openFragment(new ManageApartmentFragment()));
+        btnManageResident.setOnClickListener(v -> openFragment(new ManageResidentFragment()));
+        btnContract.setOnClickListener(v -> openFragment(new ManageContractFragment()));
+        return view;
+    }
+    private void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+
+        transaction.setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out);
+
+        transaction.add(R.id.admin_fragment_container, fragment);
+
+        transaction.addToBackStack(null);
+        transaction.commit();
     }
 }
