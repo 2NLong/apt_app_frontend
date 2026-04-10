@@ -31,7 +31,8 @@ public class ProfileViewModel extends ViewModel {
         _isLoading.setValue(true);
         profileApiService.getProfileDashboard().enqueue(new Callback<ApiResponse<ProfileDashboardResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<ProfileDashboardResponse>> call, Response<ApiResponse<ProfileDashboardResponse>> response) {
+            public void onResponse(Call<ApiResponse<ProfileDashboardResponse>> call,
+                    Response<ApiResponse<ProfileDashboardResponse>> response) {
                 _isLoading.setValue(false);
                 if (response.isSuccessful() && response.body() != null) {
                     if (response.body().getStatus() == 200) {

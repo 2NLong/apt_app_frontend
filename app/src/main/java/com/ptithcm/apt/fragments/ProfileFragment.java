@@ -203,7 +203,6 @@ public class ProfileFragment extends Fragment {
         profileViewModel.fetchProfileDashboard();
     }
 
-
     /** trạng thái expanded */
     interface BooleanGetter {
         boolean get();

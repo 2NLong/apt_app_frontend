@@ -5,13 +5,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
-import com.ptithcm.apt.fragments.BillsFragment;
-import com.ptithcm.apt.fragments.HomeFragment;
-import com.ptithcm.apt.fragments.NotificationFragment;
-import com.ptithcm.apt.fragments.ProfileFragment;
 import com.ptithcm.apt.fragments.admin.AdminBillFragment;
 import com.ptithcm.apt.fragments.admin.AdminHomeFragment;
-import com.ptithcm.apt.fragments.admin.AdminMetricFragment;
+import com.ptithcm.apt.fragments.admin.AdminServiceConfigFragment;
 import com.ptithcm.apt.fragments.admin.AdminNotificationFragment;
 
 public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
@@ -30,7 +26,7 @@ public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
             case 0:
                 return new AdminHomeFragment();
             case 1:
-                return new AdminMetricFragment();
+                return new AdminServiceConfigFragment();
             case 2:
                 return new AdminBillFragment();
             case 3:

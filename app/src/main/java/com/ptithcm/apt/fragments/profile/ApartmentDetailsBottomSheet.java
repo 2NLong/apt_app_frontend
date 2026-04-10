@@ -34,7 +34,8 @@ public class ApartmentDetailsBottomSheet extends BottomSheetDialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.dialog_apartment_details, container, false);
     }
 
@@ -59,24 +60,24 @@ public class ApartmentDetailsBottomSheet extends BottomSheetDialogFragment {
             ProfileApartmentResponse apt = (ProfileApartmentResponse) getArguments().getSerializable(ARG_APARTMENT);
             if (apt != null) {
                 iconApartment.setImageResource(R.drawable.ic_home);
-                tvRoomNumber.setText("Can ho " + (apt.getRoomNumber() != null ? apt.getRoomNumber() : "---"));
+                tvRoomNumber.setText("Căn hộ " + (apt.getRoomNumber() != null ? apt.getRoomNumber() : "---"));
 
-                // Status hien thi tu role
+                // Trạng thái hiển thị từ vai trò (Role)
                 tvStatus.setText(apt.getRole() != null ? apt.getRole() : "---");
 
-                tvFloor.setText("Tang: " + (apt.getFloor() != null ? apt.getFloor() : "---"));
-                tvArea.setText("Dien tich: " + (apt.getArea() != null ? apt.getArea() + "m2" : "---"));
+                tvFloor.setText("Tầng: " + (apt.getFloor() != null ? apt.getFloor() : "---"));
+                tvArea.setText("Diện tích: " + (apt.getArea() != null ? apt.getArea() + "m²" : "---"));
 
-                String roleText = "Vai tro: " + (apt.getRole() != null ? apt.getRole() : "---");
+                String roleText = "Vai trò: " + (apt.getRole() != null ? apt.getRole() : "---");
                 if (Boolean.TRUE.equals(apt.getIsHead())) {
-                    roleText += " (Chu ho)";
+                    roleText += " (Chủ hộ)";
                 }
                 tvRole.setText(roleText);
 
                 if (apt.getContractStart() != null || apt.getContractEnd() != null) {
                     String start = apt.getContractStart() != null ? apt.getContractStart() : "...";
                     String end = apt.getContractEnd() != null ? apt.getContractEnd() : "...";
-                    tvContractPeriod.setText("Hop dong: " + start + " - " + end);
+                    tvContractPeriod.setText("Hợp đồng: " + start + " - " + end);
                     tvContractPeriod.setVisibility(View.VISIBLE);
                 } else {
                     tvContractPeriod.setVisibility(View.GONE);
@@ -100,7 +101,8 @@ public class ApartmentDetailsBottomSheet extends BottomSheetDialogFragment {
     }
 
     private String formatCurrency(BigDecimal amount) {
-        if (amount == null) return "---";
+        if (amount == null)
+            return "---";
         try {
             NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
             return formatter.format(amount);

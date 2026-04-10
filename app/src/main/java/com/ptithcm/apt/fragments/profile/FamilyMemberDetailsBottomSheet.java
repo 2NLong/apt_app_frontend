@@ -55,13 +55,13 @@ public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
                 iconPerson.setImageResource(R.drawable.ic_person);
                 tvFullName.setText(member.getFullName() != null ? member.getFullName() : "---");
 
-                String roleText = member.getRole() != null ? member.getRole() : "Thanh vien";
+                String roleText = member.getRole() != null ? member.getRole() : "Thành viên";
                 if (Boolean.TRUE.equals(member.getIsHead())) {
-                    roleText = "Chu ho";
+                    roleText = "Chủ hộ";
                 }
                 tvRoleTag.setText(roleText);
 
-                // FamilyMemberResponse khong co truong relation rieng, dung role lam nhan phu
+                // FamilyMemberResponse không có trường quan hệ riêng, dùng role làm nhãn phụ
                 if (member.getRole() != null && !member.getRole().isEmpty()) {
                     tvRelation.setText("(" + member.getRole() + ")");
                     tvRelation.setVisibility(View.VISIBLE);
@@ -69,8 +69,8 @@ public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
                     tvRelation.setVisibility(View.GONE);
                 }
 
-                tvPhone.setText("SDT: " + (member.getPhone() != null ? member.getPhone() : "---"));
-                tvDob.setText("Ngay sinh: " + (member.getDob() != null ? member.getDob() : "---"));
+                tvPhone.setText("SĐT: " + (member.getPhone() != null ? member.getPhone() : "---"));
+                tvDob.setText("Ngày sinh: " + (member.getDob() != null ? member.getDob() : "---"));
             }
         }
     }

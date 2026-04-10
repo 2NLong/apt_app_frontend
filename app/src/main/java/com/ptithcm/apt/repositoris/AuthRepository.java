@@ -125,7 +125,7 @@ public class AuthRepository {
                                 errorMessage.postValue(apiResponse.getMessage());
                             }
                         } else {
-                            errorMessage.postValue("Refresh failed: " + response.code());
+                            errorMessage.postValue("Làm mới token thất bại: " + response.code());
                         }
                     }
 

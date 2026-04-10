@@ -26,11 +26,12 @@ public class LoginFragment extends Fragment {
     private FragmentLoginBinding binding;
     private LoginViewModel loginViewModel;
 
-    public LoginFragment() {}
+    public LoginFragment() {
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         binding = FragmentLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -63,13 +64,13 @@ public class LoginFragment extends Fragment {
             if (loginResponse != null && loginResponse.getUser() != null) {
                 String role = loginResponse.getUser().getRole();
                 Intent intent;
-                
+
                 if ("ROLE_USER".equals(role)) {
                     intent = new Intent(requireContext(), MainActivity.class);
                 } else {
                     intent = new Intent(requireContext(), AdminActivity.class);
                 }
-                
+
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
