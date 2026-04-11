@@ -17,6 +17,9 @@ import com.ptithcm.apt.models.profile.FamilyMemberResponse;
 
 import java.io.Serializable;
 
+import com.ptithcm.apt.utils.FormatUtils;
+import com.ptithcm.apt.utils.RoleTranslator;
+
 public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
 
     private static final String ARG_MEMBER = "arg_member";
@@ -31,7 +34,8 @@ public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.dialog_family_member_details, container, false);
     }
 
@@ -55,7 +59,8 @@ public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
                 iconPerson.setImageResource(R.drawable.ic_person);
                 tvFullName.setText(member.getFullName() != null ? member.getFullName() : "---");
 
-                String roleText = member.getRole() != null ? member.getRole() : "Thành viên";
+                String roleText = member.getRole() != null ? RoleTranslator.translateRole(member.getRole())
+                        : "Thành viên";
                 if (Boolean.TRUE.equals(member.getIsHead())) {
                     roleText = "Chủ hộ";
                 }
@@ -63,14 +68,15 @@ public class FamilyMemberDetailsBottomSheet extends BottomSheetDialogFragment {
 
                 // FamilyMemberResponse không có trường quan hệ riêng, dùng role làm nhãn phụ
                 if (member.getRole() != null && !member.getRole().isEmpty()) {
-                    tvRelation.setText("(" + member.getRole() + ")");
+                    tvRelation.setText("(" + RoleTranslator.translateRole(member.getRole()) + ")");
                     tvRelation.setVisibility(View.VISIBLE);
                 } else {
                     tvRelation.setVisibility(View.GONE);
                 }
 
                 tvPhone.setText("SĐT: " + (member.getPhone() != null ? member.getPhone() : "---"));
-                tvDob.setText("Ngày sinh: " + (member.getDob() != null ? member.getDob() : "---"));
+                tvDob.setText(
+                        "Ngày sinh: " + (member.getDob() != null ? FormatUtils.formatDate(member.getDob()) : "---"));
             }
         }
     }

@@ -14,6 +14,8 @@ import com.ptithcm.apt.models.profile.FamilyMemberResponse;
 
 import java.util.List;
 
+import com.ptithcm.apt.utils.RoleTranslator;
+
 public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapter.FamilyMemberViewHolder> {
 
     private List<FamilyMemberResponse> familyMemberList;
@@ -50,7 +52,7 @@ public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapte
         FamilyMemberResponse member = familyMemberList.get(position);
         holder.iconPerson.setImageResource(R.drawable.ic_person);
         holder.tvMemberName.setText(member.getFullName() != null ? member.getFullName() : "---");
-        holder.tvMemberRelation.setText(member.getRole() != null ? member.getRole() : "---");
+        holder.tvMemberRelation.setText(RoleTranslator.translateRole(member.getRole()));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

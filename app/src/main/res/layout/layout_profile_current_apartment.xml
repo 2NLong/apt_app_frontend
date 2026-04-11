@@ -19,25 +19,40 @@
             android:id="@+id/tv_status_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ĐANG THUÊ"
+            tools:text="VỊ TRÍ: ĐANG THUÊ"
             android:textColor="@color/text_body"
-            android:textSize="16sp"
-            android:textStyle="bold"
+            android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_is_head_current"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="(Chủ hộ)"
+            android:textColor="@color/primary"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            app:layout_constraintStart_toEndOf="@id/tv_status_current"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_apartment_name_current"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Căn hộ 1204"
+            android:layout_marginTop="4dp"
+            tools:text="Căn hộ 1204"
             android:textColor="@color/text_title"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_status_current" />
 
         <LinearLayout
+            android:id="@+id/layout_tags_current"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -52,7 +67,7 @@
                 android:background="@drawable/bg_rounded_tag"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="Tầng 12"
+                tools:text="Tầng 12"
                 android:textColor="@color/text_body"
                 android:textSize="12sp" />
 
@@ -64,19 +79,45 @@
                 android:background="@drawable/bg_rounded_tag"
                 android:paddingHorizontal="10dp"
                 android:paddingVertical="4dp"
-                android:text="75m²"
+                tools:text="75m²"
                 android:textColor="@color/text_body"
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/icon_arrow_current"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
-            android:src="@drawable/ic_door_open"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="vertical"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_tags_current">
 
+            <TextView
+                android:id="@+id/tv_contract_period_current"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Hợp đồng: 01/01/2024 - 31/12/2024"
+                android:textColor="@color/text_body"
+                android:textSize="14sp" />
+                
+            <TextView
+                android:id="@+id/tv_rental_price_current"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                tools:text="Giá thuê: 5.000.000 VNĐ"
+                android:textColor="@color/text_title"
+                android:textStyle="bold"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/tv_deposit_amount_current"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                tools:text="Tiền cọc: 10.000.000 VNĐ"
+                android:textColor="@color/text_body"
+                android:textSize="14sp" />
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

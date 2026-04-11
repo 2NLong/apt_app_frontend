@@ -62,7 +62,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="Quản lý mức giá tiện ích và phí dịch vụ của cơ sở. Các cập nhật được lên lịch để đảm bảo chu kỳ thanh toán minh bạch cho cư dân."
+                android:text="@string/pricing_strategy_desc"
                 android:textSize="14sp"
                 android:textColor="@color/text_body"
                 android:lineSpacingMultiplier="1.4"/>
@@ -82,9 +82,10 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
                     <TextView
+                        android:id="@+id/tvActiveServicesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4"
+                        tools:text="4"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/primary"
@@ -104,9 +105,10 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
                     <TextView
+                        android:id="@+id/tvPendingUpdatesCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="2"
+                        tools:text="2"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="@color/secondary"
@@ -197,7 +199,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Các bản sửa đổi đã lên lịch sẽ tự động kích hoạt vào lúc 00:00 sáng ngày có hiệu lực. Cư dân sẽ được thông báo qua ứng dụng 7 ngày trước bất kỳ thay đổi giá nào."
+                    android:text="@string/update_pricing_policy_desc"
                     android:textSize="13sp"
                     android:textColor="@color/text_body"
                     android:lineSpacingMultiplier="1.4"/>

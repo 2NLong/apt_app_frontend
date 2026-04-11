@@ -34,6 +34,9 @@ import com.ptithcm.apt.viewmodel.profile.ProfileViewModelFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ptithcm.apt.utils.FormatUtils;
+import com.ptithcm.apt.utils.RoleTranslator;
+
 public class ProfileFragment extends Fragment {
 
     // --- Header ---
@@ -44,6 +47,7 @@ public class ProfileFragment extends Fragment {
 
     // --- Current Apartment card ---
     private TextView tvStatusCurrent, tvApartmentNameCurrent, tvFloorCurrent, tvAreaCurrent;
+    private TextView tvIsHeadCurrent, tvContractPeriodCurrent, tvRentalPriceCurrent, tvDepositAmountCurrent;
 
     // --- Owned Apartments RecyclerView ---
     private RecyclerView rvOwnedApartments;
@@ -98,9 +102,13 @@ public class ProfileFragment extends Fragment {
         // Current apartment card
         View currentApt = view.findViewById(R.id.layout_current_apartment);
         tvStatusCurrent = currentApt.findViewById(R.id.tv_status_current);
+        tvIsHeadCurrent = currentApt.findViewById(R.id.tv_is_head_current);
         tvApartmentNameCurrent = currentApt.findViewById(R.id.tv_apartment_name_current);
         tvFloorCurrent = currentApt.findViewById(R.id.tv_floor_current);
         tvAreaCurrent = currentApt.findViewById(R.id.tv_area_current);
+        tvContractPeriodCurrent = currentApt.findViewById(R.id.tv_contract_period_current);
+        tvRentalPriceCurrent = currentApt.findViewById(R.id.tv_rental_price_current);
+        tvDepositAmountCurrent = currentApt.findViewById(R.id.tv_deposit_amount_current);
 
         // Owned apartments RecyclerView
         rvOwnedApartments = view.findViewById(R.id.rv_owned_apartments);
@@ -113,6 +121,27 @@ public class ProfileFragment extends Fragment {
         // Logout button
         View settings = view.findViewById(R.id.layout_settings);
         settings.findViewById(R.id.btn_logout).setOnClickListener(v -> loginViewModel.logout());
+
+        // Notification Settings expand/collapse
+        View notificationHeader = settings.findViewById(R.id.layout_notification_header);
+        View notificationSwitches = settings.findViewById(R.id.layout_notification_switches);
+        android.widget.ImageView notificationArrow = settings.findViewById(R.id.icon_notification_arrow);
+
+        if (notificationHeader != null && notificationSwitches != null) {
+            notificationHeader.setOnClickListener(v -> {
+                if (notificationSwitches.getVisibility() == View.VISIBLE) {
+                    notificationSwitches.setVisibility(View.GONE);
+                    if (notificationArrow != null) {
+                        notificationArrow.animate().rotation(0).setDuration(200).start();
+                    }
+                } else {
+                    notificationSwitches.setVisibility(View.VISIBLE);
+                    if (notificationArrow != null) {
+                        notificationArrow.animate().rotation(90).setDuration(200).start();
+                    }
+                }
+            });
+        }
 
         // ADAPTERS
         apartmentList = new ArrayList<>();
@@ -161,7 +190,7 @@ public class ProfileFragment extends Fragment {
             if (info != null) {
                 tvName.setText(info.getFullName() != null ? info.getFullName() : "");
                 tvEmail.setText(info.getEmail() != null ? info.getEmail() : "");
-                tvDob.setText(info.getDob() != null ? info.getDob() : "---");
+                tvDob.setText(info.getDob() != null ? FormatUtils.formatDate(info.getDob()) : "---");
                 tvCitizenIdentity.setText(info.getCitizenIdentity() != null ? info.getCitizenIdentity() : "---");
                 tvPhone.setText(info.getPhone() != null ? info.getPhone() : "---");
             }
@@ -169,11 +198,50 @@ public class ProfileFragment extends Fragment {
             // --- Căn hộ đang ở ---
             ProfileApartmentResponse living = dashboard.getLivingApartment();
             if (living != null) {
-                tvStatusCurrent.setText(living.getRole() != null ? living.getRole() : "");
-                tvApartmentNameCurrent
-                        .setText("Căn hộ " + (living.getRoomNumber() != null ? living.getRoomNumber() : "---"));
-                tvFloorCurrent.setText("Tầng " + (living.getFloor() != null ? living.getFloor() : "---"));
-                tvAreaCurrent.setText(living.getArea() != null ? living.getArea() + "m²" : "---");
+                if (tvStatusCurrent != null) tvStatusCurrent.setText(RoleTranslator.translateRole(living.getRole()));
+                if (tvIsHeadCurrent != null) {
+                    if (Boolean.TRUE.equals(living.getIsHead())) {
+                        tvIsHeadCurrent.setVisibility(View.VISIBLE);
+                    } else {
+                        tvIsHeadCurrent.setVisibility(View.GONE);
+                    }
+                }
+                if (tvApartmentNameCurrent != null)
+                    tvApartmentNameCurrent.setText("Căn hộ " + (living.getRoomNumber() != null ? living.getRoomNumber() : "---"));
+                if (tvFloorCurrent != null) tvFloorCurrent.setText("Tầng " + (living.getFloor() != null ? living.getFloor() : "---"));
+                if (tvAreaCurrent != null) tvAreaCurrent.setText(living.getArea() != null ? living.getArea() + "m²" : "---");
+
+                if (tvContractPeriodCurrent != null) {
+                    if (living.getContractStart() != null || living.getContractEnd() != null) {
+                        String start = living.getContractStart() != null ? FormatUtils.formatDate(living.getContractStart()) : "...";
+                        String end = living.getContractEnd() != null ? FormatUtils.formatDate(living.getContractEnd()) : "...";
+                        tvContractPeriodCurrent.setText("Hợp đồng: " + start + " - " + end);
+                        tvContractPeriodCurrent.setVisibility(View.VISIBLE);
+                    } else {
+                        tvContractPeriodCurrent.setVisibility(View.GONE);
+                    }
+                }
+
+                boolean isOwner = "OWNER".equalsIgnoreCase(living.getRole());
+
+                if (tvRentalPriceCurrent != null) {
+                    if (!isOwner && living.getRentalPrice() != null) {
+                        tvRentalPriceCurrent.setText("Giá thuê: " + FormatUtils.formatCurrency(living.getRentalPrice()));
+                        tvRentalPriceCurrent.setVisibility(View.VISIBLE);
+                    } else {
+                        tvRentalPriceCurrent.setVisibility(View.GONE);
+                    }
+                }
+
+                if (tvDepositAmountCurrent != null) {
+                    if (!isOwner && living.getDepositAmount() != null) {
+                        tvDepositAmountCurrent.setText("Tiền cọc: " + FormatUtils.formatCurrency(living.getDepositAmount()));
+                        tvDepositAmountCurrent.setVisibility(View.VISIBLE);
+                    } else {
+                        tvDepositAmountCurrent.setVisibility(View.GONE);
+                    }
+                }
+
                 view.findViewById(R.id.layout_current_apartment).setVisibility(View.VISIBLE);
             } else {
                 view.findViewById(R.id.layout_current_apartment).setVisibility(View.GONE);

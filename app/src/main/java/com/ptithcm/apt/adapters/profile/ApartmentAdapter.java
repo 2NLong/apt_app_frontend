@@ -14,6 +14,8 @@ import com.ptithcm.apt.models.profile.ProfileApartmentResponse;
 
 import java.util.List;
 
+import com.ptithcm.apt.utils.RoleTranslator;
+
 public class ApartmentAdapter extends RecyclerView.Adapter<ApartmentAdapter.ApartmentViewHolder> {
 
     private List<ProfileApartmentResponse> apartmentList;
@@ -50,7 +52,7 @@ public class ApartmentAdapter extends RecyclerView.Adapter<ApartmentAdapter.Apar
         ProfileApartmentResponse apartment = apartmentList.get(position);
         holder.iconApartment.setImageResource(R.drawable.ic_home);
         holder.tvApartmentName.setText(apartment.getRoomNumber() != null ? apartment.getRoomNumber() : "---");
-        holder.tvApartmentStatus.setText(apartment.getRole() != null ? apartment.getRole() : "---");
+        holder.tvApartmentStatus.setText(RoleTranslator.translateRole(apartment.getRole()));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {

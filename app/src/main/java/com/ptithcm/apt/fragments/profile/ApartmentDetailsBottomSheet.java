@@ -17,8 +17,10 @@ import com.ptithcm.apt.models.profile.ProfileApartmentResponse;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.math.BigDecimal;
+
+import com.ptithcm.apt.utils.FormatUtils;
+import com.ptithcm.apt.utils.RoleTranslator;
 
 public class ApartmentDetailsBottomSheet extends BottomSheetDialogFragment {
 
@@ -63,51 +65,43 @@ public class ApartmentDetailsBottomSheet extends BottomSheetDialogFragment {
                 tvRoomNumber.setText("Căn hộ " + (apt.getRoomNumber() != null ? apt.getRoomNumber() : "---"));
 
                 // Trạng thái hiển thị từ vai trò (Role)
-                tvStatus.setText(apt.getRole() != null ? apt.getRole() : "---");
+                tvStatus.setText(RoleTranslator.translateRole(apt.getRole()));
 
                 tvFloor.setText("Tầng: " + (apt.getFloor() != null ? apt.getFloor() : "---"));
                 tvArea.setText("Diện tích: " + (apt.getArea() != null ? apt.getArea() + "m²" : "---"));
 
-                String roleText = "Vai trò: " + (apt.getRole() != null ? apt.getRole() : "---");
+                String roleText = "Vai trò: " + RoleTranslator.translateRole(apt.getRole());
                 if (Boolean.TRUE.equals(apt.getIsHead())) {
                     roleText += " (Chủ hộ)";
                 }
                 tvRole.setText(roleText);
 
                 if (apt.getContractStart() != null || apt.getContractEnd() != null) {
-                    String start = apt.getContractStart() != null ? apt.getContractStart() : "...";
-                    String end = apt.getContractEnd() != null ? apt.getContractEnd() : "...";
+                    String start = apt.getContractStart() != null ? FormatUtils.formatDate(apt.getContractStart())
+                            : "...";
+                    String end = apt.getContractEnd() != null ? FormatUtils.formatDate(apt.getContractEnd()) : "...";
                     tvContractPeriod.setText("Hợp đồng: " + start + " - " + end);
                     tvContractPeriod.setVisibility(View.VISIBLE);
                 } else {
                     tvContractPeriod.setVisibility(View.GONE);
                 }
 
-                if (apt.getRentalPrice() != null) {
-                    tvRentalPrice.setText("Giá thuê: " + formatCurrency(apt.getRentalPrice()));
+                boolean isOwner = "OWNER".equalsIgnoreCase(apt.getRole());
+
+                if (!isOwner && apt.getRentalPrice() != null) {
+                    tvRentalPrice.setText("Giá thuê: " + FormatUtils.formatCurrency(apt.getRentalPrice()));
                     tvRentalPrice.setVisibility(View.VISIBLE);
                 } else {
                     tvRentalPrice.setVisibility(View.GONE);
                 }
 
-                if (apt.getDepositAmount() != null) {
-                    tvDepositAmount.setText("Tiền cọc: " + formatCurrency(apt.getDepositAmount()));
+                if (!isOwner && apt.getDepositAmount() != null) {
+                    tvDepositAmount.setText("Tiền cọc: " + FormatUtils.formatCurrency(apt.getDepositAmount()));
                     tvDepositAmount.setVisibility(View.VISIBLE);
                 } else {
                     tvDepositAmount.setVisibility(View.GONE);
                 }
             }
-        }
-    }
-
-    private String formatCurrency(BigDecimal amount) {
-        if (amount == null)
-            return "---";
-        try {
-            NumberFormat formatter = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("vi-VN"));
-            return formatter.format(amount);
-        } catch (Exception e) {
-            return amount.toString() + " VNĐ";
         }
     }
 }
