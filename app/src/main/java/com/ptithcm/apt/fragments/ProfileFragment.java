@@ -36,6 +36,7 @@ import java.util.List;
 
 import com.ptithcm.apt.utils.FormatUtils;
 import com.ptithcm.apt.utils.RoleTranslator;
+import com.ptithcm.apt.utils.ToastUtils;
 
 public class ProfileFragment extends Fragment {
 
@@ -165,7 +166,7 @@ public class ProfileFragment extends Fragment {
         // OBSERVERS
         loginViewModel.logoutResult.observe(getViewLifecycleOwner(), isLoggedOut -> {
             if (Boolean.TRUE.equals(isLoggedOut)) {
-                Toast.makeText(requireContext(), "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show();
+                ToastUtils.showSuccessToast(requireContext(), "Đã đăng xuất thành công");
                 Intent intent = new Intent(requireActivity(), AuthActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
@@ -175,7 +176,7 @@ public class ProfileFragment extends Fragment {
 
         profileViewModel.error.observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
-                Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show();
+                ToastUtils.showErrorToast(requireContext(), error);
             }
         });
 

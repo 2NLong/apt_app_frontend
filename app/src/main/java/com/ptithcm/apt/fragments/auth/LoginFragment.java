@@ -15,6 +15,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.activities.AdminActivity;
 import com.ptithcm.apt.activities.MainActivity;
 import com.ptithcm.apt.databinding.FragmentLoginBinding;
@@ -71,6 +72,8 @@ public class LoginFragment extends Fragment {
                     intent = new Intent(requireContext(), AdminActivity.class);
                 }
 
+                ToastUtils.showSuccessToast(requireContext(), "Đăng nhập thành công!");
+                
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }
@@ -79,7 +82,7 @@ public class LoginFragment extends Fragment {
         // Thông báo lỗi
         loginViewModel.errorMessage.observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
-                Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show();
+                ToastUtils.showErrorToast(requireContext(), error);
                 loginViewModel.clearError();
             }
         });

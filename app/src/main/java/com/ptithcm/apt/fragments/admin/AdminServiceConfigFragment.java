@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import android.graphics.drawable.GradientDrawable;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModel;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModelFactory;
@@ -105,7 +106,7 @@ public class AdminServiceConfigFragment extends Fragment {
 
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
              if (errorMsg != null && !errorMsg.isEmpty()) {
-                 Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                 ToastUtils.showErrorToast(requireContext(), errorMsg);
              }
         });
 

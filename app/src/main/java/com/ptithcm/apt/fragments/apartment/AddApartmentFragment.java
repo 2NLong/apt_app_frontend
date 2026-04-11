@@ -36,7 +36,7 @@ public class AddApartmentFragment extends Fragment {
     private TextInputEditText edtRoomNumber, edtFloor, edtArea;
     private Spinner spinnerStatus;
     private Button btnSave;
-    private String[] statusRaw = {"AVAILABLE", "RENTED", "OWNED"};
+    private String[] statusRaw = { "AVAILABLE", "RENTED", "OWNED" };
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,12 +63,12 @@ public class AddApartmentFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_item,
-                statusRaw
-        );
+                statusRaw);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStatus.setAdapter(adapter);
     }
+
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -98,7 +98,7 @@ public class AddApartmentFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_apartment, container, false);
 
         initViews(view);
@@ -117,7 +117,7 @@ public class AddApartmentFragment extends Fragment {
         String status = statusRaw[spinnerStatus.getSelectedItemPosition()];
 
         // 2. Kiểm tra rỗng (Validation)
-        if(room.isEmpty() || floor.isEmpty() || area.isEmpty()) {
+        if (room.isEmpty() || floor.isEmpty() || area.isEmpty()) {
             Toast.makeText(getContext(), "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -137,8 +137,7 @@ public class AddApartmentFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Thêm căn hộ thành công!", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().popBackStack();
-                }
-                else {
+                } else {
                     try {
                         String errorBody = response.errorBody().string();
                         JSONObject jsonObject = new JSONObject(errorBody);
