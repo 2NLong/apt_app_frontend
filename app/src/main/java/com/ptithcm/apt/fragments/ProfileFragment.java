@@ -199,7 +199,8 @@ public class ProfileFragment extends Fragment {
             // --- Căn hộ đang ở ---
             ProfileApartmentResponse living = dashboard.getLivingApartment();
             if (living != null) {
-                if (tvStatusCurrent != null) tvStatusCurrent.setText(RoleTranslator.translateRole(living.getRole()));
+                if (tvStatusCurrent != null)
+                    tvStatusCurrent.setText(RoleTranslator.translateRole(living.getRole()));
                 if (tvIsHeadCurrent != null) {
                     if (Boolean.TRUE.equals(living.getIsHead())) {
                         tvIsHeadCurrent.setVisibility(View.VISIBLE);
@@ -208,14 +209,20 @@ public class ProfileFragment extends Fragment {
                     }
                 }
                 if (tvApartmentNameCurrent != null)
-                    tvApartmentNameCurrent.setText("Căn hộ " + (living.getRoomNumber() != null ? living.getRoomNumber() : "---"));
-                if (tvFloorCurrent != null) tvFloorCurrent.setText("Tầng " + (living.getFloor() != null ? living.getFloor() : "---"));
-                if (tvAreaCurrent != null) tvAreaCurrent.setText(living.getArea() != null ? living.getArea() + "m²" : "---");
+                    tvApartmentNameCurrent
+                            .setText("Căn hộ " + (living.getRoomNumber() != null ? living.getRoomNumber() : "---"));
+                if (tvFloorCurrent != null)
+                    tvFloorCurrent.setText("Tầng " + (living.getFloor() != null ? living.getFloor() : "---"));
+                if (tvAreaCurrent != null)
+                    tvAreaCurrent.setText(living.getArea() != null ? living.getArea() + "m²" : "---");
 
                 if (tvContractPeriodCurrent != null) {
                     if (living.getContractStart() != null || living.getContractEnd() != null) {
-                        String start = living.getContractStart() != null ? FormatUtils.formatDate(living.getContractStart()) : "...";
-                        String end = living.getContractEnd() != null ? FormatUtils.formatDate(living.getContractEnd()) : "...";
+                        String start = living.getContractStart() != null
+                                ? FormatUtils.formatDate(living.getContractStart())
+                                : "...";
+                        String end = living.getContractEnd() != null ? FormatUtils.formatDate(living.getContractEnd())
+                                : "...";
                         tvContractPeriodCurrent.setText("Hợp đồng: " + start + " - " + end);
                         tvContractPeriodCurrent.setVisibility(View.VISIBLE);
                     } else {
@@ -227,7 +234,8 @@ public class ProfileFragment extends Fragment {
 
                 if (tvRentalPriceCurrent != null) {
                     if (!isOwner && living.getRentalPrice() != null) {
-                        tvRentalPriceCurrent.setText("Giá thuê: " + FormatUtils.formatCurrency(living.getRentalPrice()));
+                        tvRentalPriceCurrent
+                                .setText("Giá thuê: " + FormatUtils.formatCurrency(living.getRentalPrice()));
                         tvRentalPriceCurrent.setVisibility(View.VISIBLE);
                     } else {
                         tvRentalPriceCurrent.setVisibility(View.GONE);
@@ -236,7 +244,8 @@ public class ProfileFragment extends Fragment {
 
                 if (tvDepositAmountCurrent != null) {
                     if (!isOwner && living.getDepositAmount() != null) {
-                        tvDepositAmountCurrent.setText("Tiền cọc: " + FormatUtils.formatCurrency(living.getDepositAmount()));
+                        tvDepositAmountCurrent
+                                .setText("Tiền cọc: " + FormatUtils.formatCurrency(living.getDepositAmount()));
                         tvDepositAmountCurrent.setVisibility(View.VISIBLE);
                     } else {
                         tvDepositAmountCurrent.setVisibility(View.GONE);

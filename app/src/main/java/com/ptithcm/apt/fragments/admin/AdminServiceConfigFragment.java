@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,13 +15,13 @@ import androidx.lifecycle.ViewModelProvider;
 import android.graphics.drawable.GradientDrawable;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.FormatUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModel;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModelFactory;
 
-import java.text.NumberFormat;
-import java.util.Locale;
+import java.math.BigDecimal;
 
 public class AdminServiceConfigFragment extends Fragment {
 
@@ -92,6 +91,11 @@ public class AdminServiceConfigFragment extends Fragment {
                      if (serviceView != null) {
                          setupServiceItem(serviceView, config.getServiceName(), config.getUnit(), iconRes);
                          updatePriceData(serviceView, config);
+                         // Bắt sự kiện click vào nút Đặt lịch thay đổi
+                         View btnEdit = serviceView.findViewById(R.id.button_edit);
+                         if (btnEdit != null) {
+                             btnEdit.setOnClickListener(v -> showEditDialog(config));
+                         }
                      }
                  }
                  
@@ -113,6 +117,96 @@ public class AdminServiceConfigFragment extends Fragment {
         viewModel.fetchServiceConfigs();
     }
 
+    private void showEditDialog(AdminServiceConfigResponse config) {
+        android.app.Dialog dialog = new android.app.Dialog(requireContext());
+        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_edit_serviceconfig);
+        
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            dialog.getWindow().setLayout(
+                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 
+                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+        }
+
+        TextView tvServiceType = dialog.findViewById(R.id.tv_service_type);
+        if(tvServiceType != null) {
+            tvServiceType.setText((config.getServiceName() != null ? config.getServiceName().toUpperCase() : ""));
+        }
+        
+        android.widget.EditText etPrice = dialog.findViewById(R.id.et_new_unit_price);
+        if (etPrice != null) {
+            BigDecimal upcomingPrice = config.getUpcomingPrice();
+            if (upcomingPrice != null) {
+                // Hiển thị số nguyên (làm tròn nếu cần) cho ô nhập liệu
+                etPrice.setText(upcomingPrice.setScale(0, java.math.RoundingMode.HALF_UP).toPlainString());
+            } else {
+                etPrice.setText("");
+            }
+        }
+        
+        TextView tvCurrency = dialog.findViewById(R.id.tv_currency);
+        if (tvCurrency != null && config.getUnit() != null) {
+            tvCurrency.setText(config.getUnit());
+        }
+
+        android.widget.NumberPicker npMonth = dialog.findViewById(R.id.np_month);
+        android.widget.NumberPicker npYear = dialog.findViewById(R.id.np_year);
+
+        if (npMonth != null && npYear != null) {
+            npMonth.setMinValue(0);
+            npMonth.setMaxValue(11);
+            String[] months = new String[12];
+            for (int i = 0; i < 12; i++) {
+                months[i] = "Tháng " + (i + 1);
+            }
+            npMonth.setDisplayedValues(months);
+
+            java.util.Calendar cal = java.util.Calendar.getInstance();
+            int currentYear = cal.get(java.util.Calendar.YEAR);
+            int currentMonth = cal.get(java.util.Calendar.MONTH);
+
+            // Parser ngày sắp tới (nếu có)
+            String upcomingDateStr = config.getUpcomingEffectiveFrom();
+            if (upcomingDateStr != null && !upcomingDateStr.isEmpty()) {
+                String[] parts = upcomingDateStr.split("-");
+                if (parts.length >= 2) {
+                    try {
+                        currentYear = Integer.parseInt(parts[0]);
+                        currentMonth = Integer.parseInt(parts[1]) - 1;
+                    } catch (NumberFormatException ignored) {}
+                }
+            }
+
+            npYear.setMinValue(cal.get(java.util.Calendar.YEAR));
+            npYear.setMaxValue(cal.get(java.util.Calendar.YEAR) + 10);
+
+            npMonth.setValue(currentMonth);
+            npYear.setValue(currentYear);
+        }
+
+        View btnClose = dialog.findViewById(R.id.iv_close_icon);
+        View tvCancel = dialog.findViewById(R.id.tv_cancel);
+        View btnSave = dialog.findViewById(R.id.btn_schedule_change);
+
+        if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
+        if (tvCancel != null) tvCancel.setOnClickListener(v -> dialog.dismiss());
+        if (btnSave != null) {
+            btnSave.setOnClickListener(v -> {
+                int selectedMonth = npMonth != null ? npMonth.getValue() + 1 : 1;
+                int selectedYear = npYear != null ? npYear.getValue() : 2024;
+                String priceStr = etPrice != null ? etPrice.getText().toString() : "";
+                
+                ToastUtils.showSuccessToast(requireContext(), 
+                    "Lưu giá " + priceStr + " đ áp dụng từ Tháng " + selectedMonth + "/" + selectedYear);
+                dialog.dismiss();
+            });
+        }
+        
+        dialog.show();
+    }
+
     private void updatePriceData(View view, AdminServiceConfigResponse config) {
         View currentPriceLayout = view.findViewById(R.id.layout_current_price);
         View upcomingPriceLayout = view.findViewById(R.id.layout_upcoming_price);
@@ -121,16 +215,16 @@ public class AdminServiceConfigFragment extends Fragment {
             TextView textPrice = currentPriceLayout.findViewById(R.id.text_price);
             TextView textDate = currentPriceLayout.findViewById(R.id.text_date);
             
-            Double price = config.getCurrentPrice();
+            BigDecimal price = config.getCurrentPrice();
             if (price != null) {
-                textPrice.setText(formatCurrency(price));
+                textPrice.setText(FormatUtils.formatCurrency(price));
             } else {
                 textPrice.setText("--");
             }
             
             String date = config.getCurrentEffectiveFrom();
             if (date != null && !date.isEmpty()) {
-                textDate.setText("Từ ngày " + formatDate(date));
+                textDate.setText("Từ ngày " + FormatUtils.formatDate(date));
             } else {
                 textDate.setText("Chưa áp dụng");
             }
@@ -142,16 +236,16 @@ public class AdminServiceConfigFragment extends Fragment {
             View layoutDate = upcomingPriceLayout.findViewById(R.id.layout_date);
             TextView textNoRevision = upcomingPriceLayout.findViewById(R.id.text_no_revision);
 
-            Double price = config.getUpcomingPrice();
+            BigDecimal price = config.getUpcomingPrice();
             if (price != null) {
                 textPrice.setVisibility(View.VISIBLE);
-                textPrice.setText(formatCurrency(price));
+                textPrice.setText(FormatUtils.formatCurrency(price));
                 
                 if (layoutDate != null) layoutDate.setVisibility(View.VISIBLE);
                 
                 String date = config.getUpcomingEffectiveFrom();
                 if (date != null && !date.isEmpty()) {
-                    textDate.setText("Từ ngày " + formatDate(date));
+                    textDate.setText("Từ ngày " + FormatUtils.formatDate(date));
                 } else {
                     textDate.setText("Chưa xác định");
                 }
@@ -165,19 +259,6 @@ public class AdminServiceConfigFragment extends Fragment {
         }
     }
 
-    private String formatCurrency(Double amount) {
-        if (amount == null) return "0";
-        return NumberFormat.getNumberInstance(Locale.US).format(Math.round(amount));
-    }
-
-    private String formatDate(String input) {
-        if (input == null || input.isEmpty()) return "";
-        String[] parts = input.split("-");
-        if (parts.length == 3) {
-            return parts[2] + "/" + parts[1] + "/" + parts[0];
-        }
-        return input;
-    }
 
     /**
      * Thiết lập dữ liệu và giao diện cho từng mục dịch vụ.

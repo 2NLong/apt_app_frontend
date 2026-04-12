@@ -73,7 +73,7 @@ public class LoginFragment extends Fragment {
                 }
 
                 ToastUtils.showSuccessToast(requireContext(), "Đăng nhập thành công!");
-                
+
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
             }

@@ -1,12 +1,14 @@
 package com.ptithcm.apt.models.adminserviceconfig;
 
+import java.math.BigDecimal;
+
 public class AdminServiceConfigResponse {
     private String serviceCode;
     private String serviceName;
     private String unit;
-    private Double currentPrice;
+    private BigDecimal currentPrice;
     private String currentEffectiveFrom;
-    private Double upcomingPrice;
+    private BigDecimal upcomingPrice;
     private String upcomingEffectiveFrom;
 
     public String getServiceCode() {
@@ -33,11 +35,11 @@ public class AdminServiceConfigResponse {
         this.unit = unit;
     }
 
-    public Double getCurrentPrice() {
+    public BigDecimal getCurrentPrice() {
         return currentPrice;
     }
 
-    public void setCurrentPrice(Double currentPrice) {
+    public void setCurrentPrice(BigDecimal currentPrice) {
         this.currentPrice = currentPrice;
     }
 
@@ -49,11 +51,11 @@ public class AdminServiceConfigResponse {
         this.currentEffectiveFrom = currentEffectiveFrom;
     }
 
-    public Double getUpcomingPrice() {
+    public BigDecimal getUpcomingPrice() {
         return upcomingPrice;
     }
 
-    public void setUpcomingPrice(Double upcomingPrice) {
+    public void setUpcomingPrice(BigDecimal upcomingPrice) {
         this.upcomingPrice = upcomingPrice;
     }
 
