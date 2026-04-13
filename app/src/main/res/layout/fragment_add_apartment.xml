@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F8F9FA">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_add"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        app:title="Thêm Căn Hộ Mới"
+        app:navigationIcon="@android:drawable/ic_menu_revert" />
+
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent" android:padding="16dp">
+        <androidx.cardview.widget.CardView android:layout_width="match_parent" android:layout_height="wrap_content" app:cardCornerRadius="12dp">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+
+                <com.google.android.material.textfield.TextInputLayout style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="Số phòng">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/edt_add_room_number" android:layout_width="match_parent" android:layout_height="wrap_content" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:hint="Tầng">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/edt_add_floor" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:hint="Diện tích (m²)">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/edt_add_area" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="16dp" android:text="Trạng thái ban đầu:" />
+                <Spinner android:id="@+id/spinner_add_status" android:layout_width="match_parent" android:layout_height="50dp" android:background="@android:drawable/btn_dropdown" />
+
+                <Button android:id="@+id/btn_add_save" android:layout_width="match_parent" android:layout_height="56dp" android:layout_marginTop="24dp" android:text="TẠO CĂN HỘ" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </ScrollView>
+</LinearLayout>

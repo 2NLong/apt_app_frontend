@@ -35,6 +35,7 @@ public class AdminActivity extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.admin_menu_bottom_nav);
         bottomNavigationView.setOnItemSelectedListener(item -> {
+            getSupportFragmentManager().popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE);
             switch (item.getItemId()) {
                 case R.id.admin_nav_home:
                     viewPager.setCurrentItem(0);

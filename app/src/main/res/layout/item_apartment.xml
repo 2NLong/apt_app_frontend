@@ -25,7 +25,9 @@
             android:layout_height="24dp"
             android:src="@drawable/ic_home"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/primary"
+            />
 
         <TextView
             android:id="@+id/tv_apartment_name"
@@ -58,6 +60,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_arrow_right"
+            app:tint="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

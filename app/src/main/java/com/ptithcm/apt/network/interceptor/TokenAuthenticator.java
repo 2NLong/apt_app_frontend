@@ -40,13 +40,9 @@ public class TokenAuthenticator implements Authenticator {
     @Nullable
     @Override
     public Request authenticate(@Nullable Route route, @NonNull Response response) throws IOException {
-        // Tên thread hiện tại để debug nếu cần
-        // System.out.println("Authenticator running on: " +
-        // Thread.currentThread().getName());
 
         synchronized (this) {
-            // Kiểm tra xem token hiện tại trong SessionManager đã khác với token trong
-            // request bị lỗi chưa.
+            // Kiểm tra xem token hiện tại trong SessionManager đã khác với token trong request bị lỗi chưa.
             // Nếu đã khác, nghĩa là một thread khác đã refresh thành công rồi.
             String currentToken = sessionManager.getAccessToken();
             String failedToken = response.request().header("Authorization");
@@ -59,7 +55,6 @@ public class TokenAuthenticator implements Authenticator {
                         .build();
             }
 
-            // Tránh vòng lặp vô hạn: nếu đã thử refresh mà vẫn 401 thì dừng
             if (responseCount(response) >= 2) {
                 onSessionExpired();
                 return null;
@@ -92,10 +87,8 @@ public class TokenAuthenticator implements Authenticator {
                             .build();
                 }
             } catch (Exception e) {
-                // Lỗi mạng khi refresh
             }
 
-            // Refresh thất bại hoàn toàn
             onSessionExpired();
             return null;
         }

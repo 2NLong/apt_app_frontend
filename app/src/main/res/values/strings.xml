@@ -4,4 +4,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="see_more">Xem thêm</string>
     <string name="collapse">Thu gọn</string>
+
+    <string name="pricing_strategy_desc">Quản lý mức giá tiện ích và phí dịch vụ của cơ sở. Các cập nhật được lên lịch để đảm bảo chu kỳ thanh toán minh bạch cho cư dân.</string>
+    <string name="update_pricing_policy_desc">Thay đổi giá dịch vụ sẽ luôn có hiệu lực bắt đầu từ ngày mùng 1 của tháng được chọn. Tháng áp dụng sớm nhất phải từ tháng tiếp theo trở đi.</string>
 </resources>

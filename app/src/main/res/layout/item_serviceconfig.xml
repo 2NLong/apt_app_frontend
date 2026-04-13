@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+
+    <!-- Container cho từng thẻ dịch vụ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/bg_card_white"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <!-- Tiêu đề dịch vụ: Icon, Tên, Đơn vị -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Icon Dịch vụ -->
+            <ImageView
+                android:id="@+id/image_service_icon"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_marginEnd="12dp"
+                app:tint="@color/secondary"
+                android:src="@drawable/ic_electric" />
+
+            <!-- Tên dịch vụ và Đơn vị tính -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_service_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Dịch vụ"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_title"
+                    tools:text="Dịch vụ" />
+
+                <TextView
+                    android:id="@+id/text_service_unit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đơn giá"
+                    android:textSize="12sp"
+                    android:textColor="@color/text_body"
+                    tools:text="Đơn giá" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Container cho các thẻ giá (Hiện tại & Sắp tới) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <!-- Thẻ giá hiện tại -->
+            <include
+                android:id="@+id/layout_current_price"
+                layout="@layout/item_price_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"/>
+
+            <!-- Thẻ giá sắp tới -->
+            <include
+                android:id="@+id/layout_upcoming_price"
+                layout="@layout/item_price_card"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"/>
+        </LinearLayout>
+
+        <!-- Nút chỉnh sửa -->
+        <Button
+            android:id="@+id/button_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:backgroundTint="@null"
+            android:background="@drawable/bg_button_edit"
+            android:text="Đặt lịch thay đổi"
+            android:textColor="@color/text_title"
+            android:textSize="16sp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:textAllCaps="false"/>
+
+    </LinearLayout>
+</LinearLayout>

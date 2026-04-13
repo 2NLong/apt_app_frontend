@@ -10,25 +10,27 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.profileuser.FamilyMember;
+import com.ptithcm.apt.models.profile.FamilyMemberResponse;
 
 import java.util.List;
 
+import com.ptithcm.apt.utils.RoleTranslator;
+
 public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapter.FamilyMemberViewHolder> {
 
-    private List<FamilyMember> familyMemberList;
+    private List<FamilyMemberResponse> familyMemberList;
     private OnItemClickListener listener;
     private boolean isExpanded = false;
 
     public interface OnItemClickListener {
-        void onItemClick(FamilyMember familyMember);
+        void onItemClick(FamilyMemberResponse familyMember);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.listener = listener;
     }
 
-    public FamilyMemberAdapter(List<FamilyMember> familyMemberList) {
+    public FamilyMemberAdapter(List<FamilyMemberResponse> familyMemberList) {
         this.familyMemberList = familyMemberList;
     }
 
@@ -47,10 +49,10 @@ public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapte
 
     @Override
     public void onBindViewHolder(@NonNull FamilyMemberViewHolder holder, int position) {
-        FamilyMember member = familyMemberList.get(position);
-        holder.iconPerson.setImageResource(member.getIconResId());
-        holder.tvMemberName.setText(member.getName());
-        holder.tvMemberRelation.setText(member.getRelation());
+        FamilyMemberResponse member = familyMemberList.get(position);
+        holder.iconPerson.setImageResource(R.drawable.ic_person);
+        holder.tvMemberName.setText(member.getFullName() != null ? member.getFullName() : "---");
+        holder.tvMemberRelation.setText(RoleTranslator.translateRole(member.getRole()));
 
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
@@ -61,7 +63,7 @@ public class FamilyMemberAdapter extends RecyclerView.Adapter<FamilyMemberAdapte
 
     @Override
     public int getItemCount() {
-        return Math.min(familyMemberList.size(), isExpanded ? 10 : 3);
+        return Math.min(familyMemberList.size(), isExpanded ? Integer.MAX_VALUE : 3);
     }
 
     public static class FamilyMemberViewHolder extends RecyclerView.ViewHolder {

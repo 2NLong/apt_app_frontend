@@ -16,4 +16,7 @@ public interface AuthApiService {
 
     @POST("api/v1/auth/refresh-token")
     Call<ApiResponse<LoginResponse>> refreshToken(@Body RefreshTokenRequest request);
+
+    @POST("api/v1/auth/logout")
+    Call<ApiResponse<Void>> logout();
 }

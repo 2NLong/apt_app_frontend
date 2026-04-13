@@ -101,10 +101,30 @@
             android:id="@+id/dialog_tv_contract_period"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="12dp"
             tools:text="Hợp đồng: 01/01/2023 - 01/01/2024"
             android:textColor="@color/text_body"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/dialog_tv_rental_price"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            tools:text="Giá thuê: 5,000,000 VNĐ"
+            android:textColor="@color/text_body"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/dialog_tv_deposit_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            tools:text="Tiền cọc: 10,000,000 VNĐ"
+            android:textColor="@color/text_body"
+            android:textSize="16sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <Button

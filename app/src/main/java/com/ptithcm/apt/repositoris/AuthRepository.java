@@ -93,7 +93,7 @@ public class AuthRepository {
     }
 
     /**
-     * Làm mới token thủ công (Thường dùng cho Splash/Auto-Login).
+     * Làm mới token thủ công.
      */
     public void refreshToken(String refreshToken,
             MutableLiveData<LoginResponse> refreshResult,
@@ -125,7 +125,7 @@ public class AuthRepository {
                                 errorMessage.postValue(apiResponse.getMessage());
                             }
                         } else {
-                            errorMessage.postValue("Refresh failed: " + response.code());
+                            errorMessage.postValue("Làm mới token thất bại: " + response.code());
                         }
                     }
 
@@ -135,5 +135,30 @@ public class AuthRepository {
                         errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
                     }
                 });
+    }
+
+    /**
+     * Đăng xuất: Xóa session và gọi API logout.
+     */
+    public void logout(MutableLiveData<Boolean> logoutResult, MutableLiveData<String> errorMessage) {
+        sessionManager.clearSession();
+
+        authApiService.logout().enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful()) {
+                    logoutResult.postValue(true);
+                } else {
+//                    errorMessage.postValue("Đăng xuất từ server thất bại: " + response.code());
+                    logoutResult.postValue(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+//                errorMessage.postValue("Lỗi mạng khi đăng xuất: " + t.getLocalizedMessage());
+                logoutResult.postValue(true);
+            }
+        });
     }
 }
