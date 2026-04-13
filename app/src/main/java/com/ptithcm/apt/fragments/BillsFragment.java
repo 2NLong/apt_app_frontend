@@ -3,7 +3,6 @@ package com.ptithcm.apt.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,11 +14,11 @@ import android.widget.TextView;
 
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.BillAdapter;
-import com.ptithcm.apt.models.Bill;
+import com.ptithcm.apt.models.bill.Bill;
+import com.ptithcm.apt.models.bill.BillList;
 
 import java.util.ArrayList;
 import java.util.List;
-import android.graphics.Color;
 
 
 /**
@@ -41,8 +40,8 @@ public class BillsFragment extends Fragment {
     private RecyclerView rvBills;
     private BillAdapter adapter;
 
-    private List<Bill> unpaidList = new ArrayList<>();
-    private List<Bill> paidList = new ArrayList<>();
+    private List<BillList> unpaidList = new ArrayList<>();
+    private List<BillList> paidList = new ArrayList<>();
 
     private TextView tabUnpaid, tabHistory;
     private TextView tvDebt, tvPaid;

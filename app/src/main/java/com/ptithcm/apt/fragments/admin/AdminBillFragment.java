@@ -1,66 +1,155 @@
 package com.ptithcm.apt.fragments.admin;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.NumberPicker;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.chip.Chip;
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.adapters.AdminBillAdapter;
+import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AdminBillFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.Calendar;
+
 public class AdminBillFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "AdminBillFragment";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private int currentSelectedMonth;
+    private int currentSelectedYear;
+    private AdminBillViewModel viewModel;
+    private AdminBillAdapter adapter;
 
     public AdminBillFragment() {
-        // Required empty public constructor
+        // Lấy ngày tháng năm hiện tại khi khởi tạo
+        Calendar calendar = Calendar.getInstance();
+        currentSelectedMonth = calendar.get(Calendar.MONTH) + 1; // Tháng trong Calendar bắt đầu từ 0
+        currentSelectedYear = calendar.get(Calendar.YEAR);
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AdminBillsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AdminBillFragment newInstance(String param1, String param2) {
-        AdminBillFragment fragment = new AdminBillFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
+    @Nullable
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin_bill, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // 1. Setup RecyclerView & Adapter
+        RecyclerView recyclerView = view.findViewById(R.id.rvAdminBills);
+        if (recyclerView == null) {
+            Log.e(TAG, "RecyclerView rvAdminBills not found in layout!");
+        }
+
+        adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
+            @Override
+            public void onApprove(BillList bill) {
+                Log.d(TAG, "Approving bill: " + bill.getId());
+                Toast.makeText(getContext(), "Đang duyệt hóa đơn căn hộ: " + bill.getApartmentName(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onItemClick(BillList bill) {
+                Log.d(TAG, "Item clicked: " + bill.getId());
+            }
+        });
+        
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setAdapter(adapter);
+
+        // 2. Setup ViewModel
+        AdminBillViewModelFactory factory = new AdminBillViewModelFactory();
+        viewModel = new ViewModelProvider(this, factory).get(AdminBillViewModel.class);
+
+        // 3. Observe Data
+        viewModel.bills.observe(getViewLifecycleOwner(), bills -> {
+            if (bills != null) {
+                Log.d(TAG, "Received bills: " + bills.size());
+                adapter.updateList(bills);
+            } else {
+                Log.d(TAG, "Received null bills list");
+            }
+        });
+
+        viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null) {
+                Log.e(TAG, "ViewModel error: " + errorMsg);
+                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 4. Listeners
+        Chip chipDate = view.findViewById(R.id.chipDateFilter);
+        if (chipDate != null) {
+            chipDate.setOnClickListener(v -> showMonthYearPicker());
+            chipDate.setText("Tháng " + currentSelectedMonth + "/" + currentSelectedYear);
+        }
+
+        // 5. Load data lần đầu
+        Log.d(TAG, "Fetching bills for " + currentSelectedMonth + "/" + currentSelectedYear);
+        viewModel.fetchBills(currentSelectedMonth, currentSelectedYear);
+    }
+
+    private void showMonthYearPicker() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_month_year_picker, null);
+
+        NumberPicker pickerMonth = dialogView.findViewById(R.id.pickerMonth);
+        NumberPicker pickerYear = dialogView.findViewById(R.id.pickerYear);
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
+
+        if (pickerMonth != null) {
+            pickerMonth.setMinValue(1);
+            pickerMonth.setMaxValue(12);
+            pickerMonth.setValue(currentSelectedMonth);
+        }
+
+        if (pickerYear != null) {
+            pickerYear.setMinValue(2020);
+            pickerYear.setMaxValue(2030);
+            pickerYear.setValue(currentSelectedYear);
+        }
+
+        if (btnConfirm != null) {
+            btnConfirm.setOnClickListener(v -> {
+                if (pickerMonth != null && pickerYear != null) {
+                    currentSelectedMonth = pickerMonth.getValue();
+                    currentSelectedYear = pickerYear.getValue();
+
+                    View view = getView();
+                    if (view != null) {
+                        Chip chipDate = view.findViewById(R.id.chipDateFilter);
+                        if (chipDate != null) {
+                            chipDate.setText("Tháng " + currentSelectedMonth + "/" + currentSelectedYear);
+                        }
+                    }
+
+                    Log.d(TAG, "Reloading bills for " + currentSelectedMonth + "/" + currentSelectedYear);
+                    viewModel.fetchBills(currentSelectedMonth, currentSelectedYear);
+                }
+                dialog.dismiss();
+            });
+        }
+
+        dialog.setContentView(dialogView);
+        dialog.show();
     }
 }
