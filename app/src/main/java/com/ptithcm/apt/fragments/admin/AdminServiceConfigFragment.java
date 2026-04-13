@@ -39,7 +39,7 @@ public class AdminServiceConfigFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+            Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin_serviceconfig, container, false);
     }
 
@@ -57,102 +57,127 @@ public class AdminServiceConfigFragment extends Fragment {
         TextView tvPendingUpdatesCount = view.findViewById(R.id.tvPendingUpdatesCount);
 
         viewModel.serviceConfigsData.observe(getViewLifecycleOwner(), configs -> {
-             if (configs != null) {
-                 int activeServicesCount = 0;
-                 int pendingUpdatesCount = 0;
-                 for (AdminServiceConfigResponse config : configs) {
-                     View serviceView = null;
-                     int iconRes = 0;
-                     if (config.getServiceCode() == null) continue;
-                     
-                     activeServicesCount++;
-                     if (config.getUpcomingPrice() != null) {
-                         pendingUpdatesCount++;
-                     }
-                     
-                     switch(config.getServiceCode()) {
-                         case "MANAGEMENT":
-                             serviceView = management;
-                             iconRes = R.drawable.ic_management;
-                             break;
-                         case "WATER":
-                             serviceView = water;
-                             iconRes = R.drawable.ic_water;
-                             break;
-                         case "ELECTRICITY":
-                             serviceView = electricity;
-                             iconRes = R.drawable.ic_electric;
-                             break;
-                         case "SANITATION":
-                             serviceView = sanitation;
-                             iconRes = R.drawable.ic_sanitation;
-                             break;
-                     }
-                     if (serviceView != null) {
-                         setupServiceItem(serviceView, config.getServiceName(), config.getUnit(), iconRes);
-                         updatePriceData(serviceView, config);
-                         // Bắt sự kiện click vào nút Đặt lịch thay đổi
-                         View btnEdit = serviceView.findViewById(R.id.button_edit);
-                         if (btnEdit != null) {
-                             btnEdit.setOnClickListener(v -> showEditDialog(config));
-                         }
-                     }
-                 }
-                 
-                 if (tvActiveServicesCount != null) {
-                     tvActiveServicesCount.setText(String.valueOf(activeServicesCount));
-                 }
-                 if (tvPendingUpdatesCount != null) {
-                     tvPendingUpdatesCount.setText(String.valueOf(pendingUpdatesCount));
-                 }
-             }
+            if (configs != null) {
+                int activeServicesCount = 0;
+                int pendingUpdatesCount = 0;
+                for (AdminServiceConfigResponse config : configs) {
+                    View serviceView = null;
+                    int iconRes = 0;
+                    if (config.getServiceCode() == null)
+                        continue;
+
+                    activeServicesCount++;
+                    if (config.getUpcomingPrice() != null) {
+                        pendingUpdatesCount++;
+                    }
+
+                    switch (config.getServiceCode()) {
+                        case "MANAGEMENT":
+                            serviceView = management;
+                            iconRes = R.drawable.ic_management;
+                            break;
+                        case "WATER":
+                            serviceView = water;
+                            iconRes = R.drawable.ic_water;
+                            break;
+                        case "ELECTRICITY":
+                            serviceView = electricity;
+                            iconRes = R.drawable.ic_electric;
+                            break;
+                        case "SANITATION":
+                            serviceView = sanitation;
+                            iconRes = R.drawable.ic_sanitation;
+                            break;
+                    }
+                    if (serviceView != null) {
+                        setupServiceItem(serviceView, config.getServiceName(), config.getUnit(), iconRes);
+                        updatePriceData(serviceView, config);
+                        // Bắt sự kiện click vào nút Đặt lịch thay đổi
+                        View btnEdit = serviceView.findViewById(R.id.button_edit);
+                        if (btnEdit != null) {
+                            btnEdit.setOnClickListener(v -> showEditDialog(config));
+                        }
+                    }
+                }
+
+                if (tvActiveServicesCount != null) {
+                    tvActiveServicesCount.setText(String.valueOf(activeServicesCount));
+                }
+                if (tvPendingUpdatesCount != null) {
+                    tvPendingUpdatesCount.setText(String.valueOf(pendingUpdatesCount));
+                }
+            }
         });
 
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
-             if (errorMsg != null && !errorMsg.isEmpty()) {
-                 ToastUtils.showErrorToast(requireContext(), errorMsg);
-             }
+            if (errorMsg != null && !errorMsg.isEmpty()) {
+                ToastUtils.showErrorToast(requireContext(), errorMsg);
+            }
+        });
+
+        viewModel.updateSuccess.observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                ToastUtils.showSuccessToast(requireContext(), "Lên lịch cập nhật giá thành công!");
+                viewModel.fetchServiceConfigs();
+                viewModel.resetUpdateStatus();
+            }
+        });
+
+        viewModel.cancelSuccess.observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                ToastUtils.showSuccessToast(requireContext(), "Hủy lịch cập nhật thành công!");
+                viewModel.fetchServiceConfigs();
+                viewModel.resetCancelStatus();
+            }
         });
 
         viewModel.fetchServiceConfigs();
     }
 
+    private android.app.Dialog currentDialog;
+
     private void showEditDialog(AdminServiceConfigResponse config) {
-        android.app.Dialog dialog = new android.app.Dialog(requireContext());
-        dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_edit_serviceconfig);
-        
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
-            dialog.getWindow().setLayout(
-                android.widget.LinearLayout.LayoutParams.MATCH_PARENT, 
-                android.widget.LinearLayout.LayoutParams.WRAP_CONTENT
-            );
+        currentDialog = new android.app.Dialog(requireContext());
+        currentDialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
+        currentDialog.setContentView(R.layout.dialog_edit_serviceconfig);
+
+        if (currentDialog.getWindow() != null) {
+            currentDialog.getWindow().setBackgroundDrawable(
+                    new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+            currentDialog.getWindow().setLayout(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
         }
 
-        TextView tvServiceType = dialog.findViewById(R.id.tv_service_type);
-        if(tvServiceType != null) {
+        TextView tvServiceType = currentDialog.findViewById(R.id.tv_service_type);
+        if (tvServiceType != null) {
             tvServiceType.setText((config.getServiceName() != null ? config.getServiceName().toUpperCase() : ""));
         }
-        
-        android.widget.EditText etPrice = dialog.findViewById(R.id.et_new_unit_price);
+
+        android.widget.EditText etPrice = currentDialog.findViewById(R.id.et_new_unit_price);
         if (etPrice != null) {
             BigDecimal upcomingPrice = config.getUpcomingPrice();
             if (upcomingPrice != null) {
-                // Hiển thị số nguyên (làm tròn nếu cần) cho ô nhập liệu
+                // Hiển thị số nguyên cho ô nhập liệu
                 etPrice.setText(upcomingPrice.setScale(0, java.math.RoundingMode.HALF_UP).toPlainString());
             } else {
-                etPrice.setText("");
+                // Nếu chưa có giá sắp tới, lấy giá hiện tại làm gợi ý
+                BigDecimal currentPrice = config.getCurrentPrice();
+                if (currentPrice != null) {
+                    etPrice.setText(currentPrice.setScale(0, java.math.RoundingMode.HALF_UP).toPlainString());
+                } else {
+                    etPrice.setText("");
+                }
             }
         }
-        
-        TextView tvCurrency = dialog.findViewById(R.id.tv_currency);
+
+        TextView tvCurrency = currentDialog.findViewById(R.id.tv_currency);
         if (tvCurrency != null && config.getUnit() != null) {
             tvCurrency.setText(config.getUnit());
         }
 
-        android.widget.NumberPicker npMonth = dialog.findViewById(R.id.np_month);
-        android.widget.NumberPicker npYear = dialog.findViewById(R.id.np_year);
+        android.widget.NumberPicker npMonth = currentDialog.findViewById(R.id.np_month);
+        android.widget.NumberPicker npYear = currentDialog.findViewById(R.id.np_year);
 
         if (npMonth != null && npYear != null) {
             npMonth.setMinValue(0);
@@ -175,36 +200,75 @@ public class AdminServiceConfigFragment extends Fragment {
                     try {
                         currentYear = Integer.parseInt(parts[0]);
                         currentMonth = Integer.parseInt(parts[1]) - 1;
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
+            } else {
+                // Nếu chưa có giá sắp tới, mặc định là tháng sau
+                cal.add(java.util.Calendar.MONTH, 1);
+                currentYear = cal.get(java.util.Calendar.YEAR);
+                currentMonth = cal.get(java.util.Calendar.MONTH);
             }
 
-            npYear.setMinValue(cal.get(java.util.Calendar.YEAR));
-            npYear.setMaxValue(cal.get(java.util.Calendar.YEAR) + 10);
+            npYear.setMinValue(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR));
+            npYear.setMaxValue(java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 10);
 
             npMonth.setValue(currentMonth);
             npYear.setValue(currentYear);
         }
 
-        View btnClose = dialog.findViewById(R.id.iv_close_icon);
-        View tvCancel = dialog.findViewById(R.id.tv_cancel);
-        View btnSave = dialog.findViewById(R.id.btn_schedule_change);
+        View btnClose = currentDialog.findViewById(R.id.iv_close_icon);
+        View tvCancel = currentDialog.findViewById(R.id.tv_cancel);
+        View btnSave = currentDialog.findViewById(R.id.btn_schedule_change);
+        View tvCancelSchedule = currentDialog.findViewById(R.id.tv_cancel_schedule);
 
-        if (btnClose != null) btnClose.setOnClickListener(v -> dialog.dismiss());
-        if (tvCancel != null) tvCancel.setOnClickListener(v -> dialog.dismiss());
+        // Hiển thị nút "Hủy đặt lịch" nếu đang có lịch cập nhật sắp tới
+        if (tvCancelSchedule != null) {
+            if (config.getUpcomingPrice() != null) {
+                tvCancelSchedule.setVisibility(View.VISIBLE);
+                tvCancelSchedule.setOnClickListener(v -> {
+                    viewModel.cancelUpcomingUpdate(config.getServiceCode());
+                    currentDialog.dismiss();
+                });
+            } else {
+                tvCancelSchedule.setVisibility(View.GONE);
+            }
+        }
+
+        if (btnClose != null)
+            btnClose.setOnClickListener(v -> currentDialog.dismiss());
+        if (tvCancel != null)
+            tvCancel.setOnClickListener(v -> currentDialog.dismiss());
         if (btnSave != null) {
             btnSave.setOnClickListener(v -> {
                 int selectedMonth = npMonth != null ? npMonth.getValue() + 1 : 1;
                 int selectedYear = npYear != null ? npYear.getValue() : 2024;
                 String priceStr = etPrice != null ? etPrice.getText().toString() : "";
-                
-                ToastUtils.showSuccessToast(requireContext(), 
-                    "Lưu giá " + priceStr + " đ áp dụng từ Tháng " + selectedMonth + "/" + selectedYear);
-                dialog.dismiss();
+
+                if (priceStr.isEmpty()) {
+                    ToastUtils.showErrorToast(requireContext(), "Vui lòng nhập đơn giá mới");
+                    return;
+                }
+
+                try {
+                    BigDecimal newPrice = new BigDecimal(priceStr);
+                    // Format date as yyyy-MM-01
+                    String effectiveDate = String.format("%04d-%02d-01", selectedYear, selectedMonth);
+
+                    com.ptithcm.apt.models.adminserviceconfig.ServicePriceUpdateRequest request = new com.ptithcm.apt.models.adminserviceconfig.ServicePriceUpdateRequest(
+                            config.getServiceCode(),
+                            newPrice,
+                            effectiveDate);
+
+                    viewModel.validateAndUpdatePrice(request, config.getCurrentPrice());
+                    currentDialog.dismiss();
+                } catch (NumberFormatException e) {
+                    ToastUtils.showErrorToast(requireContext(), "Giá không hợp lệ");
+                }
             });
         }
-        
-        dialog.show();
+
+        currentDialog.show();
     }
 
     private void updatePriceData(View view, AdminServiceConfigResponse config) {
@@ -214,14 +278,14 @@ public class AdminServiceConfigFragment extends Fragment {
         if (currentPriceLayout != null) {
             TextView textPrice = currentPriceLayout.findViewById(R.id.text_price);
             TextView textDate = currentPriceLayout.findViewById(R.id.text_date);
-            
+
             BigDecimal price = config.getCurrentPrice();
             if (price != null) {
                 textPrice.setText(FormatUtils.formatCurrency(price));
             } else {
                 textPrice.setText("--");
             }
-            
+
             String date = config.getCurrentEffectiveFrom();
             if (date != null && !date.isEmpty()) {
                 textDate.setText("Từ ngày " + FormatUtils.formatDate(date));
@@ -240,31 +304,35 @@ public class AdminServiceConfigFragment extends Fragment {
             if (price != null) {
                 textPrice.setVisibility(View.VISIBLE);
                 textPrice.setText(FormatUtils.formatCurrency(price));
-                
-                if (layoutDate != null) layoutDate.setVisibility(View.VISIBLE);
-                
+
+                if (layoutDate != null)
+                    layoutDate.setVisibility(View.VISIBLE);
+
                 String date = config.getUpcomingEffectiveFrom();
                 if (date != null && !date.isEmpty()) {
                     textDate.setText("Từ ngày " + FormatUtils.formatDate(date));
                 } else {
                     textDate.setText("Chưa xác định");
                 }
-                
-                if (textNoRevision != null) textNoRevision.setVisibility(View.GONE);
+
+                if (textNoRevision != null)
+                    textNoRevision.setVisibility(View.GONE);
             } else {
                 textPrice.setVisibility(View.GONE);
-                if (layoutDate != null) layoutDate.setVisibility(View.GONE);
-                if (textNoRevision != null) textNoRevision.setVisibility(View.VISIBLE);
+                if (layoutDate != null)
+                    layoutDate.setVisibility(View.GONE);
+                if (textNoRevision != null)
+                    textNoRevision.setVisibility(View.VISIBLE);
             }
         }
     }
-
 
     /**
      * Thiết lập dữ liệu và giao diện cho từng mục dịch vụ.
      */
     private void setupServiceItem(View view, String title, String unit, int iconRes) {
-        if (view == null) return;
+        if (view == null)
+            return;
 
         ((TextView) view.findViewById(R.id.text_service_title)).setText(title);
         ((TextView) view.findViewById(R.id.text_service_unit)).setText(unit);
@@ -275,9 +343,10 @@ public class AdminServiceConfigFragment extends Fragment {
         if (currentPriceLayout != null) {
             // Hiệu ứng nổi bật (elevation)
             currentPriceLayout.setElevation(4 * getResources().getDisplayMetrics().density);
-            
+
             // Viền xanh lá liền mạch (Solid Green)
-            GradientDrawable currentBg = (GradientDrawable) ContextCompat.getDrawable(requireContext(), R.drawable.bg_card_white).mutate();
+            GradientDrawable currentBg = (GradientDrawable) ContextCompat
+                    .getDrawable(requireContext(), R.drawable.bg_card_white).mutate();
             int strokeWidth = (int) (2 * getResources().getDisplayMetrics().density);
             currentBg.setStroke(strokeWidth, ContextCompat.getColor(requireContext(), R.color.indicator_current));
             currentPriceLayout.setBackground(currentBg);
@@ -295,7 +364,7 @@ public class AdminServiceConfigFragment extends Fragment {
             // Không đổ bóng và làm mờ nhẹ
             upcomingPriceLayout.setElevation(0);
             upcomingPriceLayout.setAlpha(0.8f);
-            
+
             // Viền xám đứt đoạn (Dashed Gray)
             upcomingPriceLayout.setBackgroundResource(R.drawable.bg_card_dashed);
 
