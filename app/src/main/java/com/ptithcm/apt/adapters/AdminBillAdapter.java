@@ -1,0 +1,111 @@
+package com.ptithcm.apt.adapters;
+
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.ptithcm.apt.R;
+import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.models.bill.BillList;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.List;
+
+public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.ViewHolder> {
+
+    private List<BillList> list;
+    private OnBillActionListener listener;
+
+    public interface OnBillActionListener {
+        void onApprove(BillList bill);
+        void onItemClick(BillList bill);
+    }
+
+    public AdminBillAdapter(List<BillList> list, OnBillActionListener listener) {
+        this.list = list;
+        this.listener = listener;
+    }
+
+    public void updateList(List<BillList> newList) {
+        this.list = newList;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_bill, parent, false);
+        return new ViewHolder(view);
+    }
+
+    private String formatMoney(BigDecimal amount) {
+        if (amount == null) return "0đ";
+        DecimalFormat formatter = new DecimalFormat("#,###đ");
+        return formatter.format(amount);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        BillList bill = list.get(position);
+
+        holder.tvApartment.setText("Căn hộ " + bill.getApartmentName());
+        holder.tvDate.setText("Tháng " + bill.getBillingMonth() + "/" + bill.getBillingYear());
+
+        holder.tvElectric.setText(formatMoney(bill.getElectricityFee()));
+        holder.tvWater.setText(formatMoney(bill.getWaterFee()));
+        holder.tvManagement.setText(formatMoney(bill.getManagementFee()));
+        holder.tvSanitation.setText(formatMoney(bill.getSanitationFee()));
+        holder.tvTotal.setText(formatMoney(bill.getTotalAmount()));
+
+        if (bill.getStatus() == BillStatus.PAID) {
+            holder.tvStatus.setText("ĐÃ THANH TOÁN");
+            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
+            holder.btnConfirm.setVisibility(View.GONE);
+        } else {
+            holder.tvStatus.setText("CHƯA THANH TOÁN");
+            holder.tvStatus.setTextColor(Color.parseColor("#FF9800"));
+            holder.btnConfirm.setVisibility(View.VISIBLE);
+            holder.btnConfirm.setText("Duyệt");
+        }
+
+        holder.btnConfirm.setOnClickListener(v -> {
+            if (listener != null) listener.onApprove(bill);
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) listener.onItemClick(bill);
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return list == null ? 0 : list.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView tvApartment, tvDate, tvStatus, tvTotal;
+        TextView tvElectric, tvWater, tvManagement, tvSanitation;
+        Button btnConfirm;
+
+        public ViewHolder(@NonNull View v) {
+            super(v);
+            tvApartment = v.findViewById(R.id.tvApartment);
+            tvDate = v.findViewById(R.id.tvDate);
+            tvStatus = v.findViewById(R.id.tvStatus);
+            tvTotal = v.findViewById(R.id.tvTotal);
+            tvElectric = v.findViewById(R.id.tvElectric);
+            tvWater = v.findViewById(R.id.tvWater);
+            tvManagement = v.findViewById(R.id.tvManagement);
+            tvSanitation = v.findViewById(R.id.tvSanitation);
+            btnConfirm = v.findViewById(R.id.btnConfirm);
+        }
+    }
+}

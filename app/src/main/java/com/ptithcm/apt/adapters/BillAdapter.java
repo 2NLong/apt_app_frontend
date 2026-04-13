@@ -12,19 +12,22 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.Bill;
+import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.models.bill.BillList;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
 
-    private List<Bill> list;
+    private List<BillList> list;
 
-    public BillAdapter(List<Bill> list) {
+    public BillAdapter(List<BillList> list) {
         this.list = list;
     }
 
-    public void updateList(List<Bill> newList) {
+    public void updateList(List<BillList> newList) {
         this.list = newList;
         notifyDataSetChanged();
     }
@@ -33,15 +36,11 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
 
         TextView tvApartment, tvDate, tvStatus;
         TextView tvElectric, tvWater, tvManagement, tvService;
-        TextView tvTotal, tvDue;
+        TextView tvTotal;
         Button btnConfirm;
-        ImageView imgIcon;
 
         public ViewHolder(View v) {
             super(v);
-
-//            imgIcon = v.findViewById(R.id.imgIcon);
-
             tvApartment = v.findViewById(R.id.tvApartment);
             tvDate = v.findViewById(R.id.tvDate);
             tvStatus = v.findViewById(R.id.tvStatus);
@@ -52,8 +51,6 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
             tvService = v.findViewById(R.id.tvSanitation);
 
             tvTotal = v.findViewById(R.id.tvTotal);
-//            tvDue = v.findViewById(R.id.tvDue);
-
             btnConfirm = v.findViewById(R.id.btnConfirm);
         }
     }
@@ -65,45 +62,40 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
-    private String format(double money) {
-        return String.format("%,.0fđ", money);
+    /**
+     * Chuyển đổi BigDecimal sang định dạng tiền tệ (VD: 1.000.000đ)
+     */
+    private String formatMoney(BigDecimal amount) {
+        if (amount == null) return "0đ";
+        DecimalFormat formatter = new DecimalFormat("#,###đ");
+        return formatter.format(amount);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder h, int i) {
-        Bill b = list.get(i);
+        BillList b = list.get(i);
 
         // HEADER
-        h.tvApartment.setText("Căn hộ " + b.getApartmentId()); // hoặc A101
-        h.tvDate.setText("Tháng " + b.getMonth() + "/" + b.getYear());
+        h.tvApartment.setText("Căn hộ " + b.getApartmentName());
+        h.tvDate.setText("Tháng " + b.getBillingMonth() + "/" + b.getBillingYear());
 
-        // FEES
-        h.tvElectric.setText(format(b.getElectricityFee()));
-        h.tvWater.setText(format(b.getWaterFee()));
-        h.tvManagement.setText(format(b.getManagementFee()));
-        h.tvService.setText(format(b.getSanitationFee())); // dùng làm phí dịch vụ
+        // FEES - Sử dụng hàm formatMoney cho BigDecimal
+        h.tvElectric.setText(formatMoney(b.getElectricityFee()));
+        h.tvWater.setText(formatMoney(b.getWaterFee()));
+        h.tvManagement.setText(formatMoney(b.getManagementFee()));
+        h.tvService.setText(formatMoney(b.getSanitationFee()));
 
         // TOTAL
-        h.tvTotal.setText(format(b.getTotalAmount()));
-
-        // DATE
-//        h.tvDue.setText("Hạn: " + b.getDueDate());
+        h.tvTotal.setText(formatMoney(b.getTotalAmount()));
 
         // STATUS
-        if ("PAID".equals(b.getStatus())) {
+        if (b.getStatus() == BillStatus.PAID) {
             h.tvStatus.setText("Đã thanh toán");
             h.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
-
             h.btnConfirm.setVisibility(View.GONE);
-
-            if (b.getPaidAt() != null) {
-                h.tvDue.setText("Đã trả: " + b.getPaidAt());
-            }
-
         } else {
             h.tvStatus.setText("Chưa thanh toán");
             h.tvStatus.setTextColor(Color.parseColor("#FF9800"));
-
             h.btnConfirm.setVisibility(View.VISIBLE);
         }
 
@@ -118,13 +110,8 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
         });
     }
 
-
     @Override
     public int getItemCount() {
-        return list.size();
-    }
-
-    private String formatMoney(double amount) {
-        return String.format("%,.0fđ", amount);
+        return list == null ? 0 : list.size();
     }
 }
