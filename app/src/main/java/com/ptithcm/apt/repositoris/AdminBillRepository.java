@@ -21,13 +21,13 @@ public class AdminBillRepository {
         this.apiService = apiService;
     }
 
-    public void getBills(Integer month, Integer year, Integer page, Integer size,
+    public void getBills(Integer month, Integer year, BillStatus status, Integer page, Integer size,
                          MutableLiveData<List<BillList>> billsData,
                          MutableLiveData<String> errorMessage,
                          MutableLiveData<Boolean> isLoading) {
         
         isLoading.postValue(true);
-        apiService.getBillsByAdmin(month, year, null, null, page, size)
+        apiService.getBillsByAdmin(month, year, null, status, page, size)
                 .enqueue(new Callback<ApiResponse<PageResponse<BillList>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PageResponse<BillList>>> call, Response<ApiResponse<PageResponse<BillList>>> response) {

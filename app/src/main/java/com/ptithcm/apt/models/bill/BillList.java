@@ -1,8 +1,11 @@
 package com.ptithcm.apt.models.bill;
 
+import android.provider.ContactsContract;
+
 import com.ptithcm.apt.enums.BillStatus;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 public class BillList {
     private Long id;
@@ -15,11 +18,12 @@ public class BillList {
     private BigDecimal sanitationFee;
     private BigDecimal totalAmount;
     private BillStatus status;
+    private String dueDate;
 
     public BillList() {
     }
 
-    public BillList(String apartmentName, BigDecimal waterFee, Integer billingMonth, Integer billingYear, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount) {
+    public BillList(String apartmentName, BigDecimal waterFee, Integer billingMonth, Integer billingYear, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount, String dueDate) {
         this.apartmentName = apartmentName;
         this.waterFee = waterFee;
         this.billingMonth = billingMonth;
@@ -30,6 +34,7 @@ public class BillList {
         this.sanitationFee = sanitationFee;
         this.status = status;
         this.totalAmount = totalAmount;
+        this.dueDate = dueDate;
     }
 
     public String getApartmentName() {
@@ -110,5 +115,13 @@ public class BillList {
 
     public void setBillingMonth(Integer billingMonth) {
         this.billingMonth = billingMonth;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
     }
 }

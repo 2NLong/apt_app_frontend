@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.repositoris.AdminBillRepository;
 
@@ -25,7 +26,7 @@ public class AdminBillViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    public void fetchBills(Integer month, Integer year) {
-        repository.getBills(month, year, 0, 50, _bills, _error, _isLoading);
+    public void fetchBills(Integer month, Integer year, BillStatus status) {
+        repository.getBills(month, year, status, 0, 50, _bills, _error, _isLoading);
     }
 }
