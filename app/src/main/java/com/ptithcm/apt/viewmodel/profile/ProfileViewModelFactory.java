@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.ptithcm.apt.network.api.ProfileApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
+import com.ptithcm.apt.repositoris.ProfileRepository;
 
 public class ProfileViewModelFactory implements ViewModelProvider.Factory {
 
@@ -15,7 +16,8 @@ public class ProfileViewModelFactory implements ViewModelProvider.Factory {
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         if (modelClass.isAssignableFrom(ProfileViewModel.class)) {
             ProfileApiService apiService = RetrofitClient.getInstance().createService(ProfileApiService.class);
-            return (T) new ProfileViewModel(apiService);
+            ProfileRepository repository = new ProfileRepository(apiService);
+            return (T) new ProfileViewModel(repository);
         }
         throw new IllegalArgumentException("Unknown ViewModel class");
     }

@@ -27,7 +27,7 @@ public class ServiceConfigRepository {
             MutableLiveData<Boolean> isLoading) {
 
         isLoading.postValue(true);
-        apiService.getAdminDashboardServiceConfigs()
+        apiService.getAdminServiceConfigs()
                 .enqueue(new Callback<ApiResponse<List<AdminServiceConfigResponse>>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<List<AdminServiceConfigResponse>>> call,

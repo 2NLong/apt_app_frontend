@@ -12,14 +12,18 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ServiceConfigApiService {
     @GET("api/v1/service-configs/admin-dashboard")
-    Call<ApiResponse<List<AdminServiceConfigResponse>>> getAdminDashboardServiceConfigs();
+    Call<ApiResponse<List<AdminServiceConfigResponse>>> getAdminServiceConfigs();
 
-    @POST("api/v1/service-configs/update-price")
+    @POST("api/v1/service-configs/upcoming")
     Call<ApiResponse<Void>> updateServicePrice(@Body ServicePriceUpdateRequest request);
 
-    @DELETE("api/v1/service-configs/cancel-update/{serviceCode}")
+    @DELETE("api/v1/service-configs/{serviceCode}/upcoming")
     Call<ApiResponse<Void>> cancelUpdate(@Path("serviceCode") String serviceCode);
+
+    @GET("api/v1/service-configs/active")
+    Call<ApiResponse<List<AdminServiceConfigResponse>>> getServicePricesByDate(@Query("date") String date);
 }

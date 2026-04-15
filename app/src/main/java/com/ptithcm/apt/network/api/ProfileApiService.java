@@ -7,6 +7,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface ProfileApiService {
-    @GET("api/v1/profile/dashboard")
+    @GET("api/v1/profile")
     Call<ApiResponse<ProfileDashboardResponse>> getProfileDashboard();
 }
