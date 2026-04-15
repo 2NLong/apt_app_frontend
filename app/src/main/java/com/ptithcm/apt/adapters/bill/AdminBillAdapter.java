@@ -1,4 +1,4 @@
-package com.ptithcm.apt.adapters;
+package com.ptithcm.apt.adapters.bill;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -73,7 +73,6 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
         holder.tvSanitation.setText(formatMoney(bill.getSanitationFee()));
         holder.tvTotal.setText(formatMoney(bill.getTotalAmount()));
 
-        // XỬ LÝ CHUỖI NGÀY THÁNG TỪ API
         String rawDate = bill.getDueDate();
         if (rawDate != null && rawDate.length() >= 10) {
             try {
@@ -84,7 +83,7 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
                     holder.tvDue.setText("Hạn: " + displayFormat.format(date));
                 }
             } catch (Exception e) {
-                holder.tvDue.setText("Hạn: " + rawDate); // Nếu lỗi thì hiện chuỗi thô
+                holder.tvDue.setText("Hạn: " + rawDate);
             }
         } else {
             holder.tvDue.setText("Hạn: --/--/----");

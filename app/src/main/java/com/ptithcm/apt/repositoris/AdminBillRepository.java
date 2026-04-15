@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
+import com.ptithcm.apt.models.bill.AdminBillDetail;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.network.api.AdminBillApiService;
 
@@ -48,6 +49,37 @@ public class AdminBillRepository {
             public void onFailure(Call<ApiResponse<PageResponse<BillList>>> call, Throwable t) {
                 isLoading.postValue(false);
                 errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getBillDetail(Long id,
+                              MutableLiveData<AdminBillDetail> detailData,
+                              MutableLiveData<String> errorData,
+                              MutableLiveData<Boolean> loadingData) {
+
+        loadingData.setValue(true);
+
+        apiService.getBillDetail(id).enqueue(new Callback<ApiResponse<AdminBillDetail>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<AdminBillDetail>> call, Response<ApiResponse<AdminBillDetail>> response) {
+                loadingData.setValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    // Kiểm tra status từ API (0 là thành công theo JSON bạn gửi)
+                    if (response.body().getStatus() == 200) {
+                        detailData.setValue(response.body().getData());
+                    } else {
+                        errorData.setValue(response.body().getMessage());
+                    }
+                } else {
+                    errorData.setValue("Không thể lấy thông tin chi tiết: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<AdminBillDetail>> call, Throwable t) {
+                loadingData.setValue(false);
+                errorData.setValue("Lỗi kết nối server: " + t.getMessage());
             }
         });
     }

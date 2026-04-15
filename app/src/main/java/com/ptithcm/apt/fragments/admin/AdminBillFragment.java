@@ -1,7 +1,6 @@
 package com.ptithcm.apt.fragments.admin;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +20,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.tabs.TabLayout;
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.adapters.AdminBillAdapter;
+import com.ptithcm.apt.adapters.bill.AdminBillAdapter;
 import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
@@ -68,6 +68,13 @@ public class AdminBillFragment extends Fragment {
 
             @Override
             public void onItemClick(BillList bill) {
+                long billId = bill.getId();
+                AdminBillDetailFragment detailFragment = AdminBillDetailFragment.newInstance(billId);
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.admin_fragment_container, detailFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
         
