@@ -3,6 +3,7 @@ package com.ptithcm.apt.repositoris;
 import androidx.lifecycle.MutableLiveData;
 
 import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
+import com.ptithcm.apt.models.adminserviceconfig.ServiceConfigResponse;
 import com.ptithcm.apt.models.adminserviceconfig.ServicePriceUpdateRequest;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.network.api.ServiceConfigApiService;
@@ -109,6 +110,37 @@ public class ServiceConfigRepository {
 
             @Override
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                isLoading.postValue(false);
+                errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    public void getActiveServiceConfigs(
+            String date,
+            MutableLiveData<List<ServiceConfigResponse>> result,
+            MutableLiveData<String> errorMessage,
+            MutableLiveData<Boolean> isLoading) {
+
+        isLoading.postValue(true);
+        apiService.getServicePricesByDate(date).enqueue(new Callback<ApiResponse<List<ServiceConfigResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<ServiceConfigResponse>>> call, Response<ApiResponse<List<ServiceConfigResponse>>> response) {
+                isLoading.postValue(false);
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<List<ServiceConfigResponse>> apiResponse = response.body();
+                    if (apiResponse.getStatus() == 200) {
+                        result.postValue(apiResponse.getData());
+                    } else {
+                        errorMessage.postValue(apiResponse.getMessage());
+                    }
+                } else {
+                    errorMessage.postValue("Lỗi khi lấy giá dịch vụ: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<ServiceConfigResponse>>> call, Throwable t) {
                 isLoading.postValue(false);
                 errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
             }

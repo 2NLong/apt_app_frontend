@@ -1,5 +1,6 @@
 package com.ptithcm.apt.network.api;
 
+import com.ptithcm.apt.models.adminserviceconfig.ServiceConfigResponse;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
 import com.ptithcm.apt.models.adminserviceconfig.ServicePriceUpdateRequest;
@@ -25,5 +26,5 @@ public interface ServiceConfigApiService {
     Call<ApiResponse<Void>> cancelUpdate(@Path("serviceCode") String serviceCode);
 
     @GET("api/v1/service-configs/active")
-    Call<ApiResponse<List<AdminServiceConfigResponse>>> getServicePricesByDate(@Query("date") String date);
+    Call<ApiResponse<List<ServiceConfigResponse>>> getServicePricesByDate(@Query("date") String date);
 }

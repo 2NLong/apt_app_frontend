@@ -50,7 +50,7 @@ public class AdminServiceConfigAdapter extends RecyclerView.Adapter<AdminService
     @NonNull
     @Override
     public ServiceConfigViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_serviceconfig, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_service_config, parent, false);
         return new ServiceConfigViewHolder(view);
     }
 
