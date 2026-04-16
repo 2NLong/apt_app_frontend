@@ -1,4 +1,4 @@
-package com.ptithcm.apt.adapters;
+package com.ptithcm.apt.adapters.bill;
 
 import android.graphics.Color;
 import android.view.LayoutInflater;
@@ -16,12 +16,20 @@ import com.ptithcm.apt.models.bill.BillList;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.ViewHolder> {
 
     private List<BillList> list;
     private OnBillActionListener listener;
+    
+    // Định dạng mong muốn hiển thị
+    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+    // Định dạng để parse chuỗi từ API (chỉ lấy phần ngày yyyy-MM-dd)
+    private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     public interface OnBillActionListener {
         void onApprove(BillList bill);
@@ -65,6 +73,22 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
         holder.tvSanitation.setText(formatMoney(bill.getSanitationFee()));
         holder.tvTotal.setText(formatMoney(bill.getTotalAmount()));
 
+        String rawDate = bill.getDueDate();
+        if (rawDate != null && rawDate.length() >= 10) {
+            try {
+                // Cắt lấy 10 ký tự đầu (yyyy-MM-dd)
+                String datePart = rawDate.substring(0, 10);
+                Date date = apiFormat.parse(datePart);
+                if (date != null) {
+                    holder.tvDue.setText("Hạn: " + displayFormat.format(date));
+                }
+            } catch (Exception e) {
+                holder.tvDue.setText("Hạn: " + rawDate);
+            }
+        } else {
+            holder.tvDue.setText("Hạn: --/--/----");
+        }
+
         if (bill.getStatus() == BillStatus.PAID) {
             holder.tvStatus.setText("ĐÃ THANH TOÁN");
             holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
@@ -93,6 +117,7 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvApartment, tvDate, tvStatus, tvTotal;
         TextView tvElectric, tvWater, tvManagement, tvSanitation;
+        TextView tvDue;
         Button btnConfirm;
 
         public ViewHolder(@NonNull View v) {
@@ -105,6 +130,7 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
             tvWater = v.findViewById(R.id.tvWater);
             tvManagement = v.findViewById(R.id.tvManagement);
             tvSanitation = v.findViewById(R.id.tvSanitation);
+            tvDue = v.findViewById(R.id.tvDue);
             btnConfirm = v.findViewById(R.id.btnConfirm);
         }
     }

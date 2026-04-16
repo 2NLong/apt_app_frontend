@@ -32,9 +32,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F5F5F5">
-
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -94,7 +92,8 @@
                 android:layout_marginTop="16dp"
                 android:text="Thông tin căn hộ"
                 android:textAllCaps="true"
-                android:textSize="12sp"
+                android:textSize="11sp"
+                android:textColor="#888888"
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
@@ -110,43 +109,22 @@
                     android:padding="16dp">
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Phòng số" />
-
-                        <TextView
-                            android:id="@+id/tvDetailRoom"
-                            style="@style/DetailValue"
-                            android:text="A101" />
+                        <TextView style="@style/DetailLabel" android:text="Phòng số" />
+                        <TextView android:id="@+id/tvDetailRoom" style="@style/DetailValue" android:text="A101" />
                     </RelativeLayout>
 
                     <View style="@style/Divider" />
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Tầng" />
-
-                        <TextView
-                            android:id="@+id/tvDetailFloor"
-                            style="@style/DetailValue"
-                            android:text="Tầng 1" />
+                        <TextView style="@style/DetailLabel" android:text="Tầng" />
+                        <TextView android:id="@+id/tvDetailFloor" style="@style/DetailValue" android:text="Tầng 1" />
                     </RelativeLayout>
 
                     <View style="@style/Divider" />
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Diện tích" />
-
-                        <TextView
-                            android:id="@+id/tvDetailArea"
-                            style="@style/DetailValue"
-                            android:text="75.5 m²" />
+                        <TextView style="@style/DetailLabel" android:text="Diện tích" />
+                        <TextView android:id="@+id/tvDetailArea" style="@style/DetailValue" android:text="75.5 m²" />
                     </RelativeLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -156,9 +134,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="16dp"
-                android:text="Chi tiết dịch vụ"
+                android:text="Chi tiết dịch vụ &amp; Tiến độ"
                 android:textAllCaps="true"
-                android:textSize="12sp"
+                android:textSize="11sp"
+                android:textColor="#888888"
                 android:textStyle="bold" />
 
             <androidx.cardview.widget.CardView
@@ -174,80 +153,72 @@
                     android:padding="16dp">
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Tiền điện" />
-
-                        <TextView
-                            android:id="@+id/tvDetailElectric"
-                            style="@style/DetailValueBold"
-                            android:text="850.000đ" />
+                        <TextView style="@style/DetailLabel" android:text="Tiền điện" />
+                        <TextView android:id="@+id/tvDetailElectric" style="@style/DetailValueBold" android:text="850.000đ" />
                     </RelativeLayout>
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Tiền nước" />
-
-                        <TextView
-                            android:id="@+id/tvDetailWater"
-                            style="@style/DetailValueBold"
-                            android:text="350.000đ" />
+                        <TextView style="@style/DetailLabel" android:text="Tiền nước" />
+                        <TextView android:id="@+id/tvDetailWater" style="@style/DetailValueBold" android:text="350.000đ" />
                     </RelativeLayout>
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Phí quản lý" />
-
-                        <TextView
-                            android:id="@+id/tvDetailManagement"
-                            style="@style/DetailValueBold"
-                            android:text="600.000đ" />
+                        <TextView style="@style/DetailLabel" android:text="Phí quản lý" />
+                        <TextView android:id="@+id/tvDetailManagement" style="@style/DetailValueBold" android:text="600.000đ" />
                     </RelativeLayout>
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Phí vệ sinh" />
-
-                        <TextView
-                            android:id="@+id/tvDetailSanitation"
-                            style="@style/DetailValueBold"
-                            android:text="600.000đ" />
+                        <TextView style="@style/DetailLabel" android:text="Phí vệ sinh" />
+                        <TextView android:id="@+id/tvDetailSanitation" style="@style/DetailValueBold" android:text="600.000đ" />
                     </RelativeLayout>
 
-                    <View
-                        style="@style/Divider"
-                        android:layout_marginVertical="12dp" />
+                    <View style="@style/Divider" android:layout_marginVertical="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thông tin khởi tạo"
+                        android:textSize="11sp"
+                        android:textColor="@color/primary"
+                        android:layout_marginBottom="8dp"
+                        android:textStyle="bold" />
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Ngày tạo" />
-
-                        <TextView
-                            android:id="@+id/tvDetailCreatedAt"
-                            style="@style/DetailValue"
-                            android:text="01/10/2023" />
+                        <TextView style="@style/DetailLabel" android:text="Ngày tạo" />
+                        <TextView android:id="@+id/tvDetailCreatedAt" style="@style/DetailValue" android:text="01/10/2023" />
                     </RelativeLayout>
 
                     <RelativeLayout style="@style/DetailRow">
-
-                        <TextView
-                            style="@style/DetailLabel"
-                            android:text="Ngày thanh toán" />
-
-                        <TextView
-                            android:id="@+id/tvDetailPaidAt"
-                            style="@style/DetailValue"
-                            android:text="--" />
+                        <TextView style="@style/DetailLabel" android:text="Người tạo" />
+                        <TextView android:id="@+id/tvDetailCreatedBy" style="@style/DetailValue" android:text="Admin" />
                     </RelativeLayout>
+
+                    <RelativeLayout style="@style/DetailRow">
+                        <TextView style="@style/DetailLabel" android:text="Hạn thanh toán" />
+                        <TextView android:id="@+id/tvDetailDueDate" style="@style/DetailValue" android:textColor="#F44336" android:textStyle="bold" android:text="15/10/2023" />
+                    </RelativeLayout>
+
+                    <View style="@style/Divider" android:layout_marginVertical="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Thông tin hoàn tất"
+                        android:textSize="11sp"
+                        android:textColor="#4CAF50"
+                        android:layout_marginBottom="8dp"
+                        android:textStyle="bold" />
+
+                    <RelativeLayout style="@style/DetailRow">
+                        <TextView style="@style/DetailLabel" android:text="Ngày thanh toán" />
+                        <TextView android:id="@+id/tvDetailPaidAt" style="@style/DetailValue" android:text="--" />
+                    </RelativeLayout>
+
+                    <RelativeLayout style="@style/DetailRow">
+                        <TextView style="@style/DetailLabel" android:text="Người duyệt" />
+                        <TextView android:id="@+id/tvDetailApprovedBy" style="@style/DetailValue" android:textStyle="bold" android:text="--" />
+                    </RelativeLayout>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -256,8 +227,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
+                android:layout_marginBottom="16dp"
                 android:backgroundTint="@color/primary"
-                android:text="Thanh toán ngay"
+                android:text="Duyệt hóa đơn"
                 android:textAllCaps="false"
                 android:textSize="16sp"
                 android:textStyle="bold"
