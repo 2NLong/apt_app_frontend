@@ -1,17 +1,100 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.ManageContractFragment">
+    android:background="#F8F9FA">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_manage_contract"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/white"
+        android:elevation="4dp"
+        app:title="Quản lý Hợp đồng"
+        app:titleTextColor="@color/primary" /> <EditText
+    android:id="@+id/edt_search_contract"
+    android:layout_width="match_parent"
+    android:layout_height="50dp"
+    android:layout_below="@id/toolbar_manage_contract"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:layout_marginTop="12dp"
+    android:background="@android:drawable/editbox_background"
+    android:drawableStart="@android:drawable/ic_menu_search"
+    android:drawablePadding="8dp"
+    android:hint="Nhập CCCD hoặc Tên cư dân..."
+    android:padding="12dp"
+    android:maxLines="1"
+    android:singleLine="true" />
+
+    <Spinner
+        android:id="@+id/spinner_filter_contract"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/edt_search_contract"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@android:drawable/btn_dropdown"
+        android:padding="8dp" />
+
+    <LinearLayout
+        android:id="@+id/layout_pagination_contract"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="8dp">
+
+        <Button
+            android:id="@+id/btn_prev_page_contract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Trước"
+            android:backgroundTint="@color/primary"/>
+
+        <TextView
+            android:id="@+id/tv_page_info_contract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:layout_marginStart="24dp"
+            android:text="1 / 1"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btn_next_page_contract"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sau"
+            android:backgroundTint="@color/primary"/>
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_contracts"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/spinner_filter_contract"
+        android:layout_above="@id/layout_pagination_contract"
+        android:padding="8dp"
+        android:clipToPadding="false" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_contract"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Quản lý Hợp đồng"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_gravity="center" />
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/layout_pagination_contract"
+        android:layout_margin="24dp"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/primary"
+        app:tint="@color/white" />
 
-</FrameLayout>
+</RelativeLayout>
