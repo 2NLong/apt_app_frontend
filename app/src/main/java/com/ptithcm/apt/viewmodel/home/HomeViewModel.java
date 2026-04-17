@@ -8,10 +8,9 @@ import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
 import com.ptithcm.apt.models.adminserviceconfig.ServiceConfigResponse;
 import com.ptithcm.apt.repositoris.ServiceConfigRepository;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Locale;
 
 public class HomeViewModel extends ViewModel {
 
@@ -20,7 +19,7 @@ public class HomeViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
     
-    private final MutableLiveData<Calendar> selectedDate = new MutableLiveData<>(Calendar.getInstance());
+    private final MutableLiveData<LocalDate> selectedDate = new MutableLiveData<>(LocalDate.now().withDayOfMonth(1));
 
     public HomeViewModel(ServiceConfigRepository repository) {
         this.repository = repository;
@@ -38,35 +37,31 @@ public class HomeViewModel extends ViewModel {
         return isLoading;
     }
     
-    public LiveData<Calendar> getSelectedDate() {
+    public LiveData<LocalDate> getSelectedDate() {
         return selectedDate;
     }
 
     public void nextMonth() {
-        Calendar cal = selectedDate.getValue();
-        if (cal != null) {
-            Calendar next = (Calendar) cal.clone();
-            next.add(Calendar.MONTH, 1);
-            selectedDate.setValue(next);
+        LocalDate current = selectedDate.getValue();
+        if (current != null) {
+            selectedDate.setValue(current.plusMonths(1));
             refreshData();
         }
     }
 
     public void previousMonth() {
-        Calendar cal = selectedDate.getValue();
-        if (cal != null) {
-            Calendar prev = (Calendar) cal.clone();
-            prev.add(Calendar.MONTH, -1);
-            selectedDate.setValue(prev);
+        LocalDate current = selectedDate.getValue();
+        if (current != null) {
+            selectedDate.setValue(current.minusMonths(1));
             refreshData();
         }
     }
 
     public void refreshData() {
-        Calendar cal = selectedDate.getValue();
-        if (cal != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-01", Locale.getDefault());
-            String dateStr = sdf.format(cal.getTime());
+        LocalDate current = selectedDate.getValue();
+        if (current != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            String dateStr = current.withDayOfMonth(1).format(formatter);
             repository.getActiveServiceConfigs(dateStr, activeServiceConfigs, errorMessage, isLoading);
         }
     }

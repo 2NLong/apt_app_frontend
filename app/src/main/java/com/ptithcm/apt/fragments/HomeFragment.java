@@ -24,7 +24,7 @@ import com.ptithcm.apt.repositoris.ServiceConfigRepository;
 import com.ptithcm.apt.viewmodel.home.HomeViewModel;
 import com.ptithcm.apt.viewmodel.home.HomeViewModelFactory;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
@@ -116,9 +116,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), cal -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM / yyyy", Locale.getDefault());
-            textSelectedMonth.setText(sdf.format(cal.getTime()));
+        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), date -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM / yyyy", Locale.getDefault());
+            textSelectedMonth.setText(date.format(formatter));
         });
     }
 }

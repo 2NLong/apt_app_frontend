@@ -149,15 +149,51 @@ public class AuthRepository {
                 if (response.isSuccessful()) {
                     logoutResult.postValue(true);
                 } else {
-//                    errorMessage.postValue("Đăng xuất từ server thất bại: " + response.code());
+                    // errorMessage.postValue("Đăng xuất từ server thất bại: " + response.code());
                     logoutResult.postValue(true);
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-//                errorMessage.postValue("Lỗi mạng khi đăng xuất: " + t.getLocalizedMessage());
+                // errorMessage.postValue("Lỗi mạng khi đăng xuất: " + t.getLocalizedMessage());
                 logoutResult.postValue(true);
+            }
+        });
+    }
+
+    public void changePassword(com.ptithcm.apt.models.auth.request.ChangePasswordRequest request,
+            MutableLiveData<Boolean> changePasswordResult,
+            MutableLiveData<String> errorMessage,
+            MutableLiveData<Boolean> isLoading) {
+
+        isLoading.postValue(true);
+
+        authApiService.changePassword(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                isLoading.postValue(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<Void> apiResponse = response.body();
+                    if (apiResponse.getStatus() == 200) {
+                        changePasswordResult.postValue(true);
+                    } else {
+                        errorMessage.postValue(apiResponse.getMessage());
+                    }
+                } else {
+                    String msg = "Đổi mật khẩu thất bại (Lỗi: " + response.code() + ")";
+                    if (response.code() == 400) {
+                        msg = "Mật khẩu cũ không chính xác hoặc dữ liệu không hợp lệ";
+                    }
+                    errorMessage.postValue(msg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                isLoading.postValue(false);
+                errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
             }
         });
     }
