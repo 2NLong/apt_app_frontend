@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupObserver() {
-        viewModel.getActiveServiceConfigs().observe(getViewLifecycleOwner(), configs -> {
+        viewModel.activeServiceConfigs.observe(getViewLifecycleOwner(), configs -> {
             if (configs != null && !configs.isEmpty()) {
                 adapter.submitList(configs);
                 errorText.setVisibility(View.GONE);
@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+        viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             if (isLoading) {
                 errorText.setVisibility(View.GONE);
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+        viewModel.errorMessage.observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 errorText.setText(error);
                 errorText.setVisibility(View.VISIBLE);
@@ -116,7 +116,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), date -> {
+        viewModel.selectedDate.observe(getViewLifecycleOwner(), date -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM / yyyy", Locale.getDefault());
             textSelectedMonth.setText(date.format(formatter));
         });

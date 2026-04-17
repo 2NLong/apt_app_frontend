@@ -15,54 +15,43 @@ import java.util.List;
 public class HomeViewModel extends ViewModel {
 
     private final ServiceConfigRepository repository;
-    private final MutableLiveData<List<ServiceConfigResponse>> activeServiceConfigs = new MutableLiveData<>();
-    private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
-    private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>();
-    
-    private final MutableLiveData<LocalDate> selectedDate = new MutableLiveData<>(LocalDate.now().withDayOfMonth(1));
+    private final MutableLiveData<List<ServiceConfigResponse>> _activeServiceConfigs = new MutableLiveData<>();
+    private final MutableLiveData<String> _errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> _isLoading = new MutableLiveData<>();
+    private final MutableLiveData<LocalDate> _selectedDate = new MutableLiveData<>(LocalDate.now().withDayOfMonth(1));
+
+    public final LiveData<List<ServiceConfigResponse>> activeServiceConfigs = _activeServiceConfigs;
+    public final LiveData<String> errorMessage = _errorMessage;
+    public final LiveData<Boolean> isLoading = _isLoading;
+    public final LiveData<LocalDate> selectedDate = _selectedDate;
 
     public HomeViewModel(ServiceConfigRepository repository) {
         this.repository = repository;
     }
 
-    public LiveData<List<ServiceConfigResponse>> getActiveServiceConfigs() {
-        return activeServiceConfigs;
-    }
-
-    public LiveData<String> getErrorMessage() {
-        return errorMessage;
-    }
-
-    public LiveData<Boolean> getIsLoading() {
-        return isLoading;
-    }
-    
-    public LiveData<LocalDate> getSelectedDate() {
-        return selectedDate;
-    }
 
     public void nextMonth() {
-        LocalDate current = selectedDate.getValue();
+        LocalDate current = _selectedDate.getValue();
         if (current != null) {
-            selectedDate.setValue(current.plusMonths(1));
+            _selectedDate.setValue(current.plusMonths(1));
             refreshData();
         }
     }
 
     public void previousMonth() {
-        LocalDate current = selectedDate.getValue();
+        LocalDate current = _selectedDate.getValue();
         if (current != null) {
-            selectedDate.setValue(current.minusMonths(1));
+            _selectedDate.setValue(current.minusMonths(1));
             refreshData();
         }
     }
 
     public void refreshData() {
-        LocalDate current = selectedDate.getValue();
+        LocalDate current = _selectedDate.getValue();
         if (current != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String dateStr = current.withDayOfMonth(1).format(formatter);
-            repository.getActiveServiceConfigs(dateStr, activeServiceConfigs, errorMessage, isLoading);
+            repository.getActiveServiceConfigs(dateStr, _activeServiceConfigs, _errorMessage, _isLoading);
         }
     }
 

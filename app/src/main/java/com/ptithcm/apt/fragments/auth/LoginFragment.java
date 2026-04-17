@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,13 +21,15 @@ import com.ptithcm.apt.R;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.activities.AdminActivity;
 import com.ptithcm.apt.activities.MainActivity;
-import com.ptithcm.apt.databinding.FragmentLoginBinding;
 import com.ptithcm.apt.viewmodel.auth.LoginViewModel;
 import com.ptithcm.apt.viewmodel.auth.LoginViewModelFactory;
 
 public class LoginFragment extends Fragment {
 
-    private FragmentLoginBinding binding;
+    private Button btnSignIn;
+    private EditText etUsername;
+    private EditText etPassword;
+    private TextView tvForgotPassword;
     private LoginViewModel loginViewModel;
 
     public LoginFragment() {
@@ -33,13 +38,17 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater, container, false);
-        return binding.getRoot();
+        return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        btnSignIn = view.findViewById(R.id.btn_sign_in);
+        etUsername = view.findViewById(R.id.et_username);
+        etPassword = view.findViewById(R.id.et_password);
+        tvForgotPassword = view.findViewById(R.id.tv_forgot_password);
 
         // Dùng Factory để inject Context
         LoginViewModelFactory factory = new LoginViewModelFactory(requireContext());
@@ -47,13 +56,13 @@ public class LoginFragment extends Fragment {
 
         observeViewModel();
 
-        binding.btnSignIn.setOnClickListener(v -> {
-            String username = binding.etUsername.getText().toString().trim();
-            String password = binding.etPassword.getText().toString().trim();
+        btnSignIn.setOnClickListener(v -> {
+            String username = etUsername.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
             loginViewModel.login(username, password);
         });
 
-        binding.tvForgotPassword.setOnClickListener(v -> {
+        tvForgotPassword.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_loginFragment_to_forgotEmailFragment);
         });
@@ -90,11 +99,11 @@ public class LoginFragment extends Fragment {
         // Trạng thái loading
         loginViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                binding.btnSignIn.setEnabled(false);
-                binding.btnSignIn.setText("Đang đăng nhập...");
+                btnSignIn.setEnabled(false);
+                btnSignIn.setText("Đang đăng nhập...");
             } else {
-                binding.btnSignIn.setEnabled(true);
-                binding.btnSignIn.setText("Đăng nhập");
+                btnSignIn.setEnabled(true);
+                btnSignIn.setText("Đăng nhập");
             }
         });
     }
@@ -102,6 +111,5 @@ public class LoginFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        binding = null;
     }
 }
