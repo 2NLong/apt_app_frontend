@@ -3,6 +3,7 @@ package com.ptithcm.apt.repositoris;
 import androidx.lifecycle.MutableLiveData;
 
 import com.ptithcm.apt.models.auth.request.ChangePasswordRequest;
+import com.ptithcm.apt.utils.ErrorUtils;
 import com.ptithcm.apt.models.auth.request.ForgotPasswordRequest;
 import com.ptithcm.apt.models.auth.request.LoginRequest;
 import com.ptithcm.apt.models.auth.request.RefreshTokenRequest;
@@ -70,17 +71,7 @@ public class AuthRepository {
                                         : "Đăng nhập thất bại");
                     }
                 } else {
-                    String msg;
-                    switch (response.code()) {
-                        case 401:
-                            msg = "Sai tên đăng nhập hoặc mật khẩu";
-                            break;
-                        case 403:
-                            msg = "Tài khoản bị khoá hoặc không có quyền";
-                            break;
-                        default:
-                            msg = "Đăng nhập thất bại (Lỗi: " + response.code() + ")";
-                    }
+                    String msg = ErrorUtils.getErrorMessage(response, "Đăng nhập thất bại (Lỗi: " + response.code() + ")");
                     errorMessage.postValue(msg);
                 }
             }
@@ -126,7 +117,8 @@ public class AuthRepository {
                                 errorMessage.postValue(apiResponse.getMessage());
                             }
                         } else {
-                            errorMessage.postValue("Làm mới token thất bại: " + response.code());
+                            String msg = ErrorUtils.getErrorMessage(response, "Làm mới token thất bại (Lỗi: " + response.code() + ")");
+                            errorMessage.postValue(msg);
                         }
                     }
 
@@ -186,10 +178,7 @@ public class AuthRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    String msg = "Đổi mật khẩu thất bại (Lỗi: " + response.code() + ")";
-                    if (response.code() == 400) {
-                        msg = "Mật khẩu cũ không chính xác hoặc dữ liệu không hợp lệ";
-                    }
+                    String msg = ErrorUtils.getErrorMessage(response, "Đổi mật khẩu thất bại (Lỗi: " + response.code() + ")");
                     errorMessage.postValue(msg);
                 }
             }
@@ -230,12 +219,7 @@ public class AuthRepository {
                                                 : "Gửi OTP thất bại");
                             }
                         } else {
-                            String msg;
-                            if (response.code() == 404) {
-                                msg = "Email không tồn tại trong hệ thống";
-                            } else {
-                                msg = "Gửi OTP thất bại (Lỗi: " + response.code() + ")";
-                            }
+                            String msg = ErrorUtils.getErrorMessage(response, "Gửi OTP thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
@@ -276,12 +260,7 @@ public class AuthRepository {
                                                 : "Xác thực OTP thất bại");
                             }
                         } else {
-                            String msg;
-                            if (response.code() == 400) {
-                                msg = "Mã OTP không đúng hoặc đã hết hạn";
-                            } else {
-                                msg = "Xác thực OTP thất bại (Lỗi: " + response.code() + ")";
-                            }
+                            String msg = ErrorUtils.getErrorMessage(response, "Xác thực OTP thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
@@ -322,12 +301,7 @@ public class AuthRepository {
                                                 : "Đặt lại mật khẩu thất bại");
                             }
                         } else {
-                            String msg;
-                            if (response.code() == 400) {
-                                msg = "Token không hợp lệ hoặc đã hết hạn";
-                            } else {
-                                msg = "Đặt lại mật khẩu thất bại (Lỗi: " + response.code() + ")";
-                            }
+                            String msg = ErrorUtils.getErrorMessage(response, "Đặt lại mật khẩu thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
