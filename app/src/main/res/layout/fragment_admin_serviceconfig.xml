@@ -18,7 +18,7 @@
         android:textStyle="bold" />
 
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="16dp"
@@ -123,44 +123,14 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Service Items -->
-        <!-- Electricity Service Item -->
-        <include
-            android:id="@+id/include_electricity"
-            layout="@layout/item_serviceconfig"
+        <!-- Service Items (Dynamic RecyclerView) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvServiceConfigs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
-
-        <!-- Water Service Item -->
-        <include
-            android:id="@+id/include_water"
-            layout="@layout/item_serviceconfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
-
-        <!-- Management Service Item -->
-        <include
-            android:id="@+id/include_management"
-            layout="@layout/item_serviceconfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"/>
-
-        <!-- Sanitation Service Item -->
-        <include
-            android:id="@+id/include_sanitation"
-            layout="@layout/item_serviceconfig"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"/>
 
@@ -207,5 +177,5 @@
         </LinearLayout>
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
 </LinearLayout>
