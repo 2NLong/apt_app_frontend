@@ -16,9 +16,13 @@
         android:theme="@style/Theme.Apt"
         android:usesCleartextTraffic="true">
         <service
-            android:name=".network.api.AdminBillApiService"
+            android:name=".network.api.MonthlyMetricService"
             android:enabled="true"
             android:exported="true"></service>
+        <service
+            android:name=".network.api.AdminBillApiService"
+            android:enabled="true"
+            android:exported="true" />
 
         <activity
             android:name=".activities.AdminActivity"
