@@ -1,8 +1,11 @@
 package com.ptithcm.apt.network.api;
 
 import com.ptithcm.apt.models.auth.request.ChangePasswordRequest;
+import com.ptithcm.apt.models.auth.request.ForgotPasswordRequest;
 import com.ptithcm.apt.models.auth.request.LoginRequest;
 import com.ptithcm.apt.models.auth.request.RefreshTokenRequest;
+import com.ptithcm.apt.models.auth.request.ResetPasswordRequest;
+import com.ptithcm.apt.models.auth.request.VerifyOtpRequest;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.LoginResponse;
 
@@ -24,4 +27,13 @@ public interface AuthApiService {
 
     @PATCH("api/v1/auth/change-password")
     Call<ApiResponse<Void>> changePassword(@Body ChangePasswordRequest request);
+
+    @POST("api/v1/auth/forgot-password")
+    Call<ApiResponse<Void>> forgotPassword(@Body ForgotPasswordRequest request);
+
+    @POST("api/v1/auth/verify-otp")
+    Call<ApiResponse<String>> verifyOtp(@Body VerifyOtpRequest request);
+
+    @PATCH("api/v1/auth/reset-password")
+    Call<ApiResponse<Void>> resetPassword(@Body ResetPasswordRequest request);
 }

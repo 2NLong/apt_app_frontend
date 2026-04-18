@@ -86,6 +86,9 @@ public class AdminServiceConfigFragment extends Fragment {
         viewModel.updateSuccess.observe(getViewLifecycleOwner(), success -> {
             if (Boolean.TRUE.equals(success)) {
                 ToastUtils.showSuccessToast(requireContext(), "Lên lịch cập nhật giá thành công!");
+                if (currentDialog != null && currentDialog.isShowing()) {
+                    currentDialog.dismiss();
+                }
                 viewModel.fetchServiceConfigs();
                 viewModel.resetUpdateStatus();
             }
@@ -94,6 +97,9 @@ public class AdminServiceConfigFragment extends Fragment {
         viewModel.cancelSuccess.observe(getViewLifecycleOwner(), success -> {
             if (Boolean.TRUE.equals(success)) {
                 ToastUtils.showSuccessToast(requireContext(), "Hủy lịch cập nhật thành công!");
+                if (currentDialog != null && currentDialog.isShowing()) {
+                    currentDialog.dismiss();
+                }
                 viewModel.fetchServiceConfigs();
                 viewModel.resetCancelStatus();
             }
@@ -196,7 +202,6 @@ public class AdminServiceConfigFragment extends Fragment {
                 tvCancelSchedule.setVisibility(View.VISIBLE);
                 tvCancelSchedule.setOnClickListener(v -> {
                     viewModel.cancelUpcomingUpdate(config.getServiceCode());
-                    currentDialog.dismiss();
                 });
             } else {
                 tvCancelSchedule.setVisibility(View.GONE);
@@ -229,7 +234,6 @@ public class AdminServiceConfigFragment extends Fragment {
                             effectiveDate);
 
                     viewModel.validateAndUpdatePrice(request, config.getCurrentPrice());
-                    currentDialog.dismiss();
                 } catch (NumberFormatException e) {
                     ToastUtils.showErrorToast(requireContext(), "Giá không hợp lệ");
                 }
