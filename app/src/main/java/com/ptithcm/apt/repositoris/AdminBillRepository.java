@@ -6,7 +6,9 @@ import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.AdminBillDetail;
+import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.bill.BillPreviousMonthlyMetric;
 import com.ptithcm.apt.network.api.AdminBillApiService;
 
 import java.util.List;
@@ -80,6 +82,40 @@ public class AdminBillRepository {
             public void onFailure(Call<ApiResponse<AdminBillDetail>> call, Throwable t) {
                 loadingData.setValue(false);
                 errorData.setValue("Lỗi kết nối server: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getApartmentsForBill(MutableLiveData<List<BillApartment>> data, MutableLiveData<String> error) {
+        apiService.getBillApartments(0).enqueue(new Callback<PageResponse<BillApartment>>() {
+            @Override
+            public void onResponse(Call<PageResponse<BillApartment>> call, Response<PageResponse<BillApartment>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body().getContent());
+                } else {
+                    error.setValue("Không thể lấy danh sách căn hộ");
+                }
+            }
+            @Override
+            public void onFailure(Call<PageResponse<BillApartment>> call, Throwable t) {
+                error.setValue(t.getMessage());
+            }
+        });
+    }
+
+    public void getPreviousMetrics(Long apartmentId, MutableLiveData<BillPreviousMonthlyMetric> data, MutableLiveData<String> error) {
+        apiService.getPreviousMetrics(apartmentId).enqueue(new Callback<ApiResponse<BillPreviousMonthlyMetric>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<BillPreviousMonthlyMetric>> call, Response<ApiResponse<BillPreviousMonthlyMetric>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body().getData());
+                } else {
+                    error.setValue("Chưa có chỉ số cũ cho căn hộ này");
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<BillPreviousMonthlyMetric>> call, Throwable t) {
+                error.setValue(t.getMessage());
             }
         });
     }
