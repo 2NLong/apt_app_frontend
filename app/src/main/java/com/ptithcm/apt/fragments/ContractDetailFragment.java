@@ -1,0 +1,177 @@
+package com.ptithcm.apt.fragments;
+
+import android.graphics.Color;
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.ptithcm.apt.R;
+import com.ptithcm.apt.models.contract.ContractResponse;
+import com.ptithcm.apt.network.api.ContractApiService;
+import com.ptithcm.apt.network.retrofit.RetrofitClient;
+
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link ContractDetailFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class ContractDetailFragment extends Fragment {
+
+    private TextView tvStatus, tvResidentName, tvPhone, tvCccd;
+    private TextView tvRoom, tvRole, tvRentalPrice, tvDeposit, tvDates;
+
+    private Long contractId = -1L;
+
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    public ContractDetailFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment ContractDetailFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static ContractDetailFragment newInstance(String param1, String param2) {
+        ContractDetailFragment fragment = new ContractDetailFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view  = inflater.inflate(R.layout.fragment_contract_detail,container,false);
+        if(getArguments() != null){
+            contractId = getArguments().getLong("CONTRACT_ID",-1L);
+        }
+
+        initViews(view);
+
+        view.findViewById(R.id.toolbar_contract_detail).setOnClickListener(v->{
+            getParentFragmentManager().popBackStack();
+        });
+
+        if (contractId != -1L) {
+            fetchContractDetail(contractId);
+        } else {
+            Toast.makeText(getContext(), "Lỗi: Không lấy được ID Hợp đồng!", Toast.LENGTH_SHORT).show();
+        }
+
+        return view;
+    }
+
+    private void initViews(View view){
+        tvStatus = view.findViewById(R.id.tv_detail_status);
+        tvResidentName = view.findViewById(R.id.tv_detail_resident_name);
+        tvPhone = view.findViewById(R.id.tv_detail_phone);
+        tvCccd = view.findViewById(R.id.tv_detail_cccd);
+
+        tvRoom = view.findViewById(R.id.tv_detail_room);
+        tvRole = view.findViewById(R.id.tv_detail_role);
+        tvRentalPrice = view.findViewById(R.id.tv_detail_rental_price);
+        tvDeposit = view.findViewById(R.id.tv_detail_deposit);
+        tvDates = view.findViewById(R.id.tv_detail_dates);
+    }
+
+    private void fetchContractDetail(Long id){
+        ContractApiService apiService = RetrofitClient.getInstance().createService(ContractApiService.class);
+
+        apiService.getContractDetail(id).enqueue(new Callback<ContractResponse>() {
+            @Override
+            public void onResponse(Call<ContractResponse> call, Response<ContractResponse> response) {
+                if(response.isSuccessful() && response.body() != null){
+                    displayData(response.body());
+                }else{
+                    Toast.makeText(getContext(),"Khong the tai chi tiet hop dong",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ContractResponse> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void displayData(ContractResponse data) {
+        DecimalFormat formatter = new DecimalFormat("#,###");
+
+        tvResidentName.setText(data.getResidentName());
+        tvPhone.setText(data.getPhone() != null ? data.getPhone() : "Chưa cập nhật");
+        tvCccd.setText(data.getCitizenIdentity() != null ? data.getCitizenIdentity() : "Chưa cập nhật");
+
+        tvRoom.setText("Phòng " + data.getRoomNumber());
+        tvRole.setText("OWNER".equals(data.getRole()) ? "CHỦ HỘ" : "NGƯỜI THUÊ");
+
+        tvRentalPrice.setText(data.getRentalPrice() != null ? formatter.format(data.getRentalPrice()) : "0");
+        tvDeposit.setText(data.getDepositAmount() != null ? formatter.format(data.getDepositAmount()) : "0");
+
+        String start = data.getContractStart() != null ? data.getContractStart() : "...";
+        String end = data.getContractEnd() != null ? data.getContractEnd() : "...";
+        tvDates.setText(start + " đến " + end);
+
+        // 1. Lấy ngày hôm nay theo định dạng yyyy-MM-dd
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String todayStr = sdf.format(new Date());
+
+        boolean isStillValid = false;
+
+        if (data.getContractEnd() != null) {
+            if (data.getContractEnd().compareTo(todayStr) >= 0) {
+                isStillValid = true;
+            }
+        } else if (data.getContractStart() != null) {
+            isStillValid = true;
+        }
+
+        if (isStillValid) {
+            tvStatus.setText("ĐANG HIỆU LỰC");
+            tvStatus.setBackgroundResource(R.drawable.bg_button);
+            tvStatus.setTextColor(Color.parseColor("#A63C4F")); // Chữ đỏ
+        } else {
+            tvStatus.setText("ĐÃ KẾT THÚC / HỦY");
+            tvStatus.setBackgroundResource(R.drawable.bg_button);
+            tvStatus.setTextColor(Color.parseColor("#666666")); // Chữ xám đậm
+        }
+    }
+}

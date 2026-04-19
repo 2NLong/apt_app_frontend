@@ -12,7 +12,8 @@
         android:background="@color/white"
         android:elevation="4dp"
         app:title="Quản lý Hợp đồng"
-        app:titleTextColor="@color/primary" /> <EditText
+        app:titleTextColor="@color/primary" />
+    <EditText
     android:id="@+id/edt_search_contract"
     android:layout_width="match_parent"
     android:layout_height="50dp"
@@ -23,7 +24,7 @@
     android:background="@android:drawable/editbox_background"
     android:drawableStart="@android:drawable/ic_menu_search"
     android:drawablePadding="8dp"
-    android:hint="Nhập CCCD hoặc Tên cư dân..."
+    android:hint="Nhập số phòng hoặc Tên cư dân..."
     android:padding="12dp"
     android:maxLines="1"
     android:singleLine="true" />

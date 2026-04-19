@@ -52,7 +52,7 @@
                     android:background="@drawable/bg_button_auth"
                     android:paddingHorizontal="8dp"
                     android:paddingVertical="2dp"
-                    android:text="CHỦ HỘ"
+                    android:text=""
                     android:textColor="#A63C4F"
                     android:textSize="10sp"
                     android:textStyle="bold" />

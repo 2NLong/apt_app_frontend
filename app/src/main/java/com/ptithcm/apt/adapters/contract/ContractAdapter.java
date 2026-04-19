@@ -27,12 +27,11 @@ public class ContractAdapter extends RecyclerView.Adapter<ContractAdapter.Contra
         this.listener = listener;
     }
 
-    public void addData(List<ContractResponse> newData) {
-        if (newData == null || newData.isEmpty()) return;
-
-        int startPosition = contractList.size();
-        contractList.addAll(newData);
-        notifyItemRangeInserted(startPosition, newData.size());
+    public void setData(List<ContractResponse> newData) {
+        if (newData == null) return;
+        this.contractList.clear();
+        this.contractList.addAll(newData);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -50,7 +49,7 @@ public class ContractAdapter extends RecyclerView.Adapter<ContractAdapter.Contra
         holder.tvRoom.setText("Phòng: " + contract.getRoomNumber());
 
         // Chuyển đổi tên Role
-        String roleStr = "OWNER".equals(contract.getRole()) ? "CHỦ HỘ" : "THÀNH VIÊN";
+        String roleStr = "OWNER".equals(contract.getRole()) ? "CHỦ HỘ" : "NGƯỜI THUÊ";
         holder.tvRole.setText(roleStr);
 
         String startDate = contract.getContractStart() != null ? contract.getContractStart() : "...";
