@@ -7,6 +7,7 @@ import com.ptithcm.apt.models.adminserviceconfig.ServiceConfigResponse;
 import com.ptithcm.apt.models.adminserviceconfig.ServicePriceUpdateRequest;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.network.api.ServiceConfigApiService;
+import com.ptithcm.apt.utils.ErrorUtils;
 
 import java.util.List;
 
@@ -42,7 +43,8 @@ public class ServiceConfigRepository {
                                 errorMessage.postValue(apiResponse.getMessage());
                             }
                         } else {
-                            errorMessage.postValue("Lỗi khi lấy cấu hình dịch vụ: " + response.code());
+                            String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi lấy cấu hình dịch vụ: " + response.code());
+                            errorMessage.postValue(msg);
                         }
                     }
 
@@ -73,7 +75,8 @@ public class ServiceConfigRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    errorMessage.postValue("Lỗi khi cập nhật giá: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi cập nhật giá: " + response.code());
+                    errorMessage.postValue(msg);
                 }
             }
 
@@ -104,7 +107,8 @@ public class ServiceConfigRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    errorMessage.postValue("Lỗi khi hủy lịch cập nhật: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi hủy lịch cập nhật: " + response.code());
+                    errorMessage.postValue(msg);
                 }
             }
 
@@ -135,7 +139,8 @@ public class ServiceConfigRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    errorMessage.postValue("Lỗi khi lấy giá dịch vụ: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi lấy giá dịch vụ: " + response.code());
+                    errorMessage.postValue(msg);
                 }
             }
 

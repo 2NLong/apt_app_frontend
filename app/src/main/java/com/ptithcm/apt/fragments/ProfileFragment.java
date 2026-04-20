@@ -30,6 +30,7 @@ import com.ptithcm.apt.viewmodel.auth.LoginViewModel;
 import com.ptithcm.apt.viewmodel.auth.LoginViewModelFactory;
 import com.ptithcm.apt.viewmodel.profile.ProfileViewModel;
 import com.ptithcm.apt.viewmodel.profile.ProfileViewModelFactory;
+import com.ptithcm.apt.fragments.profile.ChangePasswordDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +86,7 @@ public class ProfileFragment extends Fragment {
         LoginViewModelFactory loginFactory = new LoginViewModelFactory(requireContext());
         loginViewModel = new ViewModelProvider(this, loginFactory).get(LoginViewModel.class);
 
-        ProfileViewModelFactory profileFactory = new ProfileViewModelFactory();
+        ProfileViewModelFactory profileFactory = new ProfileViewModelFactory(requireContext());
         profileViewModel = new ViewModelProvider(this, profileFactory).get(ProfileViewModel.class);
 
         // BIND VIEW
@@ -144,6 +145,15 @@ public class ProfileFragment extends Fragment {
             });
         }
 
+        // Change password button
+        View cardChangePassword = settings.findViewById(R.id.card_change_password);
+        if (cardChangePassword != null) {
+            cardChangePassword.setOnClickListener(v -> {
+                ChangePasswordDialogFragment.newInstance()
+                        .show(getChildFragmentManager(), "CHANGE_PASSWORD");
+            });
+        }
+
         // ADAPTERS
         apartmentList = new ArrayList<>();
         apartmentAdapter = new ApartmentAdapter(apartmentList);
@@ -177,6 +187,14 @@ public class ProfileFragment extends Fragment {
         profileViewModel.error.observe(getViewLifecycleOwner(), error -> {
             if (error != null && !error.isEmpty()) {
                 ToastUtils.showErrorToast(requireContext(), error);
+            }
+        });
+
+        profileViewModel.changePasswordSuccess.observe(getViewLifecycleOwner(), success -> {
+            if (Boolean.TRUE.equals(success)) {
+                ToastUtils.showSuccessToast(requireContext(), "Mật khẩu đã được đổi thành công. Vui lòng đăng nhập lại.");
+                loginViewModel.logout();
+                profileViewModel.resetChangePasswordStatus();
             }
         });
 

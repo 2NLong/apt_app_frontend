@@ -57,6 +57,12 @@ public class AdminServiceConfigViewModel extends ViewModel {
             return;
         }
 
+        // Kiểm tra đơn giá phải lớn hơn 0
+        if (request.getNewPrice() == null || request.getNewPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            _error.setValue("Giá dịch vụ phải lớn hơn 0.");
+            return;
+        }
+
         // Kiểm tra đơn giá (Phải khác giá hiện tại)
         if (currentPrice != null && request.getNewPrice().compareTo(currentPrice) == 0) {
             _error.setValue("Dịch vụ đang được áp dụng mức giá này rồi.");

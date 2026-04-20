@@ -6,7 +6,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.models.bill.AdminBillDetail;
+import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.bill.BillPreviousMonthlyMetric;
 import com.ptithcm.apt.repositoris.AdminBillRepository;
 
 import java.util.List;
@@ -27,6 +29,22 @@ public class AdminBillViewModel extends ViewModel {
     // LiveData cho Chi tiết (AdminBillDetailFragment)
     private final MutableLiveData<AdminBillDetail> _billDetail = new MutableLiveData<>();
     public LiveData<AdminBillDetail> billDetail = _billDetail;
+
+
+    private final MutableLiveData<List<BillApartment>> _billApartments = new MutableLiveData<>();
+    public LiveData<List<BillApartment>> billApartments = _billApartments;
+
+    private final MutableLiveData<BillPreviousMonthlyMetric> _previousMetric = new MutableLiveData<>();
+    public LiveData<BillPreviousMonthlyMetric> previousMetric = _previousMetric;
+
+    // Hàm gọi
+    public void fetchApartmentsForBill() {
+        repository.getApartmentsForBill(_billApartments, _error);
+    }
+
+    public void fetchPreviousMetrics(Long apartmentId) {
+        repository.getPreviousMetrics(apartmentId, _previousMetric, _error);
+    }
 
     public AdminBillViewModel(AdminBillRepository repository) {
         this.repository = repository;

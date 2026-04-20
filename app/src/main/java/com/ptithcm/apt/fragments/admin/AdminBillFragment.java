@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.chip.Chip;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.bill.AdminBillAdapter;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
+import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
@@ -43,6 +45,7 @@ public class AdminBillFragment extends Fragment {
     private AdminBillAdapter adapter;
     private LinearLayout layoutEmpty;
     private RecyclerView recyclerView;
+    private FloatingActionButton fabAdd;
 
     public AdminBillFragment() {
     }
@@ -59,6 +62,7 @@ public class AdminBillFragment extends Fragment {
 
         layoutEmpty = view.findViewById(R.id.layoutEmpty);
         recyclerView = view.findViewById(R.id.rvAdminBills);
+        fabAdd = view.findViewById(R.id.fabAddBill);
 
         adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
             @Override
@@ -139,6 +143,19 @@ public class AdminBillFragment extends Fragment {
                 }
             });
             updateChipText(chipDate);
+
+        }
+
+        if (fabAdd != null) {
+            fabAdd.setOnClickListener(v -> {
+                // Chuyển sang fragment tạo hóa đơn
+                AdminCreateBillFragment createBillFragment = new AdminCreateBillFragment();
+
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.admin_fragment_container, createBillFragment)
+                        .addToBackStack(null)
+                        .commit();
+            });
         }
 
         // Load data mặc định (null, null, UNPAID)
