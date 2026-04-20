@@ -2,6 +2,8 @@ package com.ptithcm.apt.models.contract;
 
 public class ContractResponse {
     private Long id;
+    private Long residentId;
+    private Long apartmentId;
     private String roomNumber;
     private String residentName;
     private String citizenIdentity;
@@ -22,6 +24,12 @@ public class ContractResponse {
 
     public String getResidentName() { return residentName; }
     public void setResidentName(String residentName) { this.residentName = residentName; }
+
+    public Long getResidentId() { return residentId; }
+    public void setResidentId(Long residentId) { this.residentId = residentId; }
+
+    public Long getApartmentId() { return apartmentId; }
+    public void setApartmentId(Long apartmentId) { this.apartmentId = apartmentId; }
 
     public String getCitizenIdentity() { return citizenIdentity; }
     public void setCitizenIdentity(String citizenIdentity) { this.citizenIdentity = citizenIdentity; }

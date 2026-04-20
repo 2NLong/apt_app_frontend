@@ -19,5 +19,4 @@ public interface ContractApiService {
 
     @GET("api/v1/admin/contracts/{id}")
     Call<ContractResponse> getContractDetail(@Path("id") long id);
-
 }

@@ -125,6 +125,18 @@
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btn_move_out"
+                android:layout_width="match_parent"
+                android:layout_height="55dp"
+                android:layout_marginBottom="24dp"
+                android:backgroundTint="#D32F2F"
+                android:text="Thanh lý Hợp đồng (Chuyển đi)"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textAllCaps="false"/>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

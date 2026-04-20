@@ -8,13 +8,18 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.contract.ContractResponse;
 import com.ptithcm.apt.network.api.ContractApiService;
+import com.ptithcm.apt.network.api.ResidentApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
+
+import org.json.JSONObject;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -36,6 +41,9 @@ public class ContractDetailFragment extends Fragment {
     private TextView tvRoom, tvRole, tvRentalPrice, tvDeposit, tvDates;
 
     private Long contractId = -1L;
+    private Button btnMoveOut;
+    private Long currentResidentId;
+    private Long currentApartmentId;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -91,6 +99,8 @@ public class ContractDetailFragment extends Fragment {
             getParentFragmentManager().popBackStack();
         });
 
+        btnMoveOut.setOnClickListener(v -> showMoveOutConfirmDialog());
+
         if (contractId != -1L) {
             fetchContractDetail(contractId);
         } else {
@@ -111,6 +121,7 @@ public class ContractDetailFragment extends Fragment {
         tvRentalPrice = view.findViewById(R.id.tv_detail_rental_price);
         tvDeposit = view.findViewById(R.id.tv_detail_deposit);
         tvDates = view.findViewById(R.id.tv_detail_dates);
+        btnMoveOut = view.findViewById(R.id.btn_move_out);
     }
 
     private void fetchContractDetail(Long id){
@@ -134,6 +145,8 @@ public class ContractDetailFragment extends Fragment {
     }
 
     private void displayData(ContractResponse data) {
+        currentResidentId = data.getResidentId();
+        currentApartmentId = data.getApartmentId();
         DecimalFormat formatter = new DecimalFormat("#,###");
 
         tvResidentName.setText(data.getResidentName());
@@ -172,6 +185,61 @@ public class ContractDetailFragment extends Fragment {
             tvStatus.setText("ĐÃ KẾT THÚC / HỦY");
             tvStatus.setBackgroundResource(R.drawable.bg_button);
             tvStatus.setTextColor(Color.parseColor("#666666")); // Chữ xám đậm
+            btnMoveOut.setVisibility(View.GONE);
         }
+    }
+
+    private void showMoveOutConfirmDialog() {
+        if (currentResidentId == null || currentApartmentId == null) return;
+
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("CẢNH BÁO THANH LÝ")
+                .setMessage("Bạn đang thực hiện thanh lý hợp đồng cho Chủ hộ. Nếu tiếp tục, TOÀN BỘ thành viên trong phòng này sẽ được hệ thống cho dọn đi và trả phòng về trạng thái trống.\n\nBạn có chắc chắn muốn thực hiện?")
+                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
+                .setPositiveButton("Xác nhận", (dialog, which) -> executeMoveOutApi())
+                .show();
+    }
+
+    private void executeMoveOutApi() {
+        ResidentApiService apiService = RetrofitClient.getInstance().createService(ResidentApiService.class);
+
+        apiService.moveOutResident(currentResidentId, currentApartmentId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Thanh lý hợp đồng thành công!", Toast.LENGTH_LONG).show();
+                    getParentFragmentManager().popBackStack();
+                } else {
+                    String errorMessage = "Lỗi hệ thống khi thanh lý hợp đồng!";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorStr = response.errorBody().string();
+                            JSONObject jsonObject = new JSONObject(errorStr);
+                            if (jsonObject.has("message")) {
+                                errorMessage = jsonObject.getString("message");
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    showErrorDialog(errorMessage);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void showErrorDialog(String message) {
+        new MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Không thể thanh lý")
+                .setMessage(message)
+                .setPositiveButton("Đã hiểu", (dialog, which) -> dialog.dismiss())
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
     }
 }
