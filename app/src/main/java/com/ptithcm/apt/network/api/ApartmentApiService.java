@@ -15,23 +15,23 @@ import retrofit2.http.Query;
 
 public interface ApartmentApiService {
     // API Lấy danh sách có phân trang
-    @GET("api/v1/admin/apartment")
+    @GET("api/v1/admin/apartments")
     Call<ApartmentPageResponse> getApartmentsByPage(@Query("page") int page);
 
     // API Tìm kiếm (Giả định URL Controller của bạn, hãy sửa lại cho khớp nếu cần)
-    @GET("api/v1/admin/apartment/search")
+    @GET("api/v1/admin/apartments/search")
     Call<List<Apartment>> searchApartments(@Query("keyword") String keyword);
 
-    @GET("api/v1/admin/apartment/{id}")
+    @GET("api/v1/admin/apartments/{id}")
     Call<Apartment> getApartmentById(@Path("id") Long id);
 
     // Lọc theo trạng thái
-    @GET("api/v1/admin/apartment/status/{status}")
+    @GET("api/v1/admin/apartments/status/{status}")
     Call<List<Apartment>> getApartmentsByStatus(@Path("status") String status);
 
-    @PUT("api/v1/admin/apartment/{id}")
+    @PUT("api/v1/admin/apartments/{id}")
     Call<Apartment> updateApartment(@Path("id") Long id,@Body Apartment apartment);
 
-    @POST("api/v1/admin/apartment")
+    @POST("api/v1/admin/apartments")
     Call<Apartment> createApartment(@Body Apartment apartment);
 }

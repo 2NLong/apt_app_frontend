@@ -76,7 +76,7 @@ public class HomeServiceConfigAdapter extends RecyclerView.Adapter<HomeServiceCo
             textUnit.setText(config.getUnit());
             textPrice.setText(FormatUtils.formatCurrency(config.getUnitPrice()).replace(" ₫", "").trim());
 
-            // Map category and icons
+            // Map code and icons
             imageIcon.setImageResource(resolveIcon(config.getServiceCode()));
             
             String baseCode = config.getServiceCode() != null ? config.getServiceCode() : "";

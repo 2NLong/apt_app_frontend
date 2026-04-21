@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.profile.ProfileDashboardResponse;
 import com.ptithcm.apt.network.api.ProfileApiService;
+import com.ptithcm.apt.utils.ErrorUtils;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,7 +45,8 @@ public class ProfileRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    errorMessage.postValue("Lỗi khi lấy thông tin cá nhân: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi lấy thông tin cá nhân: " + response.code());
+                    errorMessage.postValue(msg);
                 }
             }
 

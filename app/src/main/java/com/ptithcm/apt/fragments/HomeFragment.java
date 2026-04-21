@@ -24,7 +24,7 @@ import com.ptithcm.apt.repositoris.ServiceConfigRepository;
 import com.ptithcm.apt.viewmodel.home.HomeViewModel;
 import com.ptithcm.apt.viewmodel.home.HomeViewModelFactory;
 
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 public class HomeFragment extends Fragment {
@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void setupObserver() {
-        viewModel.getActiveServiceConfigs().observe(getViewLifecycleOwner(), configs -> {
+        viewModel.activeServiceConfigs.observe(getViewLifecycleOwner(), configs -> {
             if (configs != null && !configs.isEmpty()) {
                 adapter.submitList(configs);
                 errorText.setVisibility(View.GONE);
@@ -100,7 +100,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
+        viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             if (isLoading) {
                 errorText.setVisibility(View.GONE);
@@ -108,7 +108,7 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
+        viewModel.errorMessage.observe(getViewLifecycleOwner(), error -> {
             if (error != null) {
                 errorText.setText(error);
                 errorText.setVisibility(View.VISIBLE);
@@ -116,9 +116,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        viewModel.getSelectedDate().observe(getViewLifecycleOwner(), cal -> {
-            SimpleDateFormat sdf = new SimpleDateFormat("MM / yyyy", Locale.getDefault());
-            textSelectedMonth.setText(sdf.format(cal.getTime()));
+        viewModel.selectedDate.observe(getViewLifecycleOwner(), date -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM / yyyy", Locale.getDefault());
+            textSelectedMonth.setText(date.format(formatter));
         });
     }
 }

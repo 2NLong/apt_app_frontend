@@ -15,8 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.fragments.ResidentListInApartmentFragment;
 import com.ptithcm.apt.models.apartment.Apartment;
 import com.ptithcm.apt.network.api.ApartmentApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
@@ -39,6 +41,7 @@ public class UpdateApartmentFragment extends Fragment {
     private Spinner spinnerStatus;
     private Button btnSave, btnCancel;
     private Toolbar toolbar;
+    MaterialButton btnViewResidents;
 
     private String[] statusDisplay = {"Trống", "Đang cho thuê", "Có chủ sở hữu đang ở"};
     private String[] statusRaw = {"AVAILABLE", "RENTED", "OWNED"};
@@ -100,6 +103,23 @@ public class UpdateApartmentFragment extends Fragment {
         if (apartmentId != null) {
             fetchApartmentDetails(apartmentId);
         }
+
+        btnViewResidents = view.findViewById(R.id.btn_view_residents);
+
+        btnViewResidents.setOnClickListener(v -> {
+            // Truyền ID phòng sang để màn hình sau biết cần lấy cư dân của phòng nào
+            Bundle bundle = new Bundle();
+            bundle.putLong("APARTMENT_ID", apartmentId);
+
+            // Chuyển sang màn hình Danh sách cư dân (bạn tự tạo class này sau)
+            ResidentListInApartmentFragment residentFragment = new ResidentListInApartmentFragment();
+            residentFragment.setArguments(bundle);
+
+            requireActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, residentFragment)
+                    .addToBackStack(null)
+                    .commit();
+        });
 
         // 5. Sự kiện nút Lưu
         btnSave.setOnClickListener(v -> updateApartment());

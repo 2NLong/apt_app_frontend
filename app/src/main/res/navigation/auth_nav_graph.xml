@@ -17,7 +17,7 @@
     <fragment
         android:id="@+id/forgotEmailFragment"
         android:name="com.ptithcm.apt.fragments.auth.ForgotEmailFragment"
-        tools:layout="@layout/fragment_forgot_email">
+        tools:layout="@layout/fragment_forgotpassword_email">
         <action
             android:id="@+id/action_forgotEmailFragment_to_otpFragment"
             app:destination="@id/otpFragment" />
@@ -26,7 +26,7 @@
     <fragment
         android:id="@+id/otpFragment"
         android:name="com.ptithcm.apt.fragments.auth.OtpFragment"
-        tools:layout="@layout/fragment_otp">
+        tools:layout="@layout/fragment_forgotpassword_otp">
         <action
             android:id="@+id/action_otpFragment_to_resetPasswordFragment"
             app:destination="@id/resetPasswordFragment" />
@@ -35,7 +35,7 @@
     <fragment
         android:id="@+id/resetPasswordFragment"
         android:name="com.ptithcm.apt.fragments.auth.ResetPasswordFragment"
-        tools:layout="@layout/fragment_reset_password">
+        tools:layout="@layout/fragment_forgotpassword_reset">
         <action
             android:id="@+id/action_resetPasswordFragment_to_loginFragment"
             app:destination="@id/loginFragment"
