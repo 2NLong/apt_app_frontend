@@ -33,6 +33,28 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_view_residents"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="XEM DANH SÁCH CƯ DÂN"
+                    android:textColor="#A63C4F"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="8dp"
+                    app:icon="@android:drawable/ic_menu_myplaces"
+                    app:iconGravity="textStart"
+                    app:iconTint="#A63C4F"
+                    app:strokeColor="#A63C4F"
+                    app:strokeWidth="1dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="24dp"
+                    android:background="#E0E0E0" />
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
@@ -115,6 +137,9 @@
                     android:textColor="#FF5252" />
 
             </LinearLayout>
+
         </androidx.cardview.widget.CardView>
+
     </ScrollView>
+
 </LinearLayout>
