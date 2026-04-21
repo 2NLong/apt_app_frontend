@@ -225,7 +225,7 @@ public class AdminCreateBillFragment extends Fragment {
                     selectedYear,
                     elecNew,
                     waterNew
-            );8
+            );
             viewModel.createBill(request);
         });
     }
