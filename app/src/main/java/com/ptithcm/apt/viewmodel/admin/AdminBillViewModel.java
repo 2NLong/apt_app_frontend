@@ -9,6 +9,8 @@ import com.ptithcm.apt.models.bill.AdminBillDetail;
 import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.models.bill.BillPreviousMonthlyMetric;
+import com.ptithcm.apt.models.bill.BillServiceConfig;
+import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.repositoris.AdminBillRepository;
 
 import java.util.List;
@@ -44,6 +46,20 @@ public class AdminBillViewModel extends ViewModel {
 
     public void fetchPreviousMetrics(Long apartmentId) {
         repository.getPreviousMetrics(apartmentId, _previousMetric, _error);
+    }
+
+    private final MutableLiveData<List<BillServiceConfig>> _serviceConfigs = new MutableLiveData<>();
+    public LiveData<List<BillServiceConfig>> serviceConfigs = _serviceConfigs;
+
+    public void fetchServiceConfigs(String date) {
+        repository.getServiceConfigs(date, _serviceConfigs);
+    }
+
+    private final MutableLiveData<Boolean> _isCreateSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> isCreateSuccess = _isCreateSuccess;
+
+    public void createBill(CreateBillRequest request) {
+        repository.createBill(request, _isCreateSuccess, _error);
     }
 
     public AdminBillViewModel(AdminBillRepository repository) {

@@ -9,6 +9,8 @@ import com.ptithcm.apt.models.bill.AdminBillDetail;
 import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.models.bill.BillPreviousMonthlyMetric;
+import com.ptithcm.apt.models.bill.BillServiceConfig;
+import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.network.api.AdminBillApiService;
 
 import java.util.List;
@@ -115,6 +117,36 @@ public class AdminBillRepository {
             }
             @Override
             public void onFailure(Call<ApiResponse<BillPreviousMonthlyMetric>> call, Throwable t) {
+                error.setValue(t.getMessage());
+            }
+        });
+    }
+
+    public void getServiceConfigs(String date, MutableLiveData<List<BillServiceConfig>> data) {
+        apiService.getActiveConfigs(date).enqueue(new Callback<ApiResponse<List<BillServiceConfig>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<BillServiceConfig>>> call, Response<ApiResponse<List<BillServiceConfig>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    data.setValue(response.body().getData());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<BillServiceConfig>>> call, Throwable t) {}
+        });
+    }
+
+    public void createBill(CreateBillRequest request, MutableLiveData<Boolean> isSuccess, MutableLiveData<String> error) {
+        apiService.createBill(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful()) {
+                    isSuccess.setValue(true);
+                } else {
+                    error.setValue("Lỗi khi tạo hóa đơn: " + response.code());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 error.setValue(t.getMessage());
             }
         });
