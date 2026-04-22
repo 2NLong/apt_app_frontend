@@ -66,8 +66,8 @@ public class AdminBillViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    public void fetchBills(Integer month, Integer year, BillStatus status) {
-        repository.getBills(month, year, status, 0, 50, _bills, _error, _isLoading);
+    public void fetchBills(Integer month, Integer year, Long apartmentId, BillStatus status) {
+        repository.getBills(month, year, apartmentId, status, 0, 50, _bills, _error, _isLoading);
     }
 
     public void fetchBillDetail(Long id) {

@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
@@ -25,6 +27,7 @@ import com.ptithcm.apt.adapters.bill.AdminBillAdapter;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
+import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
@@ -35,20 +38,23 @@ import java.util.List;
 
 public class AdminBillFragment extends Fragment {
 
-    private static final String TAG = "AdminBillFragment";
-
     private Integer currentSelectedMonth = null;
     private Integer currentSelectedYear = null;
-    private BillStatus currentSelectedStatus = BillStatus.UNPAID; // Default status
-    
+    private BillStatus currentSelectedStatus = BillStatus.UNPAID;
+    private Long currentSelectedApartmentId = null;
+
     private AdminBillViewModel viewModel;
     private AdminBillAdapter adapter;
+
+    // Views
     private LinearLayout layoutEmpty;
     private RecyclerView recyclerView;
     private FloatingActionButton fabAdd;
+    private AutoCompleteTextView spinnerApartmentFilter;
+    private TabLayout tabLayout;
+    private Chip chipDate;
 
-    public AdminBillFragment() {
-    }
+    public AdminBillFragment() {}
 
     @Nullable
     @Override
@@ -60,106 +66,160 @@ public class AdminBillFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        initViews(view);          // 1. Ánh xạ View
+        initViewModel();         // 2. Khởi tạo ViewModel
+        setupRecyclerView();     // 3. Cấu hình danh sách
+        setupApartmentFilter();  // 4. Cấu hình bộ lọc căn hộ
+        setupTabsAndChips();     // 5. Cấu hình Tab và Chip ngày tháng
+        setupListeners();        // 6. Các sự kiện click khác
+        observeViewModel();      // 7. Quan sát LiveData
+
+        // Load dữ liệu ban đầu
+        viewModel.fetchApartmentsForBill();
+        fetchBillsWithFullFilters();
+    }
+
+    private void initViews(View view) {
         layoutEmpty = view.findViewById(R.id.layoutEmpty);
         recyclerView = view.findViewById(R.id.rvAdminBills);
         fabAdd = view.findViewById(R.id.fabAddBill);
+        spinnerApartmentFilter = view.findViewById(R.id.spinnerApartmentFilter);
+        tabLayout = view.findViewById(R.id.tabLayoutAdmin);
+        chipDate = view.findViewById(R.id.chipDateFilter);
+    }
 
+    private void initViewModel() {
+        AdminBillViewModelFactory factory = new AdminBillViewModelFactory();
+        viewModel = new ViewModelProvider(this, factory).get(AdminBillViewModel.class);
+    }
+
+    private void setupRecyclerView() {
         adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
             @Override
             public void onApprove(BillList bill) {
-                Toast.makeText(getContext(), "Đang duyệt hóa đơn căn hộ: " + bill.getApartmentName(), Toast.LENGTH_SHORT).show();
+                // Logic duyệt hóa đơn
             }
 
             @Override
             public void onItemClick(BillList bill) {
-                long billId = bill.getId();
-                AdminBillDetailFragment detailFragment = AdminBillDetailFragment.newInstance(billId);
-
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, detailFragment)
-                        .addToBackStack(null)
-                        .commit();
+                openBillDetail(bill.getId());
             }
         });
-        
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+    }
 
-        AdminBillViewModelFactory factory = new AdminBillViewModelFactory();
-        viewModel = new ViewModelProvider(this, factory).get(AdminBillViewModel.class);
-
-        viewModel.bills.observe(getViewLifecycleOwner(), bills -> {
-            updateUI(bills);
+    private void setupApartmentFilter() {
+        spinnerApartmentFilter.setOnItemClickListener((parent, v, position, id) -> {
+            BillApartment selected = (BillApartment) parent.getItemAtPosition(position);
+            currentSelectedApartmentId = selected.getId();
+            fetchBillsWithFullFilters();
         });
 
+        // Sự kiện xóa text để reset filter
+        spinnerApartmentFilter.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                if (s.toString().isEmpty() && currentSelectedApartmentId != null) {
+                    currentSelectedApartmentId = null;
+                    fetchBillsWithFullFilters();
+                }
+            }
+        });
+    }
+
+    private void setupTabsAndChips() {
+        // Cấu hình Tabs
+        if (tabLayout != null) {
+            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+                @Override
+                public void onTabSelected(TabLayout.Tab tab) {
+                    switch (tab.getPosition()) {
+                        case 0: currentSelectedStatus = BillStatus.UNPAID; break;
+                        case 1: currentSelectedStatus = BillStatus.PAID; break;
+                        case 2: currentSelectedStatus = BillStatus.LATE; break;
+                    }
+                    fetchBillsWithFullFilters();
+                }
+                @Override public void onTabUnselected(TabLayout.Tab tab) {}
+                @Override public void onTabReselected(TabLayout.Tab tab) {}
+            });
+        }
+
+        // Cấu hình Chip ngày tháng
+        if (chipDate != null) {
+            updateChipText();
+            chipDate.setOnClickListener(v -> {
+                if (chipDate.isChecked()) {
+                    showMonthYearPicker();
+                } else {
+                    currentSelectedMonth = null;
+                    currentSelectedYear = null;
+                    updateChipText();
+                    fetchBillsWithFullFilters();
+                }
+            });
+        }
+    }
+
+    private void setupListeners() {
+        fabAdd.setOnClickListener(v -> {
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.admin_fragment_container, new AdminCreateBillFragment())
+                    .addToBackStack(null)
+                    .commit();
+        });
+    }
+
+    private void observeViewModel() {
+        // Quan sát danh sách hóa đơn
+        viewModel.bills.observe(getViewLifecycleOwner(), this::updateUI);
+
+        // Quan sát danh sách căn hộ (cho Spinner)
+        viewModel.billApartments.observe(getViewLifecycleOwner(), apartments -> {
+            if (apartments != null) {
+                // 1. Tạo danh sách mới để thêm option "Tất cả"
+                List<BillApartment> filterList = new ArrayList<>();
+
+                // 2. Thêm lựa chọn mặc định vào đầu danh sách
+                BillApartment allOption = new BillApartment();
+                allOption.setId(null);
+                allOption.setRoomNumber("Tất cả căn hộ"); // Đặt text hiển thị
+                filterList.add(allOption);
+
+                // 3. Thêm dữ liệu từ API vào sau
+                filterList.addAll(apartments);
+
+                // 4. Thiết lập Adapter
+                ArrayAdapter<BillApartment> apartmentAdapter = new ArrayAdapter<>(
+                        requireContext(), android.R.layout.simple_dropdown_item_1line, filterList);
+                spinnerApartmentFilter.setAdapter(apartmentAdapter);
+
+                // 5. Hiển thị mặc định chữ "Tất cả căn hộ" nếu chưa chọn gì
+                if (currentSelectedApartmentId == null) {
+                    spinnerApartmentFilter.setText(allOption.getRoomNumber(), false);
+                }
+            }
+        });
+
+        // Quan sát lỗi
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null) {
                 Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
                 updateUI(null);
             }
         });
+    }
 
-        // Setup TabLayout
-        TabLayout tabLayout = view.findViewById(R.id.tabLayoutAdmin);
-        if (tabLayout != null) {
-            tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-                @Override
-                public void onTabSelected(TabLayout.Tab tab) {
-                    switch (tab.getPosition()) {
-                        case 0:
-                            currentSelectedStatus = BillStatus.UNPAID;
-                            break;
-                        case 1:
-                            currentSelectedStatus = BillStatus.PAID;
-                            break;
-                        case 2:
-                            currentSelectedStatus = BillStatus.LATE;
-                            break;
-                    }
-                    viewModel.fetchBills(currentSelectedMonth, currentSelectedYear, currentSelectedStatus);
-                }
-
-                @Override
-                public void onTabUnselected(TabLayout.Tab tab) {}
-
-                @Override
-                public void onTabReselected(TabLayout.Tab tab) {}
-            });
-        }
-
-        Chip chipDate = view.findViewById(R.id.chipDateFilter);
-        if (chipDate != null) {
-            // Thiết lập sự kiện click cho Chip
-            chipDate.setOnClickListener(v -> {
-                if (chipDate.isChecked()) {
-                    // Nếu vừa được check -> Mở picker
-                    showMonthYearPicker();
-                } else {
-                    // Nếu vừa bị uncheck -> Reset về mặc định (Tất cả)
-                    currentSelectedMonth = null;
-                    currentSelectedYear = null;
-                    updateChipText(chipDate);
-                    viewModel.fetchBills(null, null, currentSelectedStatus);
-                }
-            });
-            updateChipText(chipDate);
-
-        }
-
-        if (fabAdd != null) {
-            fabAdd.setOnClickListener(v -> {
-                // Chuyển sang fragment tạo hóa đơn
-                AdminCreateBillFragment createBillFragment = new AdminCreateBillFragment();
-
-                getParentFragmentManager().beginTransaction()
-                        .replace(R.id.admin_fragment_container, createBillFragment)
-                        .addToBackStack(null)
-                        .commit();
-            });
-        }
-
-        // Load data mặc định (null, null, UNPAID)
-        viewModel.fetchBills(currentSelectedMonth, currentSelectedYear, currentSelectedStatus);
+    private void fetchBillsWithFullFilters() {
+        viewModel.fetchBills(
+                currentSelectedMonth,
+                currentSelectedYear,
+                currentSelectedApartmentId,
+                currentSelectedStatus
+        );
     }
 
     private void updateUI(List<BillList> bills) {
@@ -174,7 +234,7 @@ public class AdminBillFragment extends Fragment {
         }
     }
 
-    private void updateChipText(Chip chipDate) {
+    private void updateChipText() {
         if (currentSelectedMonth == null) {
             chipDate.setText("Thời gian: Tất cả");
             chipDate.setChecked(false);
@@ -184,8 +244,15 @@ public class AdminBillFragment extends Fragment {
         }
     }
 
+    private void openBillDetail(long billId) {
+        AdminBillDetailFragment detailFragment = AdminBillDetailFragment.newInstance(billId);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.admin_fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
     private void showMonthYearPicker() {
-        Chip chipDate = getView().findViewById(R.id.chipDateFilter);
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_month_year_picker, null);
 
@@ -193,42 +260,26 @@ public class AdminBillFragment extends Fragment {
         NumberPicker pickerYear = dialogView.findViewById(R.id.pickerYear);
         Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
 
-        Calendar calendar = Calendar.getInstance();
-        int initialMonth = (currentSelectedMonth != null) ? currentSelectedMonth : (calendar.get(Calendar.MONTH) + 1);
-        int initialYear = (currentSelectedYear != null) ? currentSelectedYear : calendar.get(Calendar.YEAR);
+        Calendar cal = Calendar.getInstance();
+        pickerMonth.setMinValue(1);
+        pickerMonth.setMaxValue(12);
+        pickerMonth.setValue(currentSelectedMonth != null ? currentSelectedMonth : cal.get(Calendar.MONTH) + 1);
 
-        if (pickerMonth != null) {
-            pickerMonth.setMinValue(1);
-            pickerMonth.setMaxValue(12);
-            pickerMonth.setValue(initialMonth);
-        }
+        pickerYear.setMinValue(2020);
+        pickerYear.setMaxValue(2030);
+        pickerYear.setValue(currentSelectedYear != null ? currentSelectedYear : cal.get(Calendar.YEAR));
 
-        if (pickerYear != null) {
-            pickerYear.setMinValue(2020);
-            pickerYear.setMaxValue(2030);
-            pickerYear.setValue(initialYear);
-        }
-
-        // Nếu người dùng click ra ngoài hoặc đóng dialog mà chưa chọn (và đang null) thì bỏ check chip
-        dialog.setOnCancelListener(d -> {
-            if (currentSelectedMonth == null && chipDate != null) {
-                chipDate.setChecked(false);
-            }
+        btnConfirm.setOnClickListener(v -> {
+            currentSelectedMonth = pickerMonth.getValue();
+            currentSelectedYear = pickerYear.getValue();
+            updateChipText();
+            fetchBillsWithFullFilters();
+            dialog.dismiss();
         });
 
-        if (btnConfirm != null) {
-            btnConfirm.setOnClickListener(v -> {
-                if (pickerMonth != null && pickerYear != null) {
-                    currentSelectedMonth = pickerMonth.getValue();
-                    currentSelectedYear = pickerYear.getValue();
-                    
-                    if (chipDate != null) updateChipText(chipDate);
-
-                    viewModel.fetchBills(currentSelectedMonth, currentSelectedYear, currentSelectedStatus);
-                }
-                dialog.dismiss();
-            });
-        }
+        dialog.setOnCancelListener(d -> {
+            if (currentSelectedMonth == null) chipDate.setChecked(false);
+        });
 
         dialog.setContentView(dialogView);
         dialog.show();

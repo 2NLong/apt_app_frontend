@@ -93,7 +93,14 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
             holder.tvStatus.setText("ĐÃ THANH TOÁN");
             holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
             holder.btnConfirm.setVisibility(View.GONE);
-        } else {
+        }
+        else if (bill.getStatus() == BillStatus.LATE) {
+            holder.tvStatus.setText("QUÁ HẠN");
+            holder.tvStatus.setTextColor(Color.parseColor("#F44336"));
+            holder.btnConfirm.setVisibility(View.VISIBLE);
+            holder.btnConfirm.setText("Duyệt");
+        }
+        else { // Mặc định là UNPAID (Chưa thanh toán)
             holder.tvStatus.setText("CHƯA THANH TOÁN");
             holder.tvStatus.setTextColor(Color.parseColor("#FF9800"));
             holder.btnConfirm.setVisibility(View.VISIBLE);

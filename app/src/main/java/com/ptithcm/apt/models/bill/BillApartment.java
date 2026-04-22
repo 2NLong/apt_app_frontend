@@ -40,6 +40,8 @@ public class BillApartment {
 
     @Override
     public String toString() {
-        return roomNumber; // Để Spinner hiển thị số phòng
+        return roomNumber != null ? roomNumber : "";
     }
+
+
 }
