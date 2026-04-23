@@ -3,6 +3,8 @@ package com.ptithcm.apt.repositoris;
 import androidx.lifecycle.MutableLiveData;
 
 import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.enums.RentStatus;
+import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.AdminBillDetail;
@@ -150,5 +152,36 @@ public class AdminBillRepository {
                 error.setValue(t.getMessage());
             }
         });
+    }
+
+    // AdminBillRepository.java
+    public void getRentInvoices(Integer month, Integer year, Long apartmentId, RentStatus status, Integer page, Integer size,
+                                MutableLiveData<List<RentInvoiceList>> rentData,
+                                MutableLiveData<String> errorMessage,
+                                MutableLiveData<Boolean> isLoading) {
+
+        isLoading.postValue(true);
+        apiService.getRentInvoices(month, year, apartmentId, status, page, size)
+                .enqueue(new Callback<ApiResponse<PageResponse<RentInvoiceList>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<PageResponse<RentInvoiceList>>> call, Response<ApiResponse<PageResponse<RentInvoiceList>>> response) {
+                        isLoading.postValue(false);
+                        if (response.isSuccessful() && response.body() != null) {
+                            if (response.body().getData() != null) {
+                                rentData.postValue(response.body().getData().getContent());
+                            } else {
+                                errorMessage.postValue("Không có dữ liệu tiền thuê");
+                            }
+                        } else {
+                            errorMessage.postValue("Lỗi: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<PageResponse<RentInvoiceList>>> call, Throwable t) {
+                        isLoading.postValue(false);
+                        errorMessage.postValue("Lỗi kết nối: " + t.getMessage());
+                    }
+                });
     }
 }

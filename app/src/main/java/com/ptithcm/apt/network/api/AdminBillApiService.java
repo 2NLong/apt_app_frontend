@@ -1,6 +1,8 @@
 package com.ptithcm.apt.network.api;
 
 import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.enums.RentStatus;
+import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.AdminBillDetail;
@@ -37,7 +39,7 @@ public interface AdminBillApiService {
     Call<PageResponse<BillApartment>> getBillApartments(@Query("page") int page);
 
     // Lấy chỉ số cũ
-    @GET("api/public/v1/admin/monthlymetrics")
+    @GET("api/public/v1/admin/monthly-metrics")
     Call<ApiResponse<BillPreviousMonthlyMetric>> getPreviousMetrics(
             @Query("apartmentId") Long apartmentId
     );
@@ -50,4 +52,14 @@ public interface AdminBillApiService {
 
     @POST("api/public/v1/admin/bills")
     Call<ApiResponse<Void>> createBill(@Body CreateBillRequest request);
+
+    @GET("api/public/v1/admin/rent-invoices")
+    Call<ApiResponse<PageResponse<RentInvoiceList>>> getRentInvoices(
+            @Query("month") Integer month,
+            @Query("year") Integer year,
+            @Query("apartmentId") Long apartmentId,
+            @Query("status") RentStatus status,
+            @Query("page") Integer page,
+            @Query("size") Integer size);
+
 }
