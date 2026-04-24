@@ -49,7 +49,7 @@ public class ResetPasswordFragment extends Fragment {
         Button btnResetPassword = view.findViewById(R.id.btn_reset_password);
         TextView tvBackToLogin = view.findViewById(R.id.tv_back_to_login);
 
-        //OBSERVE
+        // OBSERVE
         viewModel.resetPasswordResult.observe(getViewLifecycleOwner(), success -> {
             if (success != null && success) {
                 ToastUtils.showSuccessToast(requireContext(), "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");

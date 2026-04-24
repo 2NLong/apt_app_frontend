@@ -113,6 +113,10 @@ public class LoginFragment extends Fragment {
         });
 
         tvForgotPassword.setOnClickListener(v -> {
+            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory forgotFactory = new com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory(requireContext());
+            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel forgotViewModel = new ViewModelProvider(requireActivity(), forgotFactory).get(com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel.class);
+            forgotViewModel.clearAll();
+
             NavController navController = Navigation.findNavController(view);
             navController.navigate(R.id.action_loginFragment_to_forgotEmailFragment);
         });
