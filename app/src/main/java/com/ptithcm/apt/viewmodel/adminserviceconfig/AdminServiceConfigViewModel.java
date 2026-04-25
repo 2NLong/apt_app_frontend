@@ -43,8 +43,12 @@ public class AdminServiceConfigViewModel extends ViewModel {
         repository.cancelUpcomingUpdate(serviceCode, _cancelSuccess, _error, _isLoading);
     }
 
-    public void validateAndUpdatePrice(ServicePriceUpdateRequest request, BigDecimal currentPrice) {
-        // Kiểm tra ngày hiệu lực (Phải từ tháng sau trở đi)
+    /**
+     * Chỉ validate, không gọi API.
+     * 
+     * @return true nếu dữ liệu hợp lệ.
+     */
+    public boolean validateOnly(ServicePriceUpdateRequest request, BigDecimal currentPrice) {
         LocalDate today = LocalDate.now();
         LocalDate startOfNextMonth = today.withDayOfMonth(1).plusMonths(1);
 
@@ -54,22 +58,27 @@ public class AdminServiceConfigViewModel extends ViewModel {
         if (effectiveDate.isBefore(startOfNextMonth)) {
             _error.setValue("Tháng áp dụng phải bắt đầu từ tháng " +
                     startOfNextMonth.getMonthValue() + "/" + startOfNextMonth.getYear() + " trở đi.");
-            return;
+            return false;
         }
 
-        // Kiểm tra đơn giá phải lớn hơn 0
         if (request.getNewPrice() == null || request.getNewPrice().compareTo(BigDecimal.ZERO) <= 0) {
             _error.setValue("Giá dịch vụ phải lớn hơn 0.");
-            return;
+            return false;
         }
 
-        // Kiểm tra đơn giá (Phải khác giá hiện tại)
         if (currentPrice != null && request.getNewPrice().compareTo(currentPrice) == 0) {
             _error.setValue("Dịch vụ đang được áp dụng mức giá này rồi.");
-            return;
+            return false;
         }
 
-        updateServicePrice(request);
+        return true;
+    }
+
+    /** Validate rồi gọi API luôn. */
+    public void validateAndUpdatePrice(ServicePriceUpdateRequest request, BigDecimal currentPrice) {
+        if (validateOnly(request, currentPrice)) {
+            updateServicePrice(request);
+        }
     }
 
     public void resetUpdateStatus() {

@@ -62,10 +62,10 @@ public class LoginFragment extends Fragment {
                     }
                 } catch (ApiException e) {
                     Log.w("GoogleSignIn", "Google sign in failed. Status code: " + e.getStatusCode(), e);
-                    ToastUtils.showErrorToast(requireContext(), "Đăng nhập Google thất bại! Mã lỗi: " + e.getStatusCode());
+                    ToastUtils.showErrorToast(requireContext(),
+                            "Đăng nhập Google thất bại! Mã lỗi: " + e.getStatusCode());
                 }
-            }
-    );
+            });
 
     public LoginFragment() {
     }
@@ -113,8 +113,10 @@ public class LoginFragment extends Fragment {
         });
 
         tvForgotPassword.setOnClickListener(v -> {
-            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory forgotFactory = new com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory(requireContext());
-            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel forgotViewModel = new ViewModelProvider(requireActivity(), forgotFactory).get(com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel.class);
+            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory forgotFactory = new com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory(
+                    requireContext());
+            com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel forgotViewModel = new ViewModelProvider(
+                    requireActivity(), forgotFactory).get(com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel.class);
             forgotViewModel.clearAll();
 
             NavController navController = Navigation.findNavController(view);
@@ -154,9 +156,11 @@ public class LoginFragment extends Fragment {
         loginViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
                 btnSignIn.setEnabled(false);
+                btnGoogleLogin.setEnabled(false);
                 btnSignIn.setText("Đang đăng nhập...");
             } else {
                 btnSignIn.setEnabled(true);
+                btnGoogleLogin.setEnabled(true);
                 btnSignIn.setText("Đăng nhập");
             }
         });
