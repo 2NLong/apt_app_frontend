@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;

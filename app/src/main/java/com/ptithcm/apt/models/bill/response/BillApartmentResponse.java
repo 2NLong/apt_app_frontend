@@ -1,14 +1,14 @@
-package com.ptithcm.apt.models.bill;
+package com.ptithcm.apt.models.bill.response;
 
-public class BillApartment {
+public class BillApartmentResponse {
     private Long id;
     private String roomNumber;
     private Double area;
 
-    public BillApartment() {
+    public BillApartmentResponse() {
     }
 
-    public BillApartment(Double area, String roomNumber, Long id) {
+    public BillApartmentResponse(Double area, String roomNumber, Long id) {
         this.area = area;
         this.roomNumber = roomNumber;
         this.id = id;

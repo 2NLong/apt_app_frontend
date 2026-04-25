@@ -33,9 +33,11 @@ import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
 import com.ptithcm.apt.fragments.rentinvoice.AdminRentInvoiceDetailFragment;
-import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
-import com.ptithcm.apt.models.bill.BillApartment;
-import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
+import com.ptithcm.apt.models.bill.response.BillListResponse;
+import com.ptithcm.apt.utils.DialogUtils;
+import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
 
@@ -117,12 +119,20 @@ public class AdminBillFragment extends Fragment {
     private void setupRecyclerView() {
         adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
             @Override
-            public void onApprove(BillList bill) {
-
+            public void onApprove(BillListResponse bill) {
+                DialogUtils.showConfirmDialog(
+                        requireContext(),
+                        "Xác nhận duyệt phí",
+                        "Xác nhận căn hộ " + bill.getApartmentName() + " đã đóng tổng cộng " +
+                                formatMoney(bill.getTotalAmount()) + "?",
+                        () -> {
+                            viewModel.approveBill(bill.getId());
+                        }
+                );
             }
 
             @Override
-            public void onItemClick(BillList bill) {
+            public void onItemClick(BillListResponse bill) {
                 openBillDetail(bill.getId());
             }
         });
@@ -144,7 +154,7 @@ public class AdminBillFragment extends Fragment {
 
     private void setupApartmentFilter() {
         spinnerApartmentFilter.setOnItemClickListener((parent, v, position, id) -> {
-            BillApartment selected = (BillApartment) parent.getItemAtPosition(position);
+            BillApartmentResponse selected = (BillApartmentResponse) parent.getItemAtPosition(position);
             currentSelectedApartmentId = selected.getId();
             fetchBillsWithFullFilters();
         });
@@ -289,20 +299,31 @@ public class AdminBillFragment extends Fragment {
         // 3. Quan sát danh sách căn hộ (Dùng chung cho cả 2 bộ lọc)
         viewModel.billApartments.observe(getViewLifecycleOwner(), apartments -> {
             if (apartments != null) {
-                List<BillApartment> filterList = new ArrayList<>();
-                BillApartment allOption = new BillApartment();
+                List<BillApartmentResponse> filterList = new ArrayList<>();
+                BillApartmentResponse allOption = new BillApartmentResponse();
                 allOption.setId(null);
                 allOption.setRoomNumber("Tất cả căn hộ");
                 filterList.add(allOption);
                 filterList.addAll(apartments);
 
-                ArrayAdapter<BillApartment> apartmentAdapter = new ArrayAdapter<>(
+                ArrayAdapter<BillApartmentResponse> apartmentAdapter = new ArrayAdapter<>(
                         requireContext(), android.R.layout.simple_dropdown_item_1line, filterList);
                 spinnerApartmentFilter.setAdapter(apartmentAdapter);
 
                 if (currentSelectedApartmentId == null) {
                     spinnerApartmentFilter.setText(allOption.getRoomNumber(), false);
                 }
+            }
+        });
+
+        viewModel.updateStatusSuccess.observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                // Thông báo thành công
+                ToastUtils.showSuccessToast(requireContext(), "Duyệt hóa đơn thành công!");
+
+                // QUAN TRỌNG: Gọi lại hàm fetch dữ liệu của bạn để danh sách cập nhật mới nhất
+                // Ví dụ: fetchBills(currentMonth, currentYear, null, currentStatus);
+                fetchBillsWithFullFilters();
             }
         });
 
@@ -335,7 +356,7 @@ public class AdminBillFragment extends Fragment {
         }
     }
 
-    private void updateUI(List<BillList> bills) {
+    private void updateUI(List<BillListResponse> bills) {
         if (bills == null || bills.isEmpty()) {
             adapter.updateList(new ArrayList<>());
             recyclerView.setVisibility(View.GONE);
@@ -416,5 +437,11 @@ public class AdminBillFragment extends Fragment {
 
         dialog.setContentView(dialogView);
         dialog.show();
+    }
+
+    private String formatMoney(java.math.BigDecimal amount) {
+        if (amount == null) return "0đ";
+        java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###đ");
+        return formatter.format(amount);
     }
 }

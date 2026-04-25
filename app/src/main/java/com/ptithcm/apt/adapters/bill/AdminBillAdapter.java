@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.enums.BillStatus;
-import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.bill.response.BillListResponse;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -23,7 +23,7 @@ import java.util.Locale;
 
 public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.ViewHolder> {
 
-    private List<BillList> list;
+    private List<BillListResponse> list;
     private OnBillActionListener listener;
     
     // Định dạng mong muốn hiển thị
@@ -32,16 +32,16 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
     private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
     public interface OnBillActionListener {
-        void onApprove(BillList bill);
-        void onItemClick(BillList bill);
+        void onApprove(BillListResponse bill);
+        void onItemClick(BillListResponse bill);
     }
 
-    public AdminBillAdapter(List<BillList> list, OnBillActionListener listener) {
+    public AdminBillAdapter(List<BillListResponse> list, OnBillActionListener listener) {
         this.list = list;
         this.listener = listener;
     }
 
-    public void updateList(List<BillList> newList) {
+    public void updateList(List<BillListResponse> newList) {
         this.list = newList;
         notifyDataSetChanged();
     }
@@ -62,7 +62,7 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        BillList bill = list.get(position);
+        BillListResponse bill = list.get(position);
 
         holder.tvApartment.setText("Căn hộ " + bill.getApartmentName());
         holder.tvDate.setText("Tháng " + bill.getBillingMonth() + "/" + bill.getBillingYear());

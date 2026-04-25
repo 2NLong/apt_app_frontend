@@ -1,17 +1,17 @@
-package com.ptithcm.apt.models.bill;
+package com.ptithcm.apt.models.bill.response;
 
 import java.math.BigDecimal;
 
-public class BillServiceConfig {
+public class BillServiceConfigResponse {
     private String serviceCode;
     private String serviceName;
     private BigDecimal unitPrice;
     private String unit;
 
-    public BillServiceConfig() {
+    public BillServiceConfigResponse() {
     }
 
-    public BillServiceConfig(String serviceCode, String serviceName, String unit, BigDecimal unitPrice) {
+    public BillServiceConfigResponse(String serviceCode, String serviceName, String unit, BigDecimal unitPrice) {
         this.serviceCode = serviceCode;
         this.serviceName = serviceName;
         this.unit = unit;

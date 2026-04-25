@@ -23,8 +23,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.bill.BillApartment;
-import com.ptithcm.apt.models.bill.BillServiceConfig;
+import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
+import com.ptithcm.apt.models.bill.response.BillServiceConfigResponse;
 import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
@@ -182,7 +182,7 @@ public class AdminCreateBillFragment extends Fragment {
 
         // Chọn căn hộ từ Spinner
         spinnerApartment.setOnItemClickListener((parent, v, position, id) -> {
-            BillApartment selected = (BillApartment) parent.getItemAtPosition(position);
+            BillApartmentResponse selected = (BillApartmentResponse) parent.getItemAtPosition(position);
             selectedApartmentId = selected.getId();
             currentArea = selected.getArea();
 
@@ -234,7 +234,7 @@ public class AdminCreateBillFragment extends Fragment {
         // Quan sát danh sách căn hộ đổ vào Spinner
         viewModel.billApartments.observe(getViewLifecycleOwner(), apartments -> {
             if (apartments != null) {
-                ArrayAdapter<BillApartment> adapter = new ArrayAdapter<>(
+                ArrayAdapter<BillApartmentResponse> adapter = new ArrayAdapter<>(
                         requireContext(), android.R.layout.simple_dropdown_item_1line, apartments);
                 spinnerApartment.setAdapter(adapter);
             }
@@ -266,7 +266,7 @@ public class AdminCreateBillFragment extends Fragment {
 
         viewModel.serviceConfigs.observe(getViewLifecycleOwner(), configs -> {
             if (configs != null) {
-                for (BillServiceConfig c : configs) {
+                for (BillServiceConfigResponse c : configs) {
                     switch (c.getServiceCode()) {
                         case "ELECTRICITY":
                             priceElec = c.getUnitPrice();
@@ -288,7 +288,7 @@ public class AdminCreateBillFragment extends Fragment {
 
         viewModel.serviceConfigs.observe(getViewLifecycleOwner(), configs -> {
             if (configs != null) {
-                for (BillServiceConfig c : configs) {
+                for (BillServiceConfigResponse c : configs) {
                     String priceStr = String.format("%,.0fđ", c.getUnitPrice());
                     switch (c.getServiceCode()) {
                         case "ELECTRICITY":

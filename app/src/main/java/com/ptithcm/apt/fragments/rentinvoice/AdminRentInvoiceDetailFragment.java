@@ -17,7 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceDetail;
+import com.ptithcm.apt.models.rentinvoice.RentInvoiceDetail;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
 

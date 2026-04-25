@@ -1,4 +1,4 @@
-package com.ptithcm.apt.models.auth.rentinvoice;
+package com.ptithcm.apt.models.rentinvoice;
 
 import com.ptithcm.apt.enums.RentStatus;
 

@@ -6,13 +6,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
-import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceDetail;
-import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
-import com.ptithcm.apt.models.bill.AdminBillDetail;
-import com.ptithcm.apt.models.bill.BillApartment;
-import com.ptithcm.apt.models.bill.BillList;
-import com.ptithcm.apt.models.bill.BillPreviousMonthlyMetric;
-import com.ptithcm.apt.models.bill.BillServiceConfig;
+import com.ptithcm.apt.models.rentinvoice.RentInvoiceDetail;
+import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.bill.response.AdminBillDetailResponse;
+import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
+import com.ptithcm.apt.models.bill.response.BillListResponse;
+import com.ptithcm.apt.models.bill.response.BillPreviousMonthlyMetricResponse;
+import com.ptithcm.apt.models.bill.response.BillServiceConfigResponse;
 import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.repositoris.AdminBillRepository;
 
@@ -22,8 +22,8 @@ public class AdminBillViewModel extends ViewModel {
     private final AdminBillRepository repository;
 
     // LiveData cho Danh sách (AdminBillFragment)
-    private final MutableLiveData<List<BillList>> _bills = new MutableLiveData<>();
-    public LiveData<List<BillList>> bills = _bills;
+    private final MutableLiveData<List<BillListResponse>> _bills = new MutableLiveData<>();
+    public LiveData<List<BillListResponse>> bills = _bills;
 
     private final MutableLiveData<String> _error = new MutableLiveData<>();
     public LiveData<String> error = _error;
@@ -32,15 +32,15 @@ public class AdminBillViewModel extends ViewModel {
     public LiveData<Boolean> isLoading = _isLoading;
 
     // LiveData cho Chi tiết (AdminBillDetailFragment)
-    private final MutableLiveData<AdminBillDetail> _billDetail = new MutableLiveData<>();
-    public LiveData<AdminBillDetail> billDetail = _billDetail;
+    private final MutableLiveData<AdminBillDetailResponse> _billDetail = new MutableLiveData<>();
+    public LiveData<AdminBillDetailResponse> billDetail = _billDetail;
 
 
-    private final MutableLiveData<List<BillApartment>> _billApartments = new MutableLiveData<>();
-    public LiveData<List<BillApartment>> billApartments = _billApartments;
+    private final MutableLiveData<List<BillApartmentResponse>> _billApartments = new MutableLiveData<>();
+    public LiveData<List<BillApartmentResponse>> billApartments = _billApartments;
 
-    private final MutableLiveData<BillPreviousMonthlyMetric> _previousMetric = new MutableLiveData<>();
-    public LiveData<BillPreviousMonthlyMetric> previousMetric = _previousMetric;
+    private final MutableLiveData<BillPreviousMonthlyMetricResponse> _previousMetric = new MutableLiveData<>();
+    public LiveData<BillPreviousMonthlyMetricResponse> previousMetric = _previousMetric;
 
     // Hàm gọi
     public void fetchApartmentsForBill() {
@@ -51,8 +51,8 @@ public class AdminBillViewModel extends ViewModel {
         repository.getPreviousMetrics(apartmentId, _previousMetric, _error);
     }
 
-    private final MutableLiveData<List<BillServiceConfig>> _serviceConfigs = new MutableLiveData<>();
-    public LiveData<List<BillServiceConfig>> serviceConfigs = _serviceConfigs;
+    private final MutableLiveData<List<BillServiceConfigResponse>> _serviceConfigs = new MutableLiveData<>();
+    public LiveData<List<BillServiceConfigResponse>> serviceConfigs = _serviceConfigs;
 
     public void fetchServiceConfigs(String date) {
         repository.getServiceConfigs(date, _serviceConfigs);
@@ -80,6 +80,14 @@ public class AdminBillViewModel extends ViewModel {
 
     public void fetchRentDetail(Long id) {
         repository.getRentInvoiceDetail(id, _rentDetail, _error);
+    }
+
+    private final MutableLiveData<Boolean> _updateStatusSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> updateStatusSuccess = _updateStatusSuccess;
+
+    public void approveBill(Long billId) {
+        // Mặc định set là PAID như bạn yêu cầu
+        repository.updateBillStatus(billId, BillStatus.PAID, _updateStatusSuccess, _error);
     }
 
     public AdminBillViewModel(AdminBillRepository repository) {
