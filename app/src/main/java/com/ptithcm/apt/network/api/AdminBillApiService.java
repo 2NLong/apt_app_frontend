@@ -2,6 +2,7 @@ package com.ptithcm.apt.network.api;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
+import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceDetail;
 import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
@@ -62,4 +63,9 @@ public interface AdminBillApiService {
             @Query("page") Integer page,
             @Query("size") Integer size);
 
+    @GET("api/public/v1/admin/rent-invoices/{id}")
+    Call<ApiResponse<RentInvoiceDetail>> getRentInvoiceDetail(@Path("id") Long id);
+
 }
+
+

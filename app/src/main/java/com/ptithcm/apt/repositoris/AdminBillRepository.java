@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
+import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceDetail;
 import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
@@ -183,5 +184,22 @@ public class AdminBillRepository {
                         errorMessage.postValue("Lỗi kết nối: " + t.getMessage());
                     }
                 });
+    }
+
+    public void getRentInvoiceDetail(Long id, MutableLiveData<RentInvoiceDetail> detailData, MutableLiveData<String> error) {
+        apiService.getRentInvoiceDetail(id).enqueue(new Callback<ApiResponse<RentInvoiceDetail>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<RentInvoiceDetail>> call, Response<ApiResponse<RentInvoiceDetail>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    detailData.postValue(response.body().getData());
+                } else {
+                    error.postValue("Không thể lấy chi tiết hóa đơn thuê");
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<RentInvoiceDetail>> call, Throwable t) {
+                error.postValue(t.getMessage());
+            }
+        });
     }
 }

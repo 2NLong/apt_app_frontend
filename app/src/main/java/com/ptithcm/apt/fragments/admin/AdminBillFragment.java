@@ -32,6 +32,7 @@ import com.ptithcm.apt.adapters.rentinvoice.AdminRentAdapter;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
+import com.ptithcm.apt.fragments.rentinvoice.AdminRentInvoiceDetailFragment;
 import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.bill.BillApartment;
 import com.ptithcm.apt.models.bill.BillList;
@@ -60,7 +61,8 @@ public class AdminBillFragment extends Fragment {
     private TabLayout tabLayout;
     private Chip chipDate;
 
-    private enum InvoiceType { SERVICE, RENT }
+    private enum InvoiceType {SERVICE, RENT}
+
     private InvoiceType currentType = InvoiceType.SERVICE;
 
     private AdminRentAdapter rentAdapter;
@@ -68,7 +70,8 @@ public class AdminBillFragment extends Fragment {
 
     private TextView tvServiceBill, tvRentBill;
 
-    public AdminBillFragment() {}
+    public AdminBillFragment() {
+    }
 
     @Nullable
     @Override
@@ -113,13 +116,26 @@ public class AdminBillFragment extends Fragment {
 
     private void setupRecyclerView() {
         adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
-            @Override public void onApprove(BillList bill) {}
-            @Override public void onItemClick(BillList bill) { openBillDetail(bill.getId()); }
+            @Override
+            public void onApprove(BillList bill) {
+
+            }
+
+            @Override
+            public void onItemClick(BillList bill) {
+                openBillDetail(bill.getId());
+            }
         });
 
         rentAdapter = new AdminRentAdapter(new ArrayList<>(), new AdminRentAdapter.OnRentActionListener() {
-            @Override public void onApprove(RentInvoiceList bill) {}
-            @Override public void onItemClick(RentInvoiceList bill){}
+            @Override
+            public void onApprove(RentInvoiceList bill) {
+            }
+
+            @Override
+            public void onItemClick(RentInvoiceList bill) {
+                openRentDetail(bill.getId());
+            }
         });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -135,8 +151,14 @@ public class AdminBillFragment extends Fragment {
 
         // Sự kiện xóa text để reset filter
         spinnerApartmentFilter.addTextChangedListener(new android.text.TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
             @Override
             public void afterTextChanged(android.text.Editable s) {
                 if (s.toString().isEmpty() && currentSelectedApartmentId != null) {
@@ -154,14 +176,26 @@ public class AdminBillFragment extends Fragment {
                 @Override
                 public void onTabSelected(TabLayout.Tab tab) {
                     switch (tab.getPosition()) {
-                        case 0: currentSelectedStatus = BillStatus.UNPAID; break;
-                        case 1: currentSelectedStatus = BillStatus.PAID; break;
-                        case 2: currentSelectedStatus = BillStatus.LATE; break;
+                        case 0:
+                            currentSelectedStatus = BillStatus.UNPAID;
+                            break;
+                        case 1:
+                            currentSelectedStatus = BillStatus.PAID;
+                            break;
+                        case 2:
+                            currentSelectedStatus = BillStatus.LATE;
+                            break;
                     }
                     fetchBillsWithFullFilters();
                 }
-                @Override public void onTabUnselected(TabLayout.Tab tab) {}
-                @Override public void onTabReselected(TabLayout.Tab tab) {}
+
+                @Override
+                public void onTabUnselected(TabLayout.Tab tab) {
+                }
+
+                @Override
+                public void onTabReselected(TabLayout.Tab tab) {
+                }
             });
         }
 
@@ -337,6 +371,14 @@ public class AdminBillFragment extends Fragment {
 
     private void openBillDetail(long billId) {
         AdminBillDetailFragment detailFragment = AdminBillDetailFragment.newInstance(billId);
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.admin_fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openRentDetail(long rentId) {
+        AdminRentInvoiceDetailFragment detailFragment = AdminRentInvoiceDetailFragment.newInstance(rentId);
         getParentFragmentManager().beginTransaction()
                 .replace(R.id.admin_fragment_container, detailFragment)
                 .addToBackStack(null)

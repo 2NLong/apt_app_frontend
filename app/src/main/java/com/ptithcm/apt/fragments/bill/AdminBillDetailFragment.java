@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
 import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
 
@@ -184,7 +185,16 @@ public class AdminBillDetailFragment extends Fragment {
 
         // Sự kiện nút Duyệt (Sử dụng ID mBillId để gọi API duyệt)
         btnApprove.setOnClickListener(v -> {
-            approveBill();
+            DialogUtils.showConfirmDialog(
+                    requireContext(),
+                    "Xác nhận thanh toán",
+                    "Bạn có chắc muốn duyệt hóa đơn cho căn hộ " + tvRoom.getText() + " không?",
+                    () -> {
+                        // Code xử lý duyệt ở đây
+                        approveBill();
+                    }
+            );
+
         });
     }
 
