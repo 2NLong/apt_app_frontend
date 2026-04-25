@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
+import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceDetail;
 import com.ptithcm.apt.models.auth.rentinvoice.RentInvoiceList;
 import com.ptithcm.apt.models.bill.AdminBillDetail;
 import com.ptithcm.apt.models.bill.BillApartment;
@@ -72,6 +73,13 @@ public class AdminBillViewModel extends ViewModel {
 
         repository.getRentInvoices(month, year, apartmentId, rentStatus, 0, 50,
                 _rentInvoices, _error, _isLoading);
+    }
+
+    private final MutableLiveData<RentInvoiceDetail> _rentDetail = new MutableLiveData<>();
+    public LiveData<RentInvoiceDetail> rentDetail = _rentDetail;
+
+    public void fetchRentDetail(Long id) {
+        repository.getRentInvoiceDetail(id, _rentDetail, _error);
     }
 
     public AdminBillViewModel(AdminBillRepository repository) {
