@@ -85,6 +85,57 @@ public class AuthRepository {
     }
 
     /**
+     * Gọi API đăng nhập bằng Google.
+     */
+    public void googleLogin(com.ptithcm.apt.models.auth.request.GoogleLoginRequest request,
+            MutableLiveData<LoginResponse> loginResult,
+            MutableLiveData<String> errorMessage,
+            MutableLiveData<Boolean> isLoading) {
+
+        isLoading.postValue(true);
+
+        authApiService.googleLogin(request).enqueue(new Callback<ApiResponse<LoginResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<LoginResponse>> call,
+                    Response<ApiResponse<LoginResponse>> response) {
+                isLoading.postValue(false);
+
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<LoginResponse> apiResponse = response.body();
+
+                    if (apiResponse.getStatus() == 200 && apiResponse.getData() != null) {
+                        LoginResponse loginResponse = apiResponse.getData();
+
+                        LoginResponse.UserInfo user = loginResponse.getUser();
+                        sessionManager.saveSession(
+                                loginResponse.getAccessToken(),
+                                loginResponse.getRefreshToken(),
+                                user != null ? user.getId() : null,
+                                user != null ? user.getUsername() : null,
+                                user != null ? user.getRole() : null);
+
+                        loginResult.postValue(loginResponse);
+                    } else {
+                        errorMessage.postValue(
+                                apiResponse.getMessage() != null
+                                        ? apiResponse.getMessage()
+                                        : "Đăng nhập Google thất bại");
+                    }
+                } else {
+                    String msg = ErrorUtils.getErrorMessage(response, "Đăng nhập Google thất bại (Lỗi: " + response.code() + ")");
+                    errorMessage.postValue(msg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<LoginResponse>> call, Throwable t) {
+                isLoading.postValue(false);
+                errorMessage.postValue("Lỗi mạng: " + t.getLocalizedMessage());
+            }
+        });
+    }
+
+    /**
      * Làm mới token thủ công.
      */
     public void refreshToken(String refreshToken,

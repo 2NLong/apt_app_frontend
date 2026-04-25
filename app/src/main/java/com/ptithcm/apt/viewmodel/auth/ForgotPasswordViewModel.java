@@ -113,4 +113,12 @@ public class ForgotPasswordViewModel extends ViewModel {
     public void clearError() {
         _errorMessage.setValue(null);
     }
+
+    public void clearAll() {
+        _forgotPasswordResult.setValue(null);
+        _resetToken.setValue(null);
+        _resetPasswordResult.setValue(null);
+        _errorMessage.setValue(null);
+        pendingEmail = null;
+    }
 }

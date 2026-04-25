@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.serviceconfig.AdminServiceConfigAdapter;
 import com.ptithcm.apt.models.adminserviceconfig.AdminServiceConfigResponse;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModel;
 import com.ptithcm.apt.viewmodel.adminserviceconfig.AdminServiceConfigViewModelFactory;
@@ -65,9 +66,11 @@ public class AdminServiceConfigFragment extends Fragment {
                 int activeCount = 0;
                 int pendingCount = 0;
                 for (AdminServiceConfigResponse config : configs) {
-                    if (config.getServiceCode() == null) continue;
+                    if (config.getServiceCode() == null)
+                        continue;
                     activeCount++;
-                    if (config.getUpcomingPrice() != null) pendingCount++;
+                    if (config.getUpcomingPrice() != null)
+                        pendingCount++;
                 }
 
                 if (tvActiveServicesCount != null)
@@ -200,9 +203,11 @@ public class AdminServiceConfigFragment extends Fragment {
         if (tvCancelSchedule != null) {
             if (config.getUpcomingPrice() != null) {
                 tvCancelSchedule.setVisibility(View.VISIBLE);
-                tvCancelSchedule.setOnClickListener(v -> {
-                    viewModel.cancelUpcomingUpdate(config.getServiceCode());
-                });
+                tvCancelSchedule.setOnClickListener(v -> DialogUtils.showConfirmDialog(
+                        requireContext(),
+                        "Hủy lịch cập nhật",
+                        "Bạn có chắc chắn muốn hủy lịch cập nhật giá đang chờ không?",
+                        () -> viewModel.cancelUpcomingUpdate(config.getServiceCode())));
             } else {
                 tvCancelSchedule.setVisibility(View.GONE);
             }
@@ -233,7 +238,16 @@ public class AdminServiceConfigFragment extends Fragment {
                             newPrice,
                             effectiveDate);
 
-                    viewModel.validateAndUpdatePrice(request, config.getCurrentPrice());
+                    boolean isValid = viewModel.validateOnly(request, config.getCurrentPrice());
+
+                    if (isValid) {
+                        DialogUtils.showConfirmDialog(
+                                requireContext(),
+                                "Lên lịch cập nhật giá",
+                                "Xác nhận lên lịch áp dụng giá mới từ tháng "
+                                        + selectedMonth + "/" + selectedYear + "?",
+                                () -> viewModel.updateServicePrice(request));
+                    }
                 } catch (NumberFormatException e) {
                     ToastUtils.showErrorToast(requireContext(), "Giá không hợp lệ");
                 }

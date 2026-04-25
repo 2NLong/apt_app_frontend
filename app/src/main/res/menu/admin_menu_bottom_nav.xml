@@ -21,4 +21,9 @@
         android:icon="@drawable/ic_notifications"
         android:title="Thông báo" />
 
+    <item
+        android:id="@+id/admin_nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Đăng xuất" />
+
 </menu>

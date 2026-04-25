@@ -41,7 +41,12 @@ public class ProfileViewModel extends ViewModel {
         profileRepository.getProfileDashboard(_profileData, _error, _isLoading);
     }
 
-    public void validateAndChangePassword(String oldPass, String newPass, String confirmPass) {
+    /**
+     * Chỉ validate, không gọi API.
+     * 
+     * @return true nếu tất cả dữ liệu hợp lệ.
+     */
+    public boolean validateOnly(String oldPass, String newPass, String confirmPass) {
         boolean isValid = true;
 
         if (oldPass == null || oldPass.trim().isEmpty()) {
@@ -71,7 +76,12 @@ public class ProfileViewModel extends ViewModel {
             _confirmPasswordError.setValue(null);
         }
 
-        if (isValid) {
+        return isValid;
+    }
+
+    /** Validate rồi gọi API luôn */
+    public void validateAndChangePassword(String oldPass, String newPass, String confirmPass) {
+        if (validateOnly(oldPass, newPass, confirmPass)) {
             changePassword(oldPass, newPass);
         }
     }
