@@ -303,6 +303,14 @@ public class ProfileFragment extends Fragment {
                     () -> isFamilyExpanded, v -> isFamilyExpanded = v);
         });
 
+        profileViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (Boolean.TRUE.equals(isLoading)) {
+                DialogUtils.showLoadingDialog(requireContext(), "Đang tải...");
+            } else {
+                DialogUtils.hideLoadingDialog();
+            }
+        });
+
         // Gọi API
         profileViewModel.fetchProfileDashboard();
     }

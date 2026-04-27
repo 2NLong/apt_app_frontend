@@ -108,6 +108,14 @@ public class AdminServiceConfigFragment extends Fragment {
             }
         });
 
+        viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (Boolean.TRUE.equals(isLoading)) {
+                DialogUtils.showLoadingDialog(requireContext(), "Đang xử lý...");
+            } else {
+                DialogUtils.hideLoadingDialog();
+            }
+        });
+
         viewModel.fetchServiceConfigs();
     }
 

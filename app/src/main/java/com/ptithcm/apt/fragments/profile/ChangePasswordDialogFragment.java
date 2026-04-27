@@ -89,6 +89,14 @@ public class ChangePasswordDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
+
+        profileViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (Boolean.TRUE.equals(isLoading)) {
+                DialogUtils.showLoadingDialog(requireContext(), "Đang đổi mật khẩu...");
+            } else {
+                DialogUtils.hideLoadingDialog();
+            }
+        });
     }
 
     private void setupListeners() {

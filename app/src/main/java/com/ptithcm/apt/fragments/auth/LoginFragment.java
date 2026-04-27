@@ -31,6 +31,7 @@ import com.google.android.gms.tasks.Task;
 
 import com.ptithcm.apt.BuildConfig;
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.activities.AdminActivity;
 import com.ptithcm.apt.activities.MainActivity;
@@ -155,13 +156,9 @@ public class LoginFragment extends Fragment {
         // Trạng thái loading
         loginViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                btnSignIn.setEnabled(false);
-                btnGoogleLogin.setEnabled(false);
-                btnSignIn.setText("Đang đăng nhập...");
+                DialogUtils.showLoadingDialog(requireContext(), "Đang đăng nhập...");
             } else {
-                btnSignIn.setEnabled(true);
-                btnGoogleLogin.setEnabled(true);
-                btnSignIn.setText("Đăng nhập");
+                DialogUtils.hideLoadingDialog();
             }
         });
     }
