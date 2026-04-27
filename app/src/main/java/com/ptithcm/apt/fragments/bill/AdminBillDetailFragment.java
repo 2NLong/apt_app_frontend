@@ -18,8 +18,8 @@ import com.ptithcm.apt.R;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModelFactory;
 
 import java.util.Locale;
 

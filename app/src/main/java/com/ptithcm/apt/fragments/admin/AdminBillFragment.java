@@ -33,13 +33,13 @@ import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
 import com.ptithcm.apt.fragments.rentinvoice.AdminRentInvoiceDetailFragment;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
 import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.BillListResponse;
 import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModelFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,14 +62,9 @@ public class AdminBillFragment extends Fragment {
     private AutoCompleteTextView spinnerApartmentFilter;
     private TabLayout tabLayout;
     private Chip chipDate;
-
-    private enum InvoiceType {SERVICE, RENT}
-
     private InvoiceType currentType = InvoiceType.SERVICE;
-
     private AdminRentAdapter rentAdapter;
     private MaterialCardView cardService, cardRent;
-
     private TextView tvServiceBill, tvRentBill;
 
     public AdminBillFragment() {
@@ -77,7 +72,9 @@ public class AdminBillFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+            @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_admin_bill, container, false);
     }
 
@@ -117,36 +114,46 @@ public class AdminBillFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        adapter = new AdminBillAdapter(new ArrayList<>(), new AdminBillAdapter.OnBillActionListener() {
-            @Override
-            public void onApprove(BillListResponse bill) {
-                DialogUtils.showConfirmDialog(
-                        requireContext(),
-                        "Xác nhận duyệt phí",
-                        "Xác nhận căn hộ " + bill.getApartmentName() + " đã đóng tổng cộng " +
-                                formatMoney(bill.getTotalAmount()) + "?",
-                        () -> {
-                            viewModel.approveBill(bill.getId());
-                        }
-                );
-            }
+        adapter = new AdminBillAdapter(new ArrayList<>(),
+                new AdminBillAdapter.OnBillActionListener() {
+                    @Override
+                    public void onApprove(BillListResponse bill) {
+                        DialogUtils.showConfirmDialog(requireContext(),
+                                "Xác nhận duyệt phí",
+                                "Xác nhận căn hộ " + bill.getApartmentName() + " đã đóng tổng cộng " + formatMoney(
+                                        bill.getTotalAmount()) + "?",
+                                () -> {
+                                    viewModel.approveBill(
+                                            bill.getId());
+                                });
+                    }
 
-            @Override
-            public void onItemClick(BillListResponse bill) {
-                openBillDetail(bill.getId());
-            }
-        });
+                    @Override
+                    public void onItemClick(BillListResponse bill) {
+                        openBillDetail(bill.getId());
+                    }
+                });
 
-        rentAdapter = new AdminRentAdapter(new ArrayList<>(), new AdminRentAdapter.OnRentActionListener() {
-            @Override
-            public void onApprove(RentInvoiceList bill) {
-            }
+        rentAdapter = new AdminRentAdapter(new ArrayList<>(),
+                new AdminRentAdapter.OnRentActionListener() {
+                    @Override
+                    public void onApprove(RentInvoiceListResponse rent) {
 
-            @Override
-            public void onItemClick(RentInvoiceList bill) {
-                openRentDetail(bill.getId());
-            }
-        });
+                        DialogUtils.showConfirmDialog(requireContext(),
+                                "Duyệt tiền thuê",
+                                "Xác nhận căn hộ " + rent.getApartmentName() + " đã đóng " + formatMoney(
+                                        rent.getRentAmount()) + "?",
+                                () -> {
+                                    viewModel.approveRentInvoice(
+                                            rent.getId());
+                                });
+                    }
+
+                    @Override
+                    public void onItemClick(RentInvoiceListResponse bill) {
+                        openRentDetail(bill.getId());
+                    }
+                });
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
@@ -154,7 +161,8 @@ public class AdminBillFragment extends Fragment {
 
     private void setupApartmentFilter() {
         spinnerApartmentFilter.setOnItemClickListener((parent, v, position, id) -> {
-            BillApartmentResponse selected = (BillApartmentResponse) parent.getItemAtPosition(position);
+            BillApartmentResponse selected = (BillApartmentResponse) parent.getItemAtPosition(
+                    position);
             currentSelectedApartmentId = selected.getId();
             fetchBillsWithFullFilters();
         });
@@ -241,10 +249,9 @@ public class AdminBillFragment extends Fragment {
         });
 
         fabAdd.setOnClickListener(v -> {
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.admin_fragment_container, new AdminCreateBillFragment())
-                    .addToBackStack(null)
-                    .commit();
+            getParentFragmentManager().beginTransaction().replace(R.id.admin_fragment_container,
+                    new AdminCreateBillFragment()).addToBackStack(
+                    null).commit();
         });
     }
 
@@ -307,7 +314,9 @@ public class AdminBillFragment extends Fragment {
                 filterList.addAll(apartments);
 
                 ArrayAdapter<BillApartmentResponse> apartmentAdapter = new ArrayAdapter<>(
-                        requireContext(), android.R.layout.simple_dropdown_item_1line, filterList);
+                        requireContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        filterList);
                 spinnerApartmentFilter.setAdapter(apartmentAdapter);
 
                 if (currentSelectedApartmentId == null) {
@@ -327,6 +336,13 @@ public class AdminBillFragment extends Fragment {
             }
         });
 
+        viewModel.updateRentSuccess.observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                ToastUtils.showSuccessToast(requireContext(), "Duyệt tiền thuê thành công!");
+                fetchBillsWithFullFilters(); // Fetch lại danh sách để cập nhật UI
+            }
+        });
+
         // 4. Quan sát lỗi
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null) {
@@ -340,19 +356,15 @@ public class AdminBillFragment extends Fragment {
 
     private void fetchBillsWithFullFilters() {
         if (currentType == InvoiceType.SERVICE) {
-            viewModel.fetchBills(
-                    currentSelectedMonth,
+            viewModel.fetchBills(currentSelectedMonth,
                     currentSelectedYear,
                     currentSelectedApartmentId,
-                    currentSelectedStatus
-            );
+                    currentSelectedStatus);
         } else {
-            viewModel.fetchRentInvoices(
-                    currentSelectedMonth,
+            viewModel.fetchRentInvoices(currentSelectedMonth,
                     currentSelectedYear,
                     currentSelectedApartmentId,
-                    currentSelectedStatus
-            );
+                    currentSelectedStatus);
         }
     }
 
@@ -368,7 +380,7 @@ public class AdminBillFragment extends Fragment {
         }
     }
 
-    private void updateRentUI(List<RentInvoiceList> rents) {
+    private void updateRentUI(List<RentInvoiceListResponse> rents) {
         if (rents == null || rents.isEmpty()) {
             rentAdapter.updateList(new ArrayList<>());
             recyclerView.setVisibility(View.GONE);
@@ -392,18 +404,15 @@ public class AdminBillFragment extends Fragment {
 
     private void openBillDetail(long billId) {
         AdminBillDetailFragment detailFragment = AdminBillDetailFragment.newInstance(billId);
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.admin_fragment_container, detailFragment)
-                .addToBackStack(null)
-                .commit();
+        getParentFragmentManager().beginTransaction().replace(R.id.admin_fragment_container,
+                detailFragment).addToBackStack(null).commit();
     }
 
     private void openRentDetail(long rentId) {
-        AdminRentInvoiceDetailFragment detailFragment = AdminRentInvoiceDetailFragment.newInstance(rentId);
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.admin_fragment_container, detailFragment)
-                .addToBackStack(null)
-                .commit();
+        AdminRentInvoiceDetailFragment detailFragment = AdminRentInvoiceDetailFragment.newInstance(
+                rentId);
+        getParentFragmentManager().beginTransaction().replace(R.id.admin_fragment_container,
+                detailFragment).addToBackStack(null).commit();
     }
 
     private void showMonthYearPicker() {
@@ -444,4 +453,6 @@ public class AdminBillFragment extends Fragment {
         java.text.DecimalFormat formatter = new java.text.DecimalFormat("#,###đ");
         return formatter.format(amount);
     }
+
+    private enum InvoiceType {SERVICE, RENT}
 }

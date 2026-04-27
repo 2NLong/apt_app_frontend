@@ -14,12 +14,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceDetail;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceDetailResponse;
+import com.ptithcm.apt.utils.DialogUtils;
+import com.ptithcm.apt.utils.ToastUtils;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModelFactory;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -100,8 +101,16 @@ public class AdminRentInvoiceDetailFragment extends Fragment {
         btnBack.setOnClickListener(v -> requireActivity().getOnBackPressedDispatcher().onBackPressed());
 
         btnApprove.setOnClickListener(v -> {
-            // Logic duyệt thanh toán tiền thuê ở đây
-            Toast.makeText(getContext(), "Đang duyệt thanh toán...", Toast.LENGTH_SHORT).show();
+            // Bước 1: Hiện Dialog xác nhận
+            DialogUtils.showConfirmDialog(
+                    requireContext(),
+                    "Xác nhận duyệt phí",
+                    "Xác nhận căn hộ " + tvApartment.getText() + " đã đóng tiền thuê nhà?",
+                    () -> {
+                        // Bước 2: Gọi ViewModel thực hiện API
+                        viewModel.approveRentInvoice(rentId);
+                    }
+            );
         });
     }
 
@@ -112,9 +121,24 @@ public class AdminRentInvoiceDetailFragment extends Fragment {
                 bindData(detail);
             }
         });
+
+        viewModel.updateRentSuccess.observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                ToastUtils.showSuccessToast(requireContext(), "Duyệt hóa đơn thành công!");
+                // Duyệt xong quay về màn hình danh sách
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
+
+        // Theo dõi lỗi từ hệ thống (Bao gồm lỗi 500 bạn vừa gặp)
+        viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
+            if (errorMsg != null) {
+                ToastUtils.showErrorToast(requireContext(), errorMsg);
+            }
+        });
     }
 
-    private void bindData(RentInvoiceDetail data) {
+    private void bindData(RentInvoiceDetailResponse data) {
         String status = data.getStatus();
 
         if ("PAID".equals(status)) {

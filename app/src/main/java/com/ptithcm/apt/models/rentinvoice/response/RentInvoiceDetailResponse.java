@@ -1,8 +1,8 @@
-package com.ptithcm.apt.models.rentinvoice;
+package com.ptithcm.apt.models.rentinvoice.response;
 
 import java.math.BigDecimal;
 
-public class RentInvoiceDetail {
+public class RentInvoiceDetailResponse {
     private Long id;
     private String apartmentName;
     private String apartmentFloor;
@@ -17,10 +17,10 @@ public class RentInvoiceDetail {
     private String createdAt;
     private String dueDate;
 
-    public RentInvoiceDetail() {
+    public RentInvoiceDetailResponse() {
     }
 
-    public RentInvoiceDetail(Double apartmentArea, String apartmentFloor, String apartmentName, Integer billingMonth, Integer billingYear, String createdAt, String dueDate, String createdBy, Long id, String ownerName, BigDecimal rentAmount, String status, String tenantName) {
+    public RentInvoiceDetailResponse(Double apartmentArea, String apartmentFloor, String apartmentName, Integer billingMonth, Integer billingYear, String createdAt, String dueDate, String createdBy, Long id, String ownerName, BigDecimal rentAmount, String status, String tenantName) {
         this.apartmentArea = apartmentArea;
         this.apartmentFloor = apartmentFloor;
         this.apartmentName = apartmentName;

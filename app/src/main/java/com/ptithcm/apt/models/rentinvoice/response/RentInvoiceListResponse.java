@@ -1,10 +1,10 @@
-package com.ptithcm.apt.models.rentinvoice;
+package com.ptithcm.apt.models.rentinvoice.response;
 
 import com.ptithcm.apt.enums.RentStatus;
 
 import java.math.BigDecimal;
 
-public class RentInvoiceList {
+public class RentInvoiceListResponse {
     private Long id;
     private String apartmentName;
     private Integer billingMonth;
@@ -13,10 +13,10 @@ public class RentInvoiceList {
     private RentStatus status;
     private String dueDate;
 
-    public RentInvoiceList() {
+    public RentInvoiceListResponse() {
     }
 
-    public RentInvoiceList(String apartmentName, Integer billingMonth, Integer billingYear, String dueDate, Long id, BigDecimal rentAmount, RentStatus status) {
+    public RentInvoiceListResponse(String apartmentName, Integer billingMonth, Integer billingYear, String dueDate, Long id, BigDecimal rentAmount, RentStatus status) {
         this.apartmentName = apartmentName;
         this.billingMonth = billingMonth;
         this.billingYear = billingYear;

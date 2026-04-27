@@ -6,13 +6,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.ptithcm.apt.R;
 
 public class DialogUtils {
+
+    private static AlertDialog loadingDialog;
 
     // Interface để nhận sự kiện khi người dùng bấm "Xác nhận"
     public interface ConfirmCallback {
@@ -55,5 +59,52 @@ public class DialogUtils {
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         dialog.show();
+    }
+
+    public static void showLoadingDialog(Context context) {
+        if (loadingDialog != null && loadingDialog.isShowing()) return;
+
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_loading_dialog, null);
+
+        loadingDialog = new AlertDialog.Builder(context)
+                .setView(view)
+                .setCancelable(false)
+                .create();
+
+        if (loadingDialog.getWindow() != null) {
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        loadingDialog.show();
+    }
+
+    public static void showLoadingDialog(Context context, String message) {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            TextView tvMessage = loadingDialog.findViewById(R.id.tvLoadingMessage);
+            if (tvMessage != null) tvMessage.setText(message);
+            return;
+        }
+
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_loading_dialog, null);
+        TextView tvMessage = view.findViewById(R.id.tvLoadingMessage);
+        if (tvMessage != null) tvMessage.setText(message);
+
+        loadingDialog = new AlertDialog.Builder(context)
+                .setView(view)
+                .setCancelable(false)
+                .create();
+
+        if (loadingDialog.getWindow() != null) {
+            loadingDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        }
+
+        loadingDialog.show();
+    }
+
+    public static void hideLoadingDialog() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+            loadingDialog = null;
+        }
     }
 }

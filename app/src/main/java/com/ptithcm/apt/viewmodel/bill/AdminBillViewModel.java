@@ -1,4 +1,4 @@
-package com.ptithcm.apt.viewmodel.admin;
+package com.ptithcm.apt.viewmodel.bill;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel;
 
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceDetail;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.auth.response.ApiResponse;
+import com.ptithcm.apt.models.bill.response.CreateBillResponse;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceDetailResponse;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
 import com.ptithcm.apt.models.bill.response.AdminBillDetailResponse;
 import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.BillListResponse;
@@ -17,6 +19,10 @@ import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.repositoris.AdminBillRepository;
 
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AdminBillViewModel extends ViewModel {
     private final AdminBillRepository repository;
@@ -61,12 +67,15 @@ public class AdminBillViewModel extends ViewModel {
     private final MutableLiveData<Boolean> _isCreateSuccess = new MutableLiveData<>();
     public LiveData<Boolean> isCreateSuccess = _isCreateSuccess;
 
+    // Sửa lại hàm này trong file AdminBillViewModel.java của bạn
     public void createBill(CreateBillRequest request) {
-        repository.createBill(request, _isCreateSuccess, _error);
+        // ViewModel chỉ việc "ra lệnh" cho Repository làm việc
+        // và truyền các biến LiveData có sẵn của mình vào để Repository cập nhật
+        repository.createBill(request, _isLoading, _isCreateSuccess, _error);
     }
 
-    private final MutableLiveData<List<RentInvoiceList>> _rentInvoices = new MutableLiveData<>();
-    public LiveData<List<RentInvoiceList>> rentInvoices = _rentInvoices;
+    private final MutableLiveData<List<RentInvoiceListResponse>> _rentInvoices = new MutableLiveData<>();
+    public LiveData<List<RentInvoiceListResponse>> rentInvoices = _rentInvoices;
 
     public void fetchRentInvoices(Integer month, Integer year, Long apartmentId, BillStatus status) {
         RentStatus rentStatus = RentStatus.valueOf(status.name());
@@ -75,8 +84,8 @@ public class AdminBillViewModel extends ViewModel {
                 _rentInvoices, _error, _isLoading);
     }
 
-    private final MutableLiveData<RentInvoiceDetail> _rentDetail = new MutableLiveData<>();
-    public LiveData<RentInvoiceDetail> rentDetail = _rentDetail;
+    private final MutableLiveData<RentInvoiceDetailResponse> _rentDetail = new MutableLiveData<>();
+    public LiveData<RentInvoiceDetailResponse> rentDetail = _rentDetail;
 
     public void fetchRentDetail(Long id) {
         repository.getRentInvoiceDetail(id, _rentDetail, _error);
@@ -87,7 +96,17 @@ public class AdminBillViewModel extends ViewModel {
 
     public void approveBill(Long billId) {
         // Mặc định set là PAID như bạn yêu cầu
+        _updateStatusSuccess.setValue(false);
         repository.updateBillStatus(billId, BillStatus.PAID, _updateStatusSuccess, _error);
+    }
+
+    private final MutableLiveData<Boolean> _updateRentSuccess = new MutableLiveData<>();
+    public LiveData<Boolean> updateRentSuccess = _updateRentSuccess;
+
+    public void approveRentInvoice(Long rentId) {
+        // Duyệt mặc định là PAID (Enum RentStatus)
+        _updateRentSuccess.setValue(false);
+        repository.updateRentStatus(rentId, com.ptithcm.apt.enums.RentStatus.PAID, _updateRentSuccess, _error);
     }
 
     public AdminBillViewModel(AdminBillRepository repository) {

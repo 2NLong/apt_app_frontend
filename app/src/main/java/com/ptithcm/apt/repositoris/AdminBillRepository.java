@@ -5,9 +5,11 @@ import androidx.lifecycle.MutableLiveData;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.models.bill.request.UpdateBillStatusRequest;
+import com.ptithcm.apt.models.bill.response.CreateBillResponse;
 import com.ptithcm.apt.models.bill.response.UpdateBillStatusResponse;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceDetail;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.rentinvoice.request.UpdateRentInvoiceStatusRequest;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceDetailResponse;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.AdminBillDetailResponse;
@@ -16,6 +18,7 @@ import com.ptithcm.apt.models.bill.response.BillListResponse;
 import com.ptithcm.apt.models.bill.response.BillPreviousMonthlyMetricResponse;
 import com.ptithcm.apt.models.bill.response.BillServiceConfigResponse;
 import com.ptithcm.apt.models.bill.request.CreateBillRequest;
+import com.ptithcm.apt.models.rentinvoice.response.UpdateRentInvoiceStatusResponse;
 import com.ptithcm.apt.network.api.AdminBillApiService;
 
 import java.util.List;
@@ -140,34 +143,44 @@ public class AdminBillRepository {
         });
     }
 
-    public void createBill(CreateBillRequest request, MutableLiveData<Boolean> isSuccess, MutableLiveData<String> error) {
-        apiService.createBill(request).enqueue(new Callback<ApiResponse<Void>>() {
+    public void createBill(CreateBillRequest request,
+            MutableLiveData<Boolean> isLoading,
+            MutableLiveData<Boolean> isSuccess,
+            MutableLiveData<String> error) {
+        // 1. Bật loading
+        isLoading.setValue(true);
+
+        // Ở đây Repository ĐÃ CÓ apiService (khởi tạo trong constructor)
+        apiService.createBill(request).enqueue(new Callback<ApiResponse<CreateBillResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+            public void onResponse(Call<ApiResponse<CreateBillResponse>> call, Response<ApiResponse<CreateBillResponse>> response) {
+                isLoading.setValue(false);
                 if (response.isSuccessful()) {
                     isSuccess.setValue(true);
                 } else {
-                    error.setValue("Lỗi khi tạo hóa đơn: " + response.code());
+                    error.setValue("Lỗi từ server: " + response.code());
                 }
             }
+
             @Override
-            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                error.setValue(t.getMessage());
+            public void onFailure(Call<ApiResponse<CreateBillResponse>> call, Throwable t) {
+                isLoading.setValue(false);
+                error.setValue("Lỗi kết nối: " + t.getMessage());
             }
         });
     }
 
     // AdminBillRepository.java
     public void getRentInvoices(Integer month, Integer year, Long apartmentId, RentStatus status, Integer page, Integer size,
-                                MutableLiveData<List<RentInvoiceList>> rentData,
+                                MutableLiveData<List<RentInvoiceListResponse>> rentData,
                                 MutableLiveData<String> errorMessage,
                                 MutableLiveData<Boolean> isLoading) {
 
         isLoading.postValue(true);
         apiService.getRentInvoices(month, year, apartmentId, status, page, size)
-                .enqueue(new Callback<ApiResponse<PageResponse<RentInvoiceList>>>() {
+                .enqueue(new Callback<ApiResponse<PageResponse<RentInvoiceListResponse>>>() {
                     @Override
-                    public void onResponse(Call<ApiResponse<PageResponse<RentInvoiceList>>> call, Response<ApiResponse<PageResponse<RentInvoiceList>>> response) {
+                    public void onResponse(Call<ApiResponse<PageResponse<RentInvoiceListResponse>>> call, Response<ApiResponse<PageResponse<RentInvoiceListResponse>>> response) {
                         isLoading.postValue(false);
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getData() != null) {
@@ -181,17 +194,17 @@ public class AdminBillRepository {
                     }
 
                     @Override
-                    public void onFailure(Call<ApiResponse<PageResponse<RentInvoiceList>>> call, Throwable t) {
+                    public void onFailure(Call<ApiResponse<PageResponse<RentInvoiceListResponse>>> call, Throwable t) {
                         isLoading.postValue(false);
                         errorMessage.postValue("Lỗi kết nối: " + t.getMessage());
                     }
                 });
     }
 
-    public void getRentInvoiceDetail(Long id, MutableLiveData<RentInvoiceDetail> detailData, MutableLiveData<String> error) {
-        apiService.getRentInvoiceDetail(id).enqueue(new Callback<ApiResponse<RentInvoiceDetail>>() {
+    public void getRentInvoiceDetail(Long id, MutableLiveData<RentInvoiceDetailResponse> detailData, MutableLiveData<String> error) {
+        apiService.getRentInvoiceDetail(id).enqueue(new Callback<ApiResponse<RentInvoiceDetailResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<RentInvoiceDetail>> call, Response<ApiResponse<RentInvoiceDetail>> response) {
+            public void onResponse(Call<ApiResponse<RentInvoiceDetailResponse>> call, Response<ApiResponse<RentInvoiceDetailResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     detailData.postValue(response.body().getData());
                 } else {
@@ -199,7 +212,7 @@ public class AdminBillRepository {
                 }
             }
             @Override
-            public void onFailure(Call<ApiResponse<RentInvoiceDetail>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<RentInvoiceDetailResponse>> call, Throwable t) {
                 error.postValue(t.getMessage());
             }
         });
@@ -223,6 +236,28 @@ public class AdminBillRepository {
             @Override
             public void onFailure(Call<ApiResponse<UpdateBillStatusResponse>> call, Throwable t) {
                 error.postValue("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void updateRentStatus(Long rentId, com.ptithcm.apt.enums.RentStatus status,
+                                 MutableLiveData<Boolean> isSuccess,
+                                 MutableLiveData<String> error) {
+        UpdateRentInvoiceStatusRequest req = new UpdateRentInvoiceStatusRequest(status);
+
+        apiService.updateRentInvoiceStatus(rentId, req).enqueue(new Callback<ApiResponse<UpdateRentInvoiceStatusResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UpdateRentInvoiceStatusResponse>> call, Response<ApiResponse<UpdateRentInvoiceStatusResponse>> response) {
+                if (response.isSuccessful()) {
+                    isSuccess.postValue(true);
+                } else {
+                    error.postValue("Lỗi: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UpdateRentInvoiceStatusResponse>> call, Throwable t) {
+                error.postValue(t.getMessage());
             }
         });
     }

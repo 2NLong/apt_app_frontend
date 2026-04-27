@@ -1,4 +1,4 @@
-package com.ptithcm.apt.viewmodel.admin;
+package com.ptithcm.apt.viewmodel.bill;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;

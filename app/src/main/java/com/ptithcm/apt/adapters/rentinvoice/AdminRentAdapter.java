@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.models.rentinvoice.RentInvoiceList;
+import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -19,22 +19,19 @@ import java.util.List;
 import java.util.Locale;
 
 public class AdminRentAdapter extends RecyclerView.Adapter<AdminRentAdapter.ViewHolder> {
-    private List<RentInvoiceList> list;
+    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy",
+            Locale.getDefault());
+    private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd",
+            Locale.getDefault());
+    private List<RentInvoiceListResponse> list;
     private OnRentActionListener listener;
-    private final SimpleDateFormat displayFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-    private final SimpleDateFormat apiFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-    public interface OnRentActionListener {
-        void onItemClick(RentInvoiceList bill);
-        void onApprove(RentInvoiceList bill);
-    }
-
-    public AdminRentAdapter(List<RentInvoiceList> list, OnRentActionListener listener) {
+    public AdminRentAdapter(List<RentInvoiceListResponse> list, OnRentActionListener listener) {
         this.list = list;
         this.listener = listener;
     }
 
-    public void updateList(List<RentInvoiceList> newList) {
+    public void updateList(List<RentInvoiceListResponse> newList) {
         this.list = newList;
         notifyDataSetChanged();
     }
@@ -42,13 +39,15 @@ public class AdminRentAdapter extends RecyclerView.Adapter<AdminRentAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rent_invoice, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rent_invoice,
+                parent,
+                false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        RentInvoiceList bill = list.get(position);
+        RentInvoiceListResponse bill = list.get(position);
         holder.tvApartment.setText("Căn hộ " + bill.getApartmentName());
         holder.tvDate.setText("Kỳ thuê: Tháng " + bill.getBillingMonth() + "/" + bill.getBillingYear());
 
@@ -68,13 +67,26 @@ public class AdminRentAdapter extends RecyclerView.Adapter<AdminRentAdapter.View
         }
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(bill));
+        holder.btnConfirm.setOnClickListener(v -> {
+            if (listener != null) listener.onApprove(bill);
+        });
     }
 
-    @Override public int getItemCount() { return list == null ? 0 : list.size(); }
+    @Override
+    public int getItemCount() {
+        return list == null ? 0 : list.size();
+    }
+
+    public interface OnRentActionListener {
+        void onItemClick(RentInvoiceListResponse bill);
+
+        void onApprove(RentInvoiceListResponse bill);
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvApartment, tvDate, tvStatus, tvRentAmount, tvTotal, tvDue;
         Button btnConfirm;
+
         public ViewHolder(@NonNull View v) {
             super(v);
             tvApartment = v.findViewById(R.id.tvApartment);

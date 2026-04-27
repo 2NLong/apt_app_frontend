@@ -26,9 +26,10 @@ import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.BillServiceConfigResponse;
 import com.ptithcm.apt.models.bill.request.CreateBillRequest;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModel;
-import com.ptithcm.apt.viewmodel.admin.AdminBillViewModelFactory; // Đảm bảo bạn có Factory này
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModelFactory; // Đảm bảo bạn có Factory này
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -194,6 +195,7 @@ public class AdminCreateBillFragment extends Fragment {
         });
 
         btnCreateBill.setOnClickListener(v -> {
+            // 1. Kiểm tra dữ liệu đầu vào trước khi hiện Dialog
             if (selectedApartmentId == null) {
                 ToastUtils.showErrorToast(requireContext(), "Vui lòng chọn căn hộ");
                 return;
@@ -207,26 +209,34 @@ public class AdminCreateBillFragment extends Fragment {
                 return;
             }
 
-
             BigDecimal oldE = new BigDecimal(tvElectricOld.getText().toString());
-            BigDecimal newE = new BigDecimal(etElectricNew.getText().toString());
+            BigDecimal newE = new BigDecimal(elecStr);
             if (newE.compareTo(oldE) < 0) {
                 ToastUtils.showErrorToast(requireContext(), "Số điện mới không được nhỏ hơn số cũ!");
                 return;
             }
 
-            // 2. Tạo đối tượng Request
-            BigDecimal elecNew = new BigDecimal(elecStr);
-            BigDecimal waterNew = new BigDecimal(waterStr);
+            // 2. Hiển thị Dialog xác nhận bằng Utility
+            String confirmMessage = "Bạn có chắc chắn muốn tạo hóa đơn tháng " + selectedMonth + "/" + selectedYear +
+                    " cho căn hộ " + spinnerApartment.getText().toString() + " không?\n" +
+                    "Tổng tiền: " + tvTotalAmount.getText().toString();
 
-            CreateBillRequest request = new CreateBillRequest(
-                    selectedApartmentId,
-                    selectedMonth,
-                    selectedYear,
-                    elecNew,
-                    waterNew
+            DialogUtils.showConfirmDialog(
+                    requireContext(),
+                    "Xác nhận tạo hóa đơn",
+                    confirmMessage,
+                    () -> {
+                        // 3. Thực hiện gọi API nếu chọn "Có"
+                        CreateBillRequest request = new CreateBillRequest(
+                                selectedApartmentId,
+                                selectedMonth,
+                                selectedYear,
+                                newE,
+                                new BigDecimal(waterStr)
+                        );
+                        viewModel.createBill(request);
+                    }
             );
-            viewModel.createBill(request);
         });
     }
 
@@ -313,17 +323,19 @@ public class AdminCreateBillFragment extends Fragment {
             }
         });
 
+        viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (isLoading != null && isLoading) {
+                DialogUtils.showLoadingDialog(requireContext(), "Đang tạo hóa đơn...");
+            } else {
+                DialogUtils.hideLoadingDialog();
+            }
+        });
+
+        // Khi thành công hoặc thất bại, isLoading sẽ về false, Dialog tự tắt
         viewModel.isCreateSuccess.observe(getViewLifecycleOwner(), success -> {
             if (success != null && success) {
-                // 1. Hiển thị Toast thành công bằng Util của bạn
                 ToastUtils.showSuccessToast(requireContext(), "Tạo hóa đơn thành công!");
-
-                // 2. Chuyển ngược về fragment danh sách
-                // onBackPressed sẽ lấy fragment từ BackStack ra (màn hình danh sách cũ)
                 requireActivity().getOnBackPressedDispatcher().onBackPressed();
-
-                // 3. Reset lại trạng thái để tránh bị gọi lại khi quay lại fragment này
-                // (Tùy chọn: nếu ViewModel dùng chung, bạn nên có hàm resetSuccessState)
             }
         });
     }
