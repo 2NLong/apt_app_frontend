@@ -75,9 +75,31 @@ public class ResetPasswordFragment extends Fragment {
         });
 
         btnResetPassword.setOnClickListener(v -> {
-            String newPassword = etNewPassword.getText().toString();
-            String confirmPassword = etConfirmPassword.getText().toString();
-            viewModel.resetPassword(newPassword, confirmPassword);
+            String newPassword = etNewPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if (newPassword.isEmpty()) {
+                ToastUtils.showErrorToast(requireContext(), "Vui lòng nhập mật khẩu mới");
+                return;
+            }
+            if (newPassword.length() < 6) {
+                ToastUtils.showErrorToast(requireContext(), "Mật khẩu phải có ít nhất 6 ký tự");
+                return;
+            }
+            if (confirmPassword.isEmpty()) {
+                ToastUtils.showErrorToast(requireContext(), "Vui lòng xác nhận mật khẩu mới");
+                return;
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                ToastUtils.showErrorToast(requireContext(), "Mật khẩu xác nhận không khớp");
+                return;
+            }
+
+            DialogUtils.showConfirmDialog(requireContext(),
+                    "Đặt lại mật khẩu",
+                    "Bạn có chắc chắn muốn đặt lại mật khẩu mới không?",
+                    () -> viewModel.resetPassword(newPassword, confirmPassword)
+            );
         });
 
         tvBackToLogin.setOnClickListener(v -> {
