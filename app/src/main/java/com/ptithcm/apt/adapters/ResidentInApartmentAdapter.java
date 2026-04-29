@@ -42,8 +42,27 @@ public class ResidentInApartmentAdapter extends RecyclerView.Adapter<ResidentInA
         holder.tvCccd.setText("CCCD: " + (resident.getCitizenIdentity() != null ? resident.getCitizenIdentity() : "Chưa cập nhật"));
         holder.tvPhone.setText("SĐT: " + (resident.getPhone() != null ? resident.getPhone() : "Chưa cập nhật"));
 
-        String role = "OWNER".equals(resident.getRole()) ? "CHỦ HỘ" : "THÀNH VIÊN";
-        holder.tvRole.setText(role);
+        String roleRaw = resident.getRole();
+        String displayRole = "Thành viên";
+
+        if (roleRaw != null) {
+            switch (roleRaw.toUpperCase()) {
+                case "OWNER":
+                    displayRole = "Chủ Sở Hữu";
+                    break;
+                case "TENANT":
+                    displayRole = "Người Thuê";
+                    break;
+                case "MEMBER":
+                    displayRole = "Thành viên";
+                    break;
+                default:
+                    displayRole = "Thành viên";
+                    break;
+            }
+        }
+
+        holder.tvRole.setText(displayRole);
     }
 
     @Override
