@@ -1,10 +1,10 @@
-package com.ptithcm.apt.models.bill;
+package com.ptithcm.apt.models.bill.response;
 
 import com.ptithcm.apt.enums.BillStatus;
 
 import java.math.BigDecimal;
 
-public class AdminBillDetail {
+public class AdminBillDetailResponse {
     private Long id;
     private Long apartmentId;
     private String apartmentName;
@@ -25,10 +25,10 @@ public class AdminBillDetail {
     private String paidAt;
     private String dueDate;
 
-    public AdminBillDetail() {
+    public AdminBillDetailResponse() {
     }
 
-    public AdminBillDetail(BigDecimal apartmentArea, String apartmentFloor, Long apartmentId, String apartmentName, Integer billingMonth, Integer billingYear, String confirmBy, String createdAt, String createdBy, String dueDate, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount, BigDecimal waterFee, String paidAt) {
+    public AdminBillDetailResponse(BigDecimal apartmentArea, String apartmentFloor, Long apartmentId, String apartmentName, Integer billingMonth, Integer billingYear, String confirmBy, String createdAt, String createdBy, String dueDate, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount, BigDecimal waterFee, String paidAt) {
         this.apartmentArea = apartmentArea;
         this.apartmentFloor = apartmentFloor;
         this.apartmentId = apartmentId;

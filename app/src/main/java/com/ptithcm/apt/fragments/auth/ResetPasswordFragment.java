@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory;
@@ -49,7 +50,7 @@ public class ResetPasswordFragment extends Fragment {
         Button btnResetPassword = view.findViewById(R.id.btn_reset_password);
         TextView tvBackToLogin = view.findViewById(R.id.tv_back_to_login);
 
-        //OBSERVE
+        // OBSERVE
         viewModel.resetPasswordResult.observe(getViewLifecycleOwner(), success -> {
             if (success != null && success) {
                 ToastUtils.showSuccessToast(requireContext(), "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
@@ -67,11 +68,9 @@ public class ResetPasswordFragment extends Fragment {
 
         viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                btnResetPassword.setEnabled(false);
-                btnResetPassword.setText("Đang đặt lại...");
+                DialogUtils.showLoadingDialog(requireContext(), "Đang đặt lại mật khẩu...");
             } else {
-                btnResetPassword.setEnabled(true);
-                btnResetPassword.setText("Đặt lại mật khẩu");
+                DialogUtils.hideLoadingDialog();
             }
         });
 

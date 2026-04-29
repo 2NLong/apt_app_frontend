@@ -1,13 +1,10 @@
-package com.ptithcm.apt.models.bill;
-
-import android.provider.ContactsContract;
+package com.ptithcm.apt.models.bill.response;
 
 import com.ptithcm.apt.enums.BillStatus;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
-public class BillList {
+public class BillListResponse {
     private Long id;
     private String apartmentName;
     private Integer billingMonth;
@@ -20,10 +17,10 @@ public class BillList {
     private BillStatus status;
     private String dueDate;
 
-    public BillList() {
+    public BillListResponse() {
     }
 
-    public BillList(String apartmentName, BigDecimal waterFee, Integer billingMonth, Integer billingYear, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount, String dueDate) {
+    public BillListResponse(String apartmentName, BigDecimal waterFee, Integer billingMonth, Integer billingYear, BigDecimal electricityFee, Long id, BigDecimal managementFee, BigDecimal sanitationFee, BillStatus status, BigDecimal totalAmount, String dueDate) {
         this.apartmentName = apartmentName;
         this.waterFee = waterFee;
         this.billingMonth = billingMonth;

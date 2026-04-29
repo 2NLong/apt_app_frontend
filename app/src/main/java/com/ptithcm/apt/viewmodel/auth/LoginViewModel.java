@@ -59,6 +59,19 @@ public class LoginViewModel extends ViewModel {
                 _loginResult, _errorMessage, _isLoading);
     }
 
+    /**
+     * Đăng nhập bằng Google.
+     */
+    public void googleLogin(String idToken) {
+        if (idToken == null || idToken.isEmpty()) {
+            _errorMessage.setValue("Không nhận được token từ Google");
+            return;
+        }
+
+        authRepository.googleLogin(new com.ptithcm.apt.models.auth.request.GoogleLoginRequest(idToken),
+                _loginResult, _errorMessage, _isLoading);
+    }
+
     public void clearError() {
         _errorMessage.setValue(null);
     }

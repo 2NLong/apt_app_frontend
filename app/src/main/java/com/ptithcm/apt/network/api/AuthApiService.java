@@ -2,6 +2,7 @@ package com.ptithcm.apt.network.api;
 
 import com.ptithcm.apt.models.auth.request.ChangePasswordRequest;
 import com.ptithcm.apt.models.auth.request.ForgotPasswordRequest;
+import com.ptithcm.apt.models.auth.request.GoogleLoginRequest;
 import com.ptithcm.apt.models.auth.request.LoginRequest;
 import com.ptithcm.apt.models.auth.request.RefreshTokenRequest;
 import com.ptithcm.apt.models.auth.request.ResetPasswordRequest;
@@ -18,6 +19,9 @@ public interface AuthApiService {
 
     @POST("api/v1/auth/login")
     Call<ApiResponse<LoginResponse>> login(@Body LoginRequest loginRequest);
+
+    @POST("api/v1/auth/google-login")
+    Call<ApiResponse<LoginResponse>> googleLogin(@Body GoogleLoginRequest request);
 
     @POST("api/v1/auth/refresh-token")
     Call<ApiResponse<LoginResponse>> refreshToken(@Body RefreshTokenRequest request);

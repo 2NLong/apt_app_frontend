@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory;
@@ -66,11 +67,9 @@ public class ForgotEmailFragment extends Fragment {
 
         viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                btnSendResetOtp.setEnabled(false);
-                btnSendResetOtp.setText("Đang gửi...");
+                DialogUtils.showLoadingDialog(requireContext(), "Đang gửi mã OTP...");
             } else {
-                btnSendResetOtp.setEnabled(true);
-                btnSendResetOtp.setText("Gửi mã OTP đặt lại");
+                DialogUtils.hideLoadingDialog();
             }
         });
 

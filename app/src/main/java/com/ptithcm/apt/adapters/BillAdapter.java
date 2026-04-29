@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.enums.BillStatus;
-import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.bill.response.BillListResponse;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
@@ -21,13 +20,13 @@ import java.util.List;
 
 public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
 
-    private List<BillList> list;
+    private List<BillListResponse> list;
 
-    public BillAdapter(List<BillList> list) {
+    public BillAdapter(List<BillListResponse> list) {
         this.list = list;
     }
 
-    public void updateList(List<BillList> newList) {
+    public void updateList(List<BillListResponse> newList) {
         this.list = newList;
         notifyDataSetChanged();
     }
@@ -73,7 +72,7 @@ public class BillAdapter extends RecyclerView.Adapter<BillAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(ViewHolder h, int i) {
-        BillList b = list.get(i);
+        BillListResponse b = list.get(i);
 
         // HEADER
         h.tvApartment.setText("Căn hộ " + b.getApartmentName());

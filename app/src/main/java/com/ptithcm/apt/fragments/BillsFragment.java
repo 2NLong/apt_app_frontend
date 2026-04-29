@@ -14,8 +14,7 @@ import android.widget.TextView;
 
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.BillAdapter;
-import com.ptithcm.apt.models.bill.Bill;
-import com.ptithcm.apt.models.bill.BillList;
+import com.ptithcm.apt.models.bill.response.BillListResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +39,8 @@ public class BillsFragment extends Fragment {
     private RecyclerView rvBills;
     private BillAdapter adapter;
 
-    private List<BillList> unpaidList = new ArrayList<>();
-    private List<BillList> paidList = new ArrayList<>();
+    private List<BillListResponse> unpaidList = new ArrayList<>();
+    private List<BillListResponse> paidList = new ArrayList<>();
 
     private TextView tabUnpaid, tabHistory;
     private TextView tvDebt, tvPaid;

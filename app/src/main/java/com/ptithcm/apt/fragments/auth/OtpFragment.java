@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory;
@@ -74,11 +75,9 @@ public class OtpFragment extends Fragment {
 
         viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                btnVerifyOtp.setEnabled(false);
-                btnVerifyOtp.setText("Đang xác thực...");
+                DialogUtils.showLoadingDialog(requireContext(), "Đang xác thực...");
             } else {
-                btnVerifyOtp.setEnabled(true);
-                btnVerifyOtp.setText("Xác minh OTP");
+                DialogUtils.hideLoadingDialog();
             }
         });
 

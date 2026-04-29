@@ -35,6 +35,7 @@ import com.ptithcm.apt.fragments.profile.ChangePasswordDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.FormatUtils;
 import com.ptithcm.apt.utils.RoleTranslator;
 import com.ptithcm.apt.utils.ToastUtils;
@@ -122,7 +123,14 @@ public class ProfileFragment extends Fragment {
 
         // Logout button
         View settings = view.findViewById(R.id.layout_settings);
-        settings.findViewById(R.id.btn_logout).setOnClickListener(v -> loginViewModel.logout());
+        settings.findViewById(R.id.btn_logout).setOnClickListener(v ->
+                DialogUtils.showConfirmDialog(
+                        requireContext(),
+                        "Đăng xuất",
+                        "Bạn có chắc chắn muốn đăng xuất không?",
+                        () -> loginViewModel.logout()
+                )
+        );
 
         // Notification Settings expand/collapse
         View notificationHeader = settings.findViewById(R.id.layout_notification_header);
@@ -293,6 +301,14 @@ public class ProfileFragment extends Fragment {
             familyMemberAdapter.notifyDataSetChanged();
             setupShowMore(tvShowMoreFamilyMembers, familyMemberList.size(), familyMemberAdapter,
                     () -> isFamilyExpanded, v -> isFamilyExpanded = v);
+        });
+
+        profileViewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
+            if (Boolean.TRUE.equals(isLoading)) {
+                DialogUtils.showLoadingDialog(requireContext(), "Đang tải...");
+            } else {
+                DialogUtils.hideLoadingDialog();
+            }
         });
 
         // Gọi API

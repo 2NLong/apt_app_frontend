@@ -1,16 +1,16 @@
-package com.ptithcm.apt.models.bill;
+package com.ptithcm.apt.models.bill.response;
 
 import java.math.BigDecimal;
 
-public class BillPreviousMonthlyMetric {
+public class BillPreviousMonthlyMetricResponse {
     Long apartmentId;
     BigDecimal latestElectricity;
     BigDecimal latestWater;
 
-    public BillPreviousMonthlyMetric() {
+    public BillPreviousMonthlyMetricResponse() {
     }
 
-    public BillPreviousMonthlyMetric(Long apartmentId, BigDecimal latestElectricity, BigDecimal latestWater) {
+    public BillPreviousMonthlyMetricResponse(Long apartmentId, BigDecimal latestElectricity, BigDecimal latestWater) {
         this.apartmentId = apartmentId;
         this.latestElectricity = latestElectricity;
         this.latestWater = latestWater;
