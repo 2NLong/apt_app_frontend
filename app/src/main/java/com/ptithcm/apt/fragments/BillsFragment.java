@@ -1,131 +1,305 @@
 package com.ptithcm.apt.fragments;
 
-import android.annotation.SuppressLint;
+import android.graphics.Color;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.button.MaterialButtonToggleGroup;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.tabs.TabLayout;
 import com.ptithcm.apt.R;
-import com.ptithcm.apt.adapters.BillAdapter;
-import com.ptithcm.apt.models.bill.response.BillListResponse;
+import com.ptithcm.apt.adapters.bill.AdminBillAdapter;
+import com.ptithcm.apt.adapters.bill.UserBillAdapter;
+import com.ptithcm.apt.adapters.rentinvoice.AdminRentAdapter;
+import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.fragments.bill.UserBillDetailFragment;
+import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
+import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.AdminBillViewModelFactory;
+import com.ptithcm.apt.viewmodel.bill.UserBillViewModel;
+import com.ptithcm.apt.viewmodel.bill.UserBillViewModelFactory;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BillsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class BillsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    // Giữ nguyên các biến lọc như bên Admin
+    private Integer currentSelectedMonth = null;
+    private Integer currentSelectedYear = null;
+    private BillStatus currentSelectedStatus = BillStatus.UNPAID;
+    private Long currentSelectedApartmentId = null;
+    private InvoiceType currentType = InvoiceType.SERVICE;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private RecyclerView recyclerView;
+    private LinearLayout layoutEmpty;
+    private AutoCompleteTextView spinnerApartment;
+    private TabLayout tabLayout;
+    private Chip chipDate;
+    private MaterialButtonToggleGroup toggleType;
 
-    private RecyclerView rvBills;
-    private BillAdapter adapter;
+    private UserBillViewModel viewModel;
+    private UserBillAdapter userBillAdapter;
 
-    private List<BillListResponse> unpaidList = new ArrayList<>();
-    private List<BillListResponse> paidList = new ArrayList<>();
 
-    private TextView tabUnpaid, tabHistory;
-    private TextView tvDebt, tvPaid;
+    public BillsFragment() {}
 
-    public BillsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BillsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static BillsFragment newInstance(String param1, String param2) {
-        BillsFragment fragment = new BillsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_bills, container, false);
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        initViews(view);
+        initViewModel();
+        setupRecyclerView();
+        setupFilters();
+        observeViewModel();
+
+
+        // fetchUserBillsWithFullFilters();
+        viewModel.fetchMyApartments();
+        viewModel.fetchMyBills(null, null, null, BillStatus.UNPAID);
+    }
+
+    private void initViews(View view) {
+        recyclerView = view.findViewById(R.id.rvUserBills);
+        layoutEmpty = view.findViewById(R.id.layoutUserEmpty);
+        spinnerApartment = view.findViewById(R.id.spinnerUserApartmentFilter);
+        tabLayout = view.findViewById(R.id.tabLayoutUser);
+        chipDate = view.findViewById(R.id.chipDateFilterUser);
+        toggleType = view.findViewById(R.id.toggleUserBillType);
+    }
+
+    private void initViewModel() {
+        UserBillViewModelFactory factory = new UserBillViewModelFactory();
+        viewModel = new ViewModelProvider(this, factory).get(UserBillViewModel.class);
+    }
+
+    private void setupRecyclerView() {
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        userBillAdapter = new UserBillAdapter(new ArrayList<>(), bill -> {
+            if (currentType == InvoiceType.SERVICE) {
+                openBillDetail(bill.getId());
+            } else {
+                openRentDetail(bill.getId());
+            }
+        });
+
+        // Gán vào RecyclerView
+        recyclerView.setAdapter(userBillAdapter);
+//        recyclerView.setAdapter(serviceAdapter);
+    }
+
+    private void setupFilters() {
+        // 1. Toggle Loại hóa đơn
+        toggleType.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
+            if (isChecked) {
+                if (checkedId == R.id.btnTypeService) {
+                    currentType = InvoiceType.SERVICE;
+                    recyclerView.setAdapter(userBillAdapter);
+                } else {
+                    currentType = InvoiceType.RENT;
+//                    recyclerView.setAdapter(rentAdapter);
+                }
+                fetchUserBillsWithFullFilters();
+            }
+        });
+
+        // Trong setupFilters()
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition()) {
+                    case 0: // Cần thanh toán
+                        currentSelectedStatus = BillStatus.UNPAID;
+                        break;
+                    case 1: // Trễ hạn
+                        currentSelectedStatus = BillStatus.LATE;
+                        break;
+                    case 2: // Tất cả
+                        currentSelectedStatus = null;
+                        break;
+                }
+                fetchUserBillsWithFullFilters();
+            }
+
+            @Override public void onTabUnselected(TabLayout.Tab tab) {}
+            @Override public void onTabReselected(TabLayout.Tab tab) {}
+        });
+
+        // 3. Chọn căn hộ (Spinner)
+        spinnerApartment.setOnItemClickListener((parent, v, position, id) -> {
+            UserBillApartmentResponse selected = (UserBillApartmentResponse) parent.getItemAtPosition(position);
+            currentSelectedApartmentId = selected.getApartmentId();
+            fetchUserBillsWithFullFilters();
+        });
+
+        // 4. GIỮ NGUYÊN LOGIC CHIP DATE NHƯ ADMIN
+        updateChipText();
+        chipDate.setOnClickListener(v -> {
+            if (chipDate.isChecked()) {
+                showMonthYearPicker();
+            } else {
+                currentSelectedMonth = null;
+                currentSelectedYear = null;
+                updateChipText();
+                fetchUserBillsWithFullFilters();
+            }
+        });
+    }
+
+    private void updateChipText() {
+        if (currentSelectedMonth == null) {
+            chipDate.setText("Thời gian: Tất cả");
+            chipDate.setChecked(false);
+        } else {
+            chipDate.setText("Tháng " + currentSelectedMonth + "/" + currentSelectedYear);
+            chipDate.setChecked(true);
         }
     }
 
-    @SuppressLint("ResourceAsColor")
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_bills, container, false);
+    private void showMonthYearPicker() {
+        BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_month_year_picker, null);
 
-        // INIT VIEW
-        rvBills = view.findViewById(R.id.rvBills);
-//        tabUnpaid = view.findViewById(R.id.tabUnpaid);
-//        tabHistory = view.findViewById(R.id.tabHistory);
-        tvDebt = view.findViewById(R.id.tvDebt);
-        tvPaid = view.findViewById(R.id.tvPaid);
+        NumberPicker pickerMonth = dialogView.findViewById(R.id.pickerMonth);
+        NumberPicker pickerYear = dialogView.findViewById(R.id.pickerYear);
+        Button btnConfirm = dialogView.findViewById(R.id.btnConfirm);
 
-        rvBills.setLayoutManager(new LinearLayoutManager(getContext()));
+        Calendar cal = Calendar.getInstance();
+        pickerMonth.setMinValue(1);
+        pickerMonth.setMaxValue(12);
+        pickerMonth.setValue(currentSelectedMonth != null ? currentSelectedMonth : cal.get(Calendar.MONTH) + 1);
 
-        // DATA FAKE (sau này replace bằng API)
-        initData();
+        pickerYear.setMinValue(2020);
+        pickerYear.setMaxValue(2030);
+        pickerYear.setValue(currentSelectedYear != null ? currentSelectedYear : cal.get(Calendar.YEAR));
 
-        adapter = new BillAdapter(unpaidList);
-        rvBills.setAdapter(adapter);
+        btnConfirm.setOnClickListener(v -> {
+            currentSelectedMonth = pickerMonth.getValue();
+            currentSelectedYear = pickerYear.getValue();
+            updateChipText();
+            fetchUserBillsWithFullFilters();
+            dialog.dismiss();
+        });
 
-        // SET SUMMARY
+        dialog.setOnCancelListener(d -> {
+            if (currentSelectedMonth == null) chipDate.setChecked(false);
+        });
 
-//        // TAB CLICK
-//        tabUnpaid.setOnClickListener(v -> {
-//            adapter.updateList(unpaidList);
-//            // Sửa tại đây
-//            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
-//            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
-//        });
-
-//        tabHistory.setOnClickListener(v -> {
-//            adapter.updateList(paidList);
-//            // Sửa tại đây
-//            tabHistory.setTextColor(ContextCompat.getColor(getContext(), R.color.primary));
-//            tabUnpaid.setTextColor(ContextCompat.getColor(getContext(), R.color.text_title));
-//        });
-
-        return view;
+        dialog.setContentView(dialogView);
+        dialog.show();
     }
 
+    private void fetchUserBillsWithFullFilters() {
+
+        if (currentType == InvoiceType.SERVICE) {
+
+            viewModel.fetchMyBills(currentSelectedMonth, currentSelectedYear, currentSelectedApartmentId, currentSelectedStatus);
+        } else {
+
+        }
+
+        // Ví dụ: viewModel.fetchUserBills(currentSelectedMonth, currentSelectedYear, currentSelectedApartmentId, currentSelectedStatus);
+    }
+
+    private void observeViewModel() {
+
+        viewModel.myApartments.observe(getViewLifecycleOwner(), apartments -> {
+            if (apartments != null) {
+                List<UserBillApartmentResponse> filterList = new ArrayList<>();
+
+                // Thêm lựa chọn "Tất cả căn hộ"
+                UserBillApartmentResponse allOption = new UserBillApartmentResponse();
+                allOption.setRoomNumber("Tất cả căn hộ");
+                allOption.setApartmentId(null); // Để null để API lấy tất cả
+                filterList.add(allOption);
+
+                filterList.addAll(apartments);
+
+                ArrayAdapter<UserBillApartmentResponse> adapter = new ArrayAdapter<>(
+                        requireContext(),
+                        android.R.layout.simple_dropdown_item_1line,
+                        filterList);
+                spinnerApartment.setAdapter(adapter);
+
+                // Nếu chỉ có 1 căn, tự động chọn và khóa lại (không cho chọn "Tất cả")
+                if (apartments.size() == 1) {
+                    currentSelectedApartmentId = apartments.get(0).getApartmentId();
+                    spinnerApartment.setText(apartments.get(0).getRoomNumber(), false);
+                    spinnerApartment.setEnabled(false);
+                } else {
+                    // Mặc định hiển thị "Tất cả căn hộ" khi mới load
+                    spinnerApartment.setText("Tất cả căn hộ", false);
+                    spinnerApartment.setEnabled(true);
+                }
+            }
+        });
+
+        viewModel.bills.observe(getViewLifecycleOwner(), bills -> {
+            if (bills == null || bills.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                layoutEmpty.setVisibility(View.VISIBLE);
+            } else {
+                userBillAdapter.updateList(bills);
+                recyclerView.setVisibility(View.VISIBLE);
+                layoutEmpty.setVisibility(View.GONE);
+            }
+        });
+        viewModel.error.observe(getViewLifecycleOwner(), msg -> {
+            if (msg != null) {
+                Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Theo dõi lỗi (nếu có)
 
 
-    private void initData() {
-//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
-//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
-//        unpaidList.add(new Bill(101, "2023-10-01", 1, 850000.0, 200000.0, 10, null, 50000.0, 350000.0, "UNPAID", 1450000.0, 2023)); unpaidList.add(new Bill(102, "2023-10-02", 2, 920000.0, 200000.0, 10, null, 50000.0, 410000.0, "UNPAID", 1580000.0, 2023)); unpaidList.add(new Bill(103, "2023-10-03", 3, 500000.0, 200000.0, 10, null, 50000.0, 150000.0, "UNPAID", 900000.0, 2023));
+        // ... Observe các LiveData bills và rentInvoices tương tự Admin ...
+    }
+
+    private void openBillDetail(long billId) {
+        UserBillDetailFragment detailFragment = UserBillDetailFragment.newInstance(billId);
+
+        getParentFragmentManager().beginTransaction()
+                // THAY R.id.admin_fragment_container bằng ID container trong layout của bạn
+                .replace(R.id.main_fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
+    private void openRentDetail(long rentId) {
+//        UserRentDetailFragment detailFragment = UserRentDetailFragment.newInstance(rentId);
 //
-//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
-//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
-//        paidList.add(new Bill(101, "2023-09-01", 4, 750000.0, 200000.0, 9, "2023-09-05", 50000.0, 300000.0, "PAID", 1300000.0, 2023)); paidList.add(new Bill(104, "2023-09-01", 5, 600000.0, 200000.0, 9, "2023-09-07", 50000.0, 250000.0, "PAID", 1100000.0, 2023)); paidList.add(new Bill(105, "2023-08-01", 6, 880000.0, 200000.0, 8, "2023-08-10", 50000.0, 320000.0, "PAID", 1450000.0, 2023));
+//        getParentFragmentManager().beginTransaction()
+//                .replace(R.id.fragment_container, detailFragment)
+//                .addToBackStack(null)
+//                .commit();
     }
+
+    private enum InvoiceType { SERVICE, RENT }
 }

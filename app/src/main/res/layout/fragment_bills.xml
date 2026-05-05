@@ -4,12 +4,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="#F0F2F5">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:background="@color/white"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -25,158 +25,165 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:paddingHorizontal="16dp">
+                    android:layout_height="140dp"
+                    android:background="@color/primary"
+                    android:padding="20dp">
 
-                    <ImageView
-                        android:id="@+id/btnBack"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_centerVertical="true"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:padding="4dp"
-                        android:src="@drawable/ic_back"
-                        app:tint="#1A1A1A" />
-
-                    <TextView
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_centerInParent="true"
-                        android:text="Thanh toán"
-                        android:textColor="#1A1A1A"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+                        android:layout_centerVertical="true"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Hóa đơn cá nhân"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvUserSubTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Theo dõi và thanh toán các khoản phí"
+                            android:textColor="#CCFFFFFF"
+                            android:textSize="13sp" />
+                    </LinearLayout>
                 </RelativeLayout>
 
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginTop="8dp"
-                    app:cardBackgroundColor="@color/primary"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp">
+                    android:layout_marginTop="-30dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="6dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:padding="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Tổng dư nợ hiện tại"
-                            android:textColor="#E0E0E0"
-                            android:textSize="13sp" />
-
-                        <TextView
-                            android:id="@+id/tvDebt"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="1.200.000đ"
-                            android:textColor="@android:color/white"
-                            android:textSize="28sp"
-                            android:textStyle="bold" />
-
-                        <View
+                        <com.google.android.material.textfield.TextInputLayout
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="16dp"
-                            android:alpha="0.2"
-                            android:background="@android:color/white" />
+                            android:layout_height="wrap_content"
+                            android:hint="Căn hộ của bạn"
+                            app:startIconDrawable="@drawable/ic_apartment">
+                            <AutoCompleteTextView
+                                android:id="@+id/spinnerUserApartmentFilter"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="none" />
+                        </com.google.android.material.textfield.TextInputLayout>
 
-                        <RelativeLayout
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                            <TextView
+                            <com.google.android.material.button.MaterialButtonToggleGroup
+                                android:id="@+id/toggleUserBillType"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:checkedButton="@+id/btnTypeService"
+                                app:singleSelection="true"
+                                app:selectionRequired="true">
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnTypeService"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Dịch vụ"
+                                    android:textSize="11sp"/>
+                                <com.google.android.material.button.MaterialButton
+                                    android:id="@+id/btnTypeRent"
+                                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Tiền thuê"
+                                    android:textSize="11sp"/>
+                            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipDateFilterUser"
+                                style="@style/Widget.MaterialComponents.Chip.Filter"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Đã thanh toán (Tháng này)"
-                                android:textColor="#E0E0E0"
-                                android:textSize="12sp" />
-
-                            <TextView
-                                android:id="@+id/tvPaid"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"
-                                android:text="4.500.000đ"
-                                android:textColor="@android:color/white"
-                                android:textStyle="bold" />
-                        </RelativeLayout>
+                                android:layout_marginStart="8dp"
+                                android:text="Tháng"
+                                app:chipIcon="@drawable/ic_calendar" />
+                        </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
             </LinearLayout>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
         <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabLayout"
+            android:id="@+id/tabLayoutUser"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
+            android:background="@android:color/white"
             app:tabIndicatorFullWidth="false"
-            app:tabIndicatorHeight="3dp"
-            app:tabRippleColor="@null"
+            app:tabIndicatorColor="@color/primary"
             app:tabSelectedTextColor="@color/primary"
-            app:tabTextAppearance="@style/TextAppearance.MaterialComponents.Button"
-            app:tabTextColor="#757575">
+            app:tabTextColor="#757575"
+            app:tabMode="fixed"> <!-- Đảm bảo các tab chia đều màn hình -->
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Chưa thanh toán" />
+                android:text="Cần thanh toán" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Lịch sử" />
+                android:text="Trễ hạn" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tất cả" />
+
         </com.google.android.material.tabs.TabLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvUserBills"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="80dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <LinearLayout
+        android:id="@+id/layoutUserEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <LinearLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_empty_bill"
+            app:tint="#DDDDDD" />
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:id="@+id/layoutEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                >
-
-                <ImageView
-                    android:layout_width="70dp"
-                    android:layout_height="70dp"
-                    android:alpha="0.5"
-                    android:src="@drawable/ic_empty_bill" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Tuyệt vời! Bạn không còn hóa đơn nào."
-                    android:textColor="#9E9E9E" />
-            </LinearLayout>
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvBills"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:paddingBottom="80dp" />
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
+            android:layout_marginTop="12dp"
+            android:text="Không có hóa đơn nào"
+            android:textColor="#999999" />
+    </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
