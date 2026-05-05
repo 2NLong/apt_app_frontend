@@ -2,11 +2,13 @@ package com.ptithcm.apt.repositoris;
 
 import androidx.lifecycle.MutableLiveData;
 import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillDetailResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.network.api.UserBillApiService;
 import java.util.List;
 import retrofit2.Call;
@@ -74,5 +76,35 @@ public class UserBillRepository {
                 error.setValue(t.getMessage());
             }
         });
+    }
+
+    public void getMyRentInvoices(Integer month, Integer year, Long apartmentId, BillStatus status,
+            MutableLiveData<List<UserRentInvoiceListResponse>> data,
+            MutableLiveData<String> error,
+            MutableLiveData<Boolean> loading) {
+        loading.setValue(true);
+
+        String statusStr = (status != null) ? status.name() : null;
+
+        apiService.getMyRentInvoices(month, year, apartmentId, statusStr, 0, 50)
+                .enqueue(new Callback<ApiResponse<PageResponse<UserRentInvoiceListResponse>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<PageResponse<UserRentInvoiceListResponse>>> call,
+                            Response<ApiResponse<PageResponse<UserRentInvoiceListResponse>>> response) {
+                        loading.setValue(false);
+                        if (response.isSuccessful() && response.body() != null) {
+                            // Trả về danh sách content từ PageResponse
+                            data.setValue(response.body().getData().getContent());
+                        } else {
+                            error.setValue("Lỗi tải tiền thuê: " + response.code());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<PageResponse<UserRentInvoiceListResponse>>> call, Throwable t) {
+                        loading.setValue(false);
+                        error.setValue("Lỗi kết nối: " + t.getMessage());
+                    }
+                });
     }
 }

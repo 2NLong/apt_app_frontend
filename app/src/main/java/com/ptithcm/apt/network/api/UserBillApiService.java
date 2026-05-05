@@ -6,6 +6,7 @@ import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillDetailResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 
 import java.util.List;
 
@@ -30,4 +31,14 @@ public interface UserBillApiService {
 
     @GET("api/v1/me/bills/{id}")
     Call<ApiResponse<UserBillDetailResponse>> getBillDetail(@Path("id") Long id);
+
+    @GET("api/v1/me/rent-invoices")
+    Call<ApiResponse<PageResponse<UserRentInvoiceListResponse>>> getMyRentInvoices(
+            @Query("month") Integer month,
+            @Query("year") Integer year,
+            @Query("apartmentId") Long apartmentId,
+            @Query("status") String status,
+            @Query("page") int page,
+            @Query("size") int size
+    );
 }

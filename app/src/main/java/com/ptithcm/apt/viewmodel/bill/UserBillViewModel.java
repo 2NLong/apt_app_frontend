@@ -5,8 +5,10 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.ptithcm.apt.enums.BillStatus;
+import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.repositoris.UserBillRepository;
 
 import java.util.List;
@@ -22,6 +24,13 @@ public class UserBillViewModel extends ViewModel {
     public LiveData<List<UserBillApartmentResponse>> myApartments = _myApartments;
     public void fetchMyApartments() {
         repository.getMyApartments(_myApartments, error);
+    }
+
+    private final MutableLiveData<List<UserRentInvoiceListResponse>> _rentInvoices = new MutableLiveData<>();
+    public LiveData<List<UserRentInvoiceListResponse>> rentInvoices = _rentInvoices;
+
+    public void fetchMyRentInvoices(Integer month, Integer year, Long apartmentId, BillStatus status) {
+        repository.getMyRentInvoices(month, year, apartmentId, status, _rentInvoices, error, isLoading);
     }
 
     public UserBillViewModel(UserBillRepository repository) { this.repository = repository; }

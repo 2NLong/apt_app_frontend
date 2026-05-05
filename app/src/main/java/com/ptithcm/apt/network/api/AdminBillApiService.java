@@ -42,7 +42,7 @@ public interface AdminBillApiService {
     Call<ApiResponse<AdminBillDetailResponse>> getBillDetail(@Path("id") Long id);
 
     // Lấy danh sách căn hộ
-    @GET("api/v1/admin/apartments")
+    @GET("api/v1/apartments")
     Call<PageResponse<BillApartmentResponse>> getBillApartments(@Query("page") int page);
 
     // Lấy chỉ số cũ

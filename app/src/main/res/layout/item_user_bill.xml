@@ -4,9 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:background="@drawable/bg_card"
-    android:orientation="vertical"
-    android:padding="16dp">>
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="#F0F0F0"
+    app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,6 +16,7 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,7 +26,7 @@
             <ImageView
                 android:layout_width="38dp"
                 android:layout_height="38dp"
-                android:background="@color/background_color"
+                android:background="#F0F2F5"
                 android:padding="8dp"
                 android:src="@drawable/ic_apartment"
                 app:tint="@color/primary" />
@@ -57,12 +60,10 @@
                 android:id="@+id/tvStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/background_color"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="4dp"
+                android:paddingStart="8dp"
                 android:text="Chưa thanh toán"
                 android:textColor="#FF9800"
-                android:textSize="10sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -72,6 +73,7 @@
             android:layout_marginVertical="12dp"
             android:background="#F0F0F0" />
 
+        <!-- Chi tiết phí -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -98,10 +100,11 @@
             </RelativeLayout>
         </LinearLayout>
 
+        <!-- Hạn thanh toán -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:gravity="end|center_vertical"
             android:orientation="horizontal">
 
@@ -122,6 +125,7 @@
                 android:textStyle="italic" />
         </LinearLayout>
 
+        <!-- Tổng phí -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -149,6 +153,7 @@
                 android:textStyle="bold" />
         </RelativeLayout>
 
+        <!-- Footer: Vai trò & Khách thuê -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -169,7 +174,7 @@
                 android:id="@+id/tvTenantName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Khách thuê: Nguyễn Văn A"
+                android:text="Khách thuê: --"
                 android:textColor="#616161"
                 android:textSize="11sp"
                 android:textStyle="italic"
