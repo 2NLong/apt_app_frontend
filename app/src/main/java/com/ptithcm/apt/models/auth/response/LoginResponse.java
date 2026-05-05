@@ -24,12 +24,16 @@ public class LoginResponse {
 
         private String role;
 
+        private String residentName;
+
         public Long getId() { return id; }
         public String getUsername() { return username; }
         public String getRole() { return role; }
+        public String getResidentName() { return residentName; }
 
         public void setId(Long id) { this.id = id; }
         public void setUsername(String username) { this.username = username; }
         public void setRole(String role) { this.role = role; }
+        public void setResidentName(String residentName) { this.residentName = residentName; }
     }
 }

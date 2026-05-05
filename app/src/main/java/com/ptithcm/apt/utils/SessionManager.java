@@ -17,6 +17,7 @@ public class SessionManager {
     private static final String KEY_USERNAME = "username";
     private static final String KEY_ROLE = "role";
     private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_RESIDENT_NAME = "resident_name";
 
     private static volatile SessionManager instance;
     private final SharedPreferences prefs;
@@ -58,13 +59,14 @@ public class SessionManager {
      * Lưu toàn bộ session sau khi đăng nhập thành công.
      */
     public void saveSession(String accessToken, String refreshToken,
-            Long userId, String username, String role) {
+            Long userId, String username, String role, String residentName) {
         prefs.edit()
                 .putString(KEY_ACCESS_TOKEN, accessToken)
                 .putString(KEY_REFRESH_TOKEN, refreshToken)
                 .putString(KEY_USERNAME, username)
                 .putString(KEY_ROLE, role)
                 .putLong(KEY_USER_ID, userId != null ? userId : -1L)
+                .putString(KEY_RESIDENT_NAME, residentName)
                 .apply();
     }
 
@@ -107,6 +109,10 @@ public class SessionManager {
 
     public long getUserId() {
         return prefs.getLong(KEY_USER_ID, -1L);
+    }
+
+    public String getResidentName() {
+        return prefs.getString(KEY_RESIDENT_NAME, null);
     }
 
     /**

@@ -77,9 +77,20 @@ public class TokenAuthenticator implements Authenticator {
                         && refreshResponse.body().getStatus() == 200) {
 
                     LoginResponse newTokens = refreshResponse.body().getData();
-                    sessionManager.updateTokens(
-                            newTokens.getAccessToken(),
-                            newTokens.getRefreshToken());
+                    LoginResponse.UserInfo user = newTokens.getUser();
+                    if (user != null) {
+                        sessionManager.saveSession(
+                                newTokens.getAccessToken(),
+                                newTokens.getRefreshToken(),
+                                user.getId(),
+                                user.getUsername(),
+                                user.getRole(),
+                                user.getResidentName());
+                    } else {
+                        sessionManager.updateTokens(
+                                newTokens.getAccessToken(),
+                                newTokens.getRefreshToken());
+                    }
 
                     // Retry request gốc với token mới
                     return response.request().newBuilder()

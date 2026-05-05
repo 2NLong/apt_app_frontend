@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.ptithcm.apt.R;
+import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModel;
 import com.ptithcm.apt.viewmodel.auth.ForgotPasswordViewModelFactory;
@@ -67,18 +68,38 @@ public class ResetPasswordFragment extends Fragment {
 
         viewModel.isLoading.observe(getViewLifecycleOwner(), isLoading -> {
             if (isLoading != null && isLoading) {
-                btnResetPassword.setEnabled(false);
-                btnResetPassword.setText("Đang đặt lại...");
+                DialogUtils.showLoadingDialog(requireContext(), "Đang đặt lại mật khẩu...");
             } else {
-                btnResetPassword.setEnabled(true);
-                btnResetPassword.setText("Đặt lại mật khẩu");
+                DialogUtils.hideLoadingDialog();
             }
         });
 
         btnResetPassword.setOnClickListener(v -> {
-            String newPassword = etNewPassword.getText().toString();
-            String confirmPassword = etConfirmPassword.getText().toString();
-            viewModel.resetPassword(newPassword, confirmPassword);
+            String newPassword = etNewPassword.getText().toString().trim();
+            String confirmPassword = etConfirmPassword.getText().toString().trim();
+
+            if (newPassword.isEmpty()) {
+                ToastUtils.showErrorToast(requireContext(), "Vui lòng nhập mật khẩu mới");
+                return;
+            }
+            if (newPassword.length() < 6) {
+                ToastUtils.showErrorToast(requireContext(), "Mật khẩu phải có ít nhất 6 ký tự");
+                return;
+            }
+            if (confirmPassword.isEmpty()) {
+                ToastUtils.showErrorToast(requireContext(), "Vui lòng xác nhận mật khẩu mới");
+                return;
+            }
+            if (!newPassword.equals(confirmPassword)) {
+                ToastUtils.showErrorToast(requireContext(), "Mật khẩu xác nhận không khớp");
+                return;
+            }
+
+            DialogUtils.showConfirmDialog(requireContext(),
+                    "Đặt lại mật khẩu",
+                    "Bạn có chắc chắn muốn đặt lại mật khẩu mới không?",
+                    () -> viewModel.resetPassword(newPassword, confirmPassword)
+            );
         });
 
         tvBackToLogin.setOnClickListener(v -> {
