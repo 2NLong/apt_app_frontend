@@ -29,6 +29,7 @@ import com.ptithcm.apt.adapters.rentinvoice.UserRentAdapter;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.fragments.bill.UserBillDetailFragment;
+import com.ptithcm.apt.fragments.rentinvoice.UserRentInvoiceDetailFragment;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
@@ -244,9 +245,12 @@ public class BillsFragment extends Fragment {
     }
 
     private void openRentDetail(long rentId) {
-        // Tương tự cho chi tiết tiền thuê nếu có màn hình riêng
-        // UserRentDetailFragment fragment = UserRentDetailFragment.newInstance(rentId);
-        // getParentFragmentManager().beginTransaction().replace(R.id.main_fragment_container, fragment).addToBackStack(null).commit();
+        UserRentInvoiceDetailFragment detailFragment = UserRentInvoiceDetailFragment.newInstance((int) rentId);
+
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.main_fragment_container, detailFragment)
+                .addToBackStack(null)
+                .commit();
     }
 
     private void updateChipText() {

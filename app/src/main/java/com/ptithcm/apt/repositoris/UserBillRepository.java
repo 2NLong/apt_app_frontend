@@ -8,6 +8,7 @@ import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillDetailResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceDetailResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.network.api.UserBillApiService;
 import java.util.List;
@@ -106,5 +107,27 @@ public class UserBillRepository {
                         error.setValue("Lỗi kết nối: " + t.getMessage());
                     }
                 });
+    }
+
+    public void getRentInvoiceDetail(int id,
+            MutableLiveData<UserRentInvoiceDetailResponse> data,
+            MutableLiveData<String> error) {
+        apiService.getRentInvoiceDetail(id).enqueue(new Callback<ApiResponse<UserRentInvoiceDetailResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<UserRentInvoiceDetailResponse>> call,
+                    Response<ApiResponse<UserRentInvoiceDetailResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Ánh xạ đúng dữ liệu từ trường data của ApiResponse
+                    data.setValue(response.body().getData());
+                } else {
+                    error.setValue("Không thể tải chi tiết hóa đơn thuê");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<UserRentInvoiceDetailResponse>> call, Throwable t) {
+                error.setValue("Lỗi mạng: " + t.getMessage());
+            }
+        });
     }
 }

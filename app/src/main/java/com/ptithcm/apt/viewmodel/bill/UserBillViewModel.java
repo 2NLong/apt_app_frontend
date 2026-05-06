@@ -8,6 +8,7 @@ import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceDetailResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.repositoris.UserBillRepository;
 
@@ -33,6 +34,12 @@ public class UserBillViewModel extends ViewModel {
         repository.getMyRentInvoices(month, year, apartmentId, status, _rentInvoices, error, isLoading);
     }
 
+    private final MutableLiveData<UserRentInvoiceDetailResponse> _rentInvoiceDetail = new MutableLiveData<>();
+    public LiveData<UserRentInvoiceDetailResponse> rentInvoiceDetail = _rentInvoiceDetail;
+
+    public void fetchRentInvoiceDetail(int id) {
+        repository.getRentInvoiceDetail(id, _rentInvoiceDetail, error);
+    }
     public UserBillViewModel(UserBillRepository repository) { this.repository = repository; }
 
     public void fetchMyBills(Integer month, Integer year, Long apartmentId, BillStatus status) {

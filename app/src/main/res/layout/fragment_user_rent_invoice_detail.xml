@@ -4,16 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F9FA"
-    android:orientation="vertical"
-    android:clickable="true"
-    android:focusable="true">
+    android:orientation="vertical">
 
     <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary"
-        android:elevation="4dp"
         android:paddingHorizontal="16dp">
 
         <ImageView
@@ -28,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="Chi tiết Hóa Đơn"
+            android:text="Chi tiết Hóa Đơn Thuê"
             android:textColor="@color/white"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -36,9 +33,7 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:clipToPadding="false"
-        android:paddingBottom="24dp">
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -62,18 +57,17 @@
                     android:padding="28dp">
 
                     <TextView
-                        android:id="@+id/tvDetailStatus"
+                        android:id="@+id/tvRentDetailStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:paddingHorizontal="16dp"
                         android:paddingVertical="6dp"
-                        android:text="CHƯA THANH TOÁN"
-                        android:textColor="#FF9800"
-                        android:textSize="11sp"
+                        android:text="--"
+                        android:textSize="12sp"
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvDetailTotal"
+                        android:id="@+id/tvRentDetailAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="16dp"
@@ -83,31 +77,21 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/tvDetailBillingMonth"
+                        android:id="@+id/tvRentDetailBillingMonth"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Hóa đơn tháng --/----"
+                        android:text="Tiền thuê tháng --/----"
                         android:textColor="#757575"
                         android:textSize="14sp" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="20dp"
-                android:text="Thông tin phí chi tiết"
-                android:textAllCaps="true"
-                android:textColor="#666666"
-                android:textSize="11sp"
-                android:textStyle="bold" />
-
+            <!-- Chi tiết phí -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="1dp">
 
@@ -118,54 +102,38 @@
                     android:padding="16dp">
 
                     <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Mã căn hộ" />
-                        <TextView android:id="@+id/tvDetailRoom" style="@style/DetailValue" android:textStyle="bold" android:text="--" />
+                        <TextView style="@style/DetailLabel" android:text="Căn hộ" />
+                        <TextView android:id="@+id/tvRentDetailRoom" style="@style/DetailValueBold" android:text="--" />
                     </RelativeLayout>
 
-                    <View style="@style/Divider" android:layout_marginVertical="8dp" />
-
+                    <!-- Dòng hiển thị giá thuê chi tiết -->
                     <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Tiền điện" />
-                        <TextView android:id="@+id/tvDetailElectric" style="@style/DetailValueBold" android:text="0đ" />
-                    </RelativeLayout>
-
-                    <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Tiền nước" />
-                        <TextView android:id="@+id/tvDetailWater" style="@style/DetailValueBold" android:text="0đ" />
-                    </RelativeLayout>
-
-                    <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Phí quản lý" />
-                        <TextView android:id="@+id/tvDetailManagement" style="@style/DetailValueBold" android:text="0đ" />
-                    </RelativeLayout>
-
-                    <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Phí vệ sinh" />
-                        <TextView android:id="@+id/tvDetailSanitation" style="@style/DetailValueBold" android:text="0đ" />
+                        <TextView style="@style/DetailLabel" android:text="Tiền thuê nhà" />
+                        <TextView android:id="@+id/tvRentDetailPrice" style="@style/DetailValueBold" android:text="0đ" />
                     </RelativeLayout>
 
                     <View style="@style/Divider" android:layout_marginVertical="12dp" />
 
                     <RelativeLayout style="@style/DetailRow">
                         <TextView style="@style/DetailLabel" android:text="Ngày tạo" />
-                        <TextView android:id="@+id/tvDetailCreatedAt" style="@style/DetailValue" android:text="--" />
+                        <TextView android:id="@+id/tvRentDetailCreatedAt" style="@style/DetailValue" android:text="--" />
                     </RelativeLayout>
 
                     <RelativeLayout style="@style/DetailRow">
                         <TextView style="@style/DetailLabel" android:text="Hạn thanh toán" />
-                        <TextView android:id="@+id/tvDetailDueDate" style="@style/DetailValue" android:textColor="#E53935" android:textStyle="bold" android:text="--" />
+                        <TextView android:id="@+id/tvRentDetailDueDate" style="@style/DetailValue" android:textColor="#E53935" android:textStyle="bold" android:text="--" />
                     </RelativeLayout>
 
-                    <RelativeLayout style="@style/DetailRow">
-                        <TextView style="@style/DetailLabel" android:text="Ngày xác nhận" />
-                        <TextView android:id="@+id/tvDetailPaidAt" style="@style/DetailValue" android:textColor="#43A047" android:textStyle="bold" android:text="--" />
+                    <RelativeLayout android:id="@+id/layoutPaidAt" style="@style/DetailRow">
+                        <TextView style="@style/DetailLabel" android:text="Ngày thanh toán" />
+                        <TextView android:id="@+id/tvRentDetailPaidAt" style="@style/DetailValue" android:textColor="#43A047" android:textStyle="bold" android:text="--" />
                     </RelativeLayout>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
-            <!-- Card Lưu ý (Sử dụng ic_info hoặc ic_money) -->
+            <!-- Hướng dẫn thanh toán -->
             <androidx.cardview.widget.CardView
-                android:id="@+id/layoutPaymentNote"
+                android:id="@+id/layoutRentPaymentNote"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
@@ -190,8 +158,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
-                        android:lineSpacingExtra="2dp"
-                        android:text="Vui lòng đến văn phòng Ban quản lý để thanh toán. Trạng thái sẽ được cập nhật sau khi quản trị viên duyệt."
+                        android:text="Vui lòng đến văn phòng Ban quản lý để thanh toán. Trạng thái sẽ cập nhật sau khi duyệt."
                         android:textColor="#AF7B00"
                         android:textSize="12sp" />
                 </LinearLayout>

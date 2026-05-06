@@ -6,6 +6,7 @@ import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.UserBillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.UserBillDetailResponse;
 import com.ptithcm.apt.models.bill.response.UserBillListResponse;
+import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceDetailResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 
 import java.util.List;
@@ -41,4 +42,7 @@ public interface UserBillApiService {
             @Query("page") int page,
             @Query("size") int size
     );
+
+    @GET("api/v1/me/rent-invoices/{id}")
+    Call<ApiResponse<UserRentInvoiceDetailResponse>> getRentInvoiceDetail(@Path("id") int id);
 }
