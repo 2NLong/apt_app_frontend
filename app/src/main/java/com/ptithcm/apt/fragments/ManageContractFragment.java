@@ -17,6 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +73,10 @@ public class ManageContractFragment extends Fragment {
         );
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        Toolbar toolbar = view.findViewById(R.id.toolbar_manage_contract);
+        toolbar.setNavigationOnClickListener(v -> {
+            requireActivity().onBackPressed();
+        });
         searchSpinnerRole.setAdapter(spinnerAdapter);
         rvContracts = view.findViewById(R.id.rv_contracts);
         edtSearch = view.findViewById(R.id.edt_search_contract);
@@ -94,7 +99,18 @@ public class ManageContractFragment extends Fragment {
         rvContracts.setAdapter(adapter);
 
         fabAddContract.setOnClickListener(v -> {
-            Toast.makeText(getContext(), "Vui lòng vào Chi tiết phòng để thêm hợp đồng!", Toast.LENGTH_LONG).show();
+
+            Bundle bundle = new Bundle();
+            bundle.putLong("APARTMENT_ID", -1L);
+
+            CreateContractFragment createFragment = new CreateContractFragment();
+            createFragment.setArguments(bundle);
+
+            requireActivity().getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.admin_fragment_container, createFragment)
+                    .addToBackStack(null)
+                    .commit();
         });
 
         // 3. Setup Events
@@ -108,7 +124,6 @@ public class ManageContractFragment extends Fragment {
         return view;
     }
 
-    // HÀM GỌI API
     private void fetchContracts(String keyword,String role, int page) {
         ContractApiService apiService = RetrofitClient.getInstance().createService(ContractApiService.class);
         apiService.getAllContracts(keyword,role, page, 5).enqueue(new Callback<ContractPageResponse>() {
@@ -137,7 +152,6 @@ public class ManageContractFragment extends Fragment {
         });
     }
 
-    // --- PHÂN TRANG ---
     private void setupPaginationListeners() {
         btnPrev.setOnClickListener(v -> {
             if (currentPage > 0) fetchContracts(currentKeyword, currentRole,currentPage - 1);
@@ -185,7 +199,7 @@ public class ManageContractFragment extends Fragment {
                 } else if (selected.equals("OWNER")) {
                     currentRole = "OWNER";
                 } else {
-                    currentRole = null; // Tất cả
+                    currentRole = null;
                 }
 
                 fetchContracts(currentKeyword, currentRole, 0);

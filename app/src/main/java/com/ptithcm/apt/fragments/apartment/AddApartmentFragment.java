@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import androidx.appcompat.widget.Toolbar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +37,8 @@ public class AddApartmentFragment extends Fragment {
     private TextInputEditText edtRoomNumber, edtFloor, edtArea;
     private Spinner spinnerStatus;
     private Button btnSave;
-    private String[] statusRaw = { "AVAILABLE", "RENTED", "OWNED" };
+    private Toolbar toolbarAdd;
+    private String[] statusRaw = { "AVAILABLE" };
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -57,6 +59,7 @@ public class AddApartmentFragment extends Fragment {
         edtArea = view.findViewById(R.id.edt_add_area);
         spinnerStatus = view.findViewById(R.id.spinner_add_status);
         btnSave = view.findViewById(R.id.btn_add_save);
+        toolbarAdd = view.findViewById(R.id.toolbar_add);
     }
 
     private void setupSpinner() {
@@ -67,6 +70,8 @@ public class AddApartmentFragment extends Fragment {
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerStatus.setAdapter(adapter);
+
+        spinnerStatus.setEnabled(false);
     }
 
     /**
@@ -104,6 +109,10 @@ public class AddApartmentFragment extends Fragment {
         initViews(view);
         setupSpinner();
 
+        toolbarAdd.setNavigationOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         btnSave.setOnClickListener(v -> handleAddApartment());
 
         return view;
@@ -114,7 +123,7 @@ public class AddApartmentFragment extends Fragment {
         String room = edtRoomNumber.getText().toString().trim();
         String floor = edtFloor.getText().toString().trim();
         String area = edtArea.getText().toString().trim();
-        String status = statusRaw[spinnerStatus.getSelectedItemPosition()];
+        String status = statusRaw[0];
 
         // 2. Kiểm tra rỗng (Validation)
         if (room.isEmpty() || floor.isEmpty() || area.isEmpty()) {

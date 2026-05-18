@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.apt.R;
@@ -112,6 +113,10 @@ public class ManageApartmentFragment extends Fragment {
         // Nạp giao diện vào biến 'view'
         View view = inflater.inflate(R.layout.fragment_manage_apartment, container, false);
 
+        Toolbar toolbar = view.findViewById(R.id.toolbar_apartment);
+        toolbar.setNavigationOnClickListener(v -> {
+            requireActivity().onBackPressed();
+        });
         rvApartments = view.findViewById(R.id.rv_apartments);
         edtSearch = view.findViewById(R.id.edt_search);
 
@@ -130,10 +135,8 @@ public class ManageApartmentFragment extends Fragment {
         });
 
         rvApartments.setLayoutManager(new LinearLayoutManager(getContext()));
-        // Khởi tạo Adapter và bắt sự kiện click ngay tại đây
         adapter = new ManagerApartmentAdapter(new ArrayList<>(), apartment -> {
 
-            // Nhờ có khai báo "apartment ->" ở dòng trên, bây giờ máy đã hiểu "apartment" là gì!
             Bundle bundle = new Bundle();
             bundle.putLong("APARTMENT_ID", apartment.getId());
 
@@ -147,7 +150,6 @@ public class ManageApartmentFragment extends Fragment {
                     .commit();
         });
 
-        // Nhớ set lại adapter cho RecyclerView
         rvApartments.setAdapter(adapter);
         rvApartments.setAdapter(adapter);
 
@@ -155,7 +157,6 @@ public class ManageApartmentFragment extends Fragment {
         setupSearchListener();
         setupFilterSpinner();
 
-        // Gọi trang đầu tiên (index 0)
         fetchApartmentsByPage(0);
 
         return view;
@@ -174,9 +175,7 @@ public class ManageApartmentFragment extends Fragment {
 
                     // Cập nhật thông số trang
                     totalPages = pageResponse.getTotalPages();
-                    currentPage = pageResponse.getNumber(); // Backend trả về trang mấy thì gán vào
-
-                    // Hiển thị ra màn hình (Cộng 1 vì User đếm từ 1, Backend đếm từ 0)
+                    currentPage = pageResponse.getNumber();
                     tvPageInfo.setText((currentPage + 1) + " / " + Math.max(1, totalPages));
 
                     // Cập nhật trạng thái nút

@@ -21,6 +21,8 @@ import com.ptithcm.apt.network.retrofit.RetrofitClient;
 
 import org.json.JSONObject;
 
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -84,12 +86,11 @@ public class UpdateResidentFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_update_resident, container, false);
 
-        // 2. Lấy ID từ màn hình danh sách truyền sang
+        // Lấy ID từ màn hình danh sách truyền sang
         if (getArguments() != null) {
             residentId = getArguments().getLong("RESIDENT_ID", -1L);
         }
 
-        // 3. GỌI CÁC HÀM KHỞI TẠO VÀ TẢI DỮ LIỆU TẠI ĐÂY
         initViews(view);
         setupEvents();
 
@@ -99,7 +100,6 @@ public class UpdateResidentFragment extends Fragment {
             Toast.makeText(getContext(), "Lỗi: Không nhận được ID Cư dân", Toast.LENGTH_SHORT).show();
         }
 
-        // 4. Cuối cùng mới return
         return view;
     }
 
@@ -115,11 +115,10 @@ public class UpdateResidentFragment extends Fragment {
 
     private void setupEvents() {
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
-
         btnSave.setOnClickListener(v -> updateInfo());
-
-        btnMoveOut.setOnClickListener(v -> showMoveOutConfirm());
+        btnMoveOut.setOnClickListener(v -> handleMoveOutClick());
     }
+
     private void loadDetail() {
         ResidentApiService apiService = RetrofitClient.getInstance().createService(ResidentApiService.class);
         apiService.getResidentDetail(residentId).enqueue(new Callback<ResidentDetailResponse>() {
@@ -140,36 +139,63 @@ public class UpdateResidentFragment extends Fragment {
         });
     }
 
-    private void showMoveOutConfirm() {
-        if (currentResidentData == null) return;
+    private void handleMoveOutClick() {
+        if (currentResidentData == null || currentResidentData.getResidencies() == null || currentResidentData.getResidencies().isEmpty()) {
+            Toast.makeText(getContext(), "Cư dân này hiện không ở phòng nào!", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        // Cảnh báo dựa trên vai trò Head hay Member
-        String message = currentResidentData.getIsHead()
-                ? "CẢNH BÁO: Đây là Chủ hộ! Nếu thực hiện chuyển đi, TẤT CẢ thành viên trong phòng " + currentResidentData.getRoomNumber() + " sẽ bị hệ thống cho dọn đi theo. Bạn chắc chứ?"
-                : "Xác nhận cho cư dân " + currentResidentData.getFullName() + " chuyển ra khỏi phòng " + currentResidentData.getRoomNumber() + "?";
+        List<ResidentDetailResponse.ResidencyInfo> residencies = currentResidentData.getResidencies();
+
+        // 1. Nếu chỉ có 1 phòng -> Bật xác nhận luôn
+        if (residencies.size() == 1) {
+            showMoveOutConfirm(residencies.get(0));
+        }
+        // 2. Nếu có nhiều phòng -> Bật popup chọn phòng muốn chuyển đi
+        else {
+            String[] roomNames = new String[residencies.size()];
+            for (int i = 0; i < residencies.size(); i++) {
+                roomNames[i] = "Phòng " + residencies.get(i).getRoomNumber() + " (" + residencies.get(i).getRole() + ")";
+            }
+
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle("Chọn phòng muốn dọn đi")
+                    .setItems(roomNames, (dialog, which) -> {
+                        showMoveOutConfirm(residencies.get(which));
+                    })
+                    .show();
+        }
+    }
+
+    private void showMoveOutConfirm(ResidentDetailResponse.ResidencyInfo roomInfo) {
+        String message = roomInfo.getIsHead() != null && roomInfo.getIsHead()
+                ? "CẢNH BÁO: Đây là Chủ hộ! Nếu thực hiện chuyển đi, TẤT CẢ thành viên trong phòng " + roomInfo.getRoomNumber() + " sẽ bị hệ thống cho dọn đi theo. Bạn chắc chứ?"
+                : "Xác nhận cho cư dân " + currentResidentData.getFullName() + " chuyển ra khỏi phòng " + roomInfo.getRoomNumber() + "?";
 
         new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Xác nhận chuyển đi")
                 .setMessage(message)
                 .setNegativeButton("Hủy", (d, w) -> d.dismiss())
-                .setPositiveButton("Thực hiện", (d, w) -> callMoveOutApi())
+                .setPositiveButton("Thực hiện", (d, w) -> callMoveOutApi(roomInfo.getApartmentId()))
                 .show();
     }
 
-    private void callMoveOutApi() {
+    private void callMoveOutApi(Long apartmentId) {
         ResidentApiService apiService = RetrofitClient.getInstance().createService(ResidentApiService.class);
-        apiService.moveOutResident(residentId, currentResidentData.getApartmentId()).enqueue(new Callback<Void>() {
+        apiService.moveOutResident(residentId, apartmentId).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Xử lý thành công", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Đã xử lý chuyển đi thành công", Toast.LENGTH_SHORT).show();
                     getParentFragmentManager().popBackStack();
                 } else {
                     handleError(response);
                 }
             }
             @Override
-            public void onFailure(Call<Void> call, Throwable t) { /* Toast lỗi kết nối */ }
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -194,7 +220,7 @@ public class UpdateResidentFragment extends Fragment {
             public void onResponse(Call<ResidentDetailResponse> call, Response<ResidentDetailResponse> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Cập nhật thông tin thành công!", Toast.LENGTH_SHORT).show();
-                    getParentFragmentManager().popBackStack(); // Lưu xong thì lùi về danh sách
+                    getParentFragmentManager().popBackStack();
                 } else {
                     handleError(response);
                 }
@@ -210,7 +236,9 @@ public class UpdateResidentFragment extends Fragment {
     private void handleError(Response<?> response) {
         try {
             JSONObject json = new JSONObject(response.errorBody().string());
-            Toast.makeText(getContext(), json.optString("message", "Lỗi"), Toast.LENGTH_LONG).show();
-        } catch (Exception e) { e.printStackTrace(); }
+            Toast.makeText(getContext(), json.optString("message", "Lỗi xử lý"), Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

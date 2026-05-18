@@ -16,7 +16,7 @@ import java.util.List;
 public class ManagerApartmentAdapter extends RecyclerView.Adapter<ManagerApartmentAdapter.ApartmentViewHolder> {
 
     private List<Apartment> apartmentList;
-    private OnItemClickListener listener; // ĐÃ SỬA: Bỏ cái đường dẫn dài ngoằng trỏ sai package đi
+    private OnItemClickListener listener;
 
     // Interface dùng để bắt sự kiện click
     public interface OnItemClickListener {

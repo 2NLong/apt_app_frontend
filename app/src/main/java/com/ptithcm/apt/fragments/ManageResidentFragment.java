@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -112,6 +113,9 @@ public class ManageResidentFragment extends Fragment {
 
     private void initViews(View view) {
         toolbar = view.findViewById(R.id.toolbar_manage_resident);
+        toolbar.setNavigationOnClickListener(v -> {
+            requireActivity().onBackPressed();
+        });
         rvResidents = view.findViewById(R.id.rv_residents);
         edtSearch = view.findViewById(R.id.edt_search_resident);
         btnPrev = view.findViewById(R.id.btn_prev_page_res);
@@ -139,7 +143,6 @@ public class ManageResidentFragment extends Fragment {
     }
 
     private void setupEvents() {
-        // --- 1. Phân trang ---
         btnPrev.setOnClickListener(v -> {
             if (currentPage > 0) fetchResidents(currentKeyword, currentPage - 1);
         });
@@ -148,7 +151,6 @@ public class ManageResidentFragment extends Fragment {
             if (currentPage < totalPages - 1) fetchResidents(currentKeyword, currentPage + 1);
         });
 
-        // --- 2. Tìm kiếm ---
         edtSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -170,7 +172,6 @@ public class ManageResidentFragment extends Fragment {
             public void afterTextChanged(Editable s) {}
         });
 
-        // --- 3. Bấm dấu Cộng (+) Thêm cư dân ---
         fabAddResident.setOnClickListener(v -> showAddMemberDialog());
     }
 

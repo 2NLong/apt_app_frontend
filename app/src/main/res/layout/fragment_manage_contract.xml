@@ -11,6 +11,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="@color/white"
         android:elevation="4dp"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:title="Quản lý Hợp đồng"
         app:titleTextColor="@color/primary" />
     <EditText
