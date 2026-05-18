@@ -50,7 +50,7 @@ public class AdminBillAdapter extends RecyclerView.Adapter<AdminBillAdapter.View
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_bill, parent, false);
+                .inflate(R.layout.item_admin_bill, parent, false);
         return new ViewHolder(view);
     }
 

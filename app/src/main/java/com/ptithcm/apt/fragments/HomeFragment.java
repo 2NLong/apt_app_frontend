@@ -23,6 +23,7 @@ import com.ptithcm.apt.network.retrofit.RetrofitClient;
 import com.ptithcm.apt.repositoris.ServiceConfigRepository;
 import com.ptithcm.apt.viewmodel.home.HomeViewModel;
 import com.ptithcm.apt.viewmodel.home.HomeViewModelFactory;
+import com.ptithcm.apt.utils.SessionManager;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
@@ -69,6 +70,12 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new HomeServiceConfigAdapter(requireContext());
         recyclerView.setAdapter(adapter);
+
+        // Hiển thị tên cư dân từ session
+        TextView textUserName = view.findViewById(R.id.text_user_name);
+        SessionManager sessionManager = SessionManager.getInstance(requireContext());
+        String residentName = sessionManager.getResidentName();
+        textUserName.setText(residentName != null ? residentName : sessionManager.getUsername());
     }
 
     private void setupDateControls(View view) {

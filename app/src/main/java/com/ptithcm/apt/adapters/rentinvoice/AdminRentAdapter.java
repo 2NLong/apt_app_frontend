@@ -39,7 +39,7 @@ public class AdminRentAdapter extends RecyclerView.Adapter<AdminRentAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_rent_invoice,
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_admin_rent_invoice,
                 parent,
                 false);
         return new ViewHolder(v);

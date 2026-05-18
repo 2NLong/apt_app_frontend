@@ -61,7 +61,8 @@ public class AuthRepository {
                                 loginResponse.getRefreshToken(),
                                 user != null ? user.getId() : null,
                                 user != null ? user.getUsername() : null,
-                                user != null ? user.getRole() : null);
+                                user != null ? user.getRole() : null,
+                                user != null ? user.getResidentName() : null);
 
                         loginResult.postValue(loginResponse);
                     } else {
@@ -71,7 +72,8 @@ public class AuthRepository {
                                         : "Đăng nhập thất bại");
                     }
                 } else {
-                    String msg = ErrorUtils.getErrorMessage(response, "Đăng nhập thất bại (Lỗi: " + response.code() + ")");
+                    String msg = ErrorUtils.getErrorMessage(response,
+                            "Đăng nhập thất bại (Lỗi: " + response.code() + ")");
                     errorMessage.postValue(msg);
                 }
             }
@@ -112,7 +114,8 @@ public class AuthRepository {
                                 loginResponse.getRefreshToken(),
                                 user != null ? user.getId() : null,
                                 user != null ? user.getUsername() : null,
-                                user != null ? user.getRole() : null);
+                                user != null ? user.getRole() : null,
+                                user != null ? user.getResidentName() : null);
 
                         loginResult.postValue(loginResponse);
                     } else {
@@ -122,7 +125,8 @@ public class AuthRepository {
                                         : "Đăng nhập Google thất bại");
                     }
                 } else {
-                    String msg = ErrorUtils.getErrorMessage(response, "Đăng nhập Google thất bại (Lỗi: " + response.code() + ")");
+                    String msg = ErrorUtils.getErrorMessage(response,
+                            "Đăng nhập Google thất bại (Lỗi: " + response.code() + ")");
                     errorMessage.postValue(msg);
                 }
             }
@@ -158,17 +162,29 @@ public class AuthRepository {
                             if (apiResponse.getStatus() == 200 && apiResponse.getData() != null) {
                                 LoginResponse loginResponse = apiResponse.getData();
 
-                                // Cập nhật session mới
-                                sessionManager.updateTokens(
-                                        loginResponse.getAccessToken(),
-                                        loginResponse.getRefreshToken());
+                                // Cập nhật session
+                                LoginResponse.UserInfo user = loginResponse.getUser();
+                                if (user != null) {
+                                    sessionManager.saveSession(
+                                            loginResponse.getAccessToken(),
+                                            loginResponse.getRefreshToken(),
+                                            user.getId(),
+                                            user.getUsername(),
+                                            user.getRole(),
+                                            user.getResidentName());
+                                } else {
+                                    sessionManager.updateTokens(
+                                            loginResponse.getAccessToken(),
+                                            loginResponse.getRefreshToken());
+                                }
 
                                 refreshResult.postValue(loginResponse);
                             } else {
                                 errorMessage.postValue(apiResponse.getMessage());
                             }
                         } else {
-                            String msg = ErrorUtils.getErrorMessage(response, "Làm mới token thất bại (Lỗi: " + response.code() + ")");
+                            String msg = ErrorUtils.getErrorMessage(response,
+                                    "Làm mới token thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
@@ -229,7 +245,8 @@ public class AuthRepository {
                         errorMessage.postValue(apiResponse.getMessage());
                     }
                 } else {
-                    String msg = ErrorUtils.getErrorMessage(response, "Đổi mật khẩu thất bại (Lỗi: " + response.code() + ")");
+                    String msg = ErrorUtils.getErrorMessage(response,
+                            "Đổi mật khẩu thất bại (Lỗi: " + response.code() + ")");
                     errorMessage.postValue(msg);
                 }
             }
@@ -270,7 +287,8 @@ public class AuthRepository {
                                                 : "Gửi OTP thất bại");
                             }
                         } else {
-                            String msg = ErrorUtils.getErrorMessage(response, "Gửi OTP thất bại (Lỗi: " + response.code() + ")");
+                            String msg = ErrorUtils.getErrorMessage(response,
+                                    "Gửi OTP thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
@@ -311,7 +329,8 @@ public class AuthRepository {
                                                 : "Xác thực OTP thất bại");
                             }
                         } else {
-                            String msg = ErrorUtils.getErrorMessage(response, "Xác thực OTP thất bại (Lỗi: " + response.code() + ")");
+                            String msg = ErrorUtils.getErrorMessage(response,
+                                    "Xác thực OTP thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
@@ -352,7 +371,8 @@ public class AuthRepository {
                                                 : "Đặt lại mật khẩu thất bại");
                             }
                         } else {
-                            String msg = ErrorUtils.getErrorMessage(response, "Đặt lại mật khẩu thất bại (Lỗi: " + response.code() + ")");
+                            String msg = ErrorUtils.getErrorMessage(response,
+                                    "Đặt lại mật khẩu thất bại (Lỗi: " + response.code() + ")");
                             errorMessage.postValue(msg);
                         }
                     }
