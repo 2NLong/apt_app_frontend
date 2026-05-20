@@ -55,15 +55,21 @@ public class AdminRentAdapter extends RecyclerView.Adapter<AdminRentAdapter.View
         holder.tvRentAmount.setText(formatter.format(bill.getRentAmount()));
         holder.tvTotal.setText(formatter.format(bill.getRentAmount()));
 
-        // Xử lý status màu sắc (Tương tự AdminBillAdapter nhưng dùng RentStatus)
+
         if (bill.getStatus().name().equals("PAID")) {
             holder.tvStatus.setText("ĐÃ THANH TOÁN");
             holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
             holder.btnConfirm.setVisibility(View.GONE);
+        } else if (bill.getStatus().name().equals("LATE")) {
+            holder.tvStatus.setText("QUÁ HẠN");
+            holder.tvStatus.setTextColor(Color.parseColor("#F44336"));
+            holder.btnConfirm.setVisibility(View.VISIBLE);
+            holder.btnConfirm.setText("Duyệt");
         } else {
             holder.tvStatus.setText("CHƯA THANH TOÁN");
             holder.tvStatus.setTextColor(Color.parseColor("#FF9800"));
             holder.btnConfirm.setVisibility(View.VISIBLE);
+            holder.btnConfirm.setText("Duyệt");
         }
 
         holder.itemView.setOnClickListener(v -> listener.onItemClick(bill));
