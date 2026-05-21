@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -125,7 +124,7 @@ public class AdminBillDetailFragment extends Fragment {
 
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null) {
-                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showErrorToast(requireContext(), errorMsg);
             }
         });
     }

@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,6 +16,7 @@ import com.ptithcm.apt.models.bill.response.UserBillDetailResponse;
 import com.ptithcm.apt.network.api.UserBillApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
 import com.ptithcm.apt.repositoris.UserBillRepository;
+import com.ptithcm.apt.utils.ToastUtils;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -75,7 +75,7 @@ public class UserBillDetailFragment extends Fragment {
         repository.getBillDetail(billId, data, error);
 
         data.observe(getViewLifecycleOwner(), this::updateUI);
-        error.observe(getViewLifecycleOwner(), msg -> Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show());
+        error.observe(getViewLifecycleOwner(), msg -> ToastUtils.showErrorToast(requireContext(), msg));
     }
 
     private void updateUI(UserBillDetailResponse bill) {

@@ -11,7 +11,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -346,7 +345,7 @@ public class AdminBillFragment extends Fragment {
         // 4. Quan sát lỗi
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null) {
-                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showErrorToast(requireContext(), errorMsg);
                 // Xóa danh sách hiện tại tùy theo mode
                 if (currentType == InvoiceType.SERVICE) updateUI(null);
                 else updateRentUI(null);

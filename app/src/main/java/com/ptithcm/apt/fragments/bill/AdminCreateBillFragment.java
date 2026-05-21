@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -270,7 +269,7 @@ public class AdminCreateBillFragment extends Fragment {
         // Lắng nghe lỗi
         viewModel.error.observe(getViewLifecycleOwner(), errorMsg -> {
             if (errorMsg != null) {
-                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                ToastUtils.showErrorToast(requireContext(), errorMsg);
             }
         });
 

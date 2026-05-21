@@ -20,6 +20,7 @@ import com.ptithcm.apt.models.bill.response.BillServiceConfigResponse;
 import com.ptithcm.apt.models.bill.request.CreateBillRequest;
 import com.ptithcm.apt.models.rentinvoice.response.UpdateRentInvoiceStatusResponse;
 import com.ptithcm.apt.network.api.AdminBillApiService;
+import com.ptithcm.apt.utils.ErrorUtils;
 
 import java.util.List;
 
@@ -53,7 +54,8 @@ public class AdminBillRepository {
                         errorMessage.postValue("Không có dữ liệu");
                     }
                 } else {
-                    errorMessage.postValue("Lỗi: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi lấy danh sách hóa đơn: " + response.code());
+                    errorMessage.postValue(msg);
                 }
             }
 
@@ -84,7 +86,8 @@ public class AdminBillRepository {
                         errorData.setValue(response.body().getMessage());
                     }
                 } else {
-                    errorData.setValue("Không thể lấy thông tin chi tiết: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể lấy thông tin chi tiết hóa đơn: " + response.code());
+                    errorData.setValue(msg);
                 }
             }
 
@@ -103,7 +106,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     data.setValue(response.body().getContent());
                 } else {
-                    error.setValue("Không thể lấy danh sách căn hộ");
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể lấy danh sách căn hộ: " + response.code());
+                    error.setValue(msg);
                 }
             }
             @Override
@@ -120,7 +124,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     data.setValue(response.body().getData());
                 } else {
-                    error.setValue("Chưa có chỉ số cũ cho căn hộ này");
+                    String msg = ErrorUtils.getErrorMessage(response, "Chưa có chỉ số cũ cho căn hộ này: " + response.code());
+                    error.setValue(msg);
                 }
             }
             @Override
@@ -158,7 +163,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful()) {
                     isSuccess.setValue(true);
                 } else {
-                    error.setValue("Lỗi từ server: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi tạo hóa đơn: " + response.code());
+                    error.setValue(msg);
                 }
             }
 
@@ -189,7 +195,8 @@ public class AdminBillRepository {
                                 errorMessage.postValue("Không có dữ liệu tiền thuê");
                             }
                         } else {
-                            errorMessage.postValue("Lỗi: " + response.code());
+                            String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi lấy danh sách hóa đơn thuê: " + response.code());
+                            errorMessage.postValue(msg);
                         }
                     }
 
@@ -208,7 +215,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     detailData.postValue(response.body().getData());
                 } else {
-                    error.postValue("Không thể lấy chi tiết hóa đơn thuê");
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể lấy chi tiết hóa đơn thuê: " + response.code());
+                    error.postValue(msg);
                 }
             }
             @Override
@@ -229,7 +237,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful()) {
                     isSuccess.postValue(true);
                 } else {
-                    error.postValue("Lỗi hệ thống: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi cập nhật trạng thái hóa đơn: " + response.code());
+                    error.postValue(msg);
                 }
             }
 
@@ -251,7 +260,8 @@ public class AdminBillRepository {
                 if (response.isSuccessful()) {
                     isSuccess.postValue(true);
                 } else {
-                    error.postValue("Lỗi: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi khi cập nhật trạng thái hóa đơn thuê: " + response.code());
+                    error.postValue(msg);
                 }
             }
 

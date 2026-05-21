@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.NumberPicker;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +34,7 @@ import com.ptithcm.apt.models.bill.response.UserBillListResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.viewmodel.bill.UserBillViewModel;
 import com.ptithcm.apt.viewmodel.bill.UserBillViewModelFactory;
+import com.ptithcm.apt.utils.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -200,7 +200,7 @@ public class BillsFragment extends Fragment {
         });
 
         viewModel.error.observe(getViewLifecycleOwner(), msg -> {
-            if (msg != null) Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            if (msg != null) ToastUtils.showErrorToast(requireContext(), msg);
         });
     }
 

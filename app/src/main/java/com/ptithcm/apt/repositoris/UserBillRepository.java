@@ -11,6 +11,7 @@ import com.ptithcm.apt.models.bill.response.UserBillListResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceDetailResponse;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceListResponse;
 import com.ptithcm.apt.network.api.UserBillApiService;
+import com.ptithcm.apt.utils.ErrorUtils;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +36,8 @@ public class UserBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     data.setValue(response.body().getData().getContent());
                 } else {
-                    error.setValue("Lỗi tải dữ liệu: " + response.code());
+                    String msg = ErrorUtils.getErrorMessage(response, "Lỗi tải danh sách hóa đơn: " + response.code());
+                    error.setValue(msg);
                 }
             }
 
@@ -52,7 +54,10 @@ public class UserBillRepository {
             @Override
             public void onResponse(Call<List<UserBillApartmentResponse>> call, Response<List<UserBillApartmentResponse>> response) {
                 if (response.isSuccessful()) data.setValue(response.body());
-                else error.setValue("Không thể lấy danh sách căn hộ");
+                else {
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể lấy danh sách căn hộ: " + response.code());
+                    error.setValue(msg);
+                }
             }
             @Override
             public void onFailure(Call<List<UserBillApartmentResponse>> call, Throwable t) {
@@ -68,7 +73,8 @@ public class UserBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     data.setValue(response.body().getData());
                 } else {
-                    error.setValue("Không thể tải chi tiết hóa đơn");
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể tải chi tiết hóa đơn: " + response.code());
+                    error.setValue(msg);
                 }
             }
 
@@ -97,7 +103,8 @@ public class UserBillRepository {
                             // Trả về danh sách content từ PageResponse
                             data.setValue(response.body().getData().getContent());
                         } else {
-                            error.setValue("Lỗi tải tiền thuê: " + response.code());
+                            String msg = ErrorUtils.getErrorMessage(response, "Lỗi tải danh sách hóa đơn thuê: " + response.code());
+                            error.setValue(msg);
                         }
                     }
 
@@ -120,7 +127,8 @@ public class UserBillRepository {
                     // Ánh xạ đúng dữ liệu từ trường data của ApiResponse
                     data.setValue(response.body().getData());
                 } else {
-                    error.setValue("Không thể tải chi tiết hóa đơn thuê");
+                    String msg = ErrorUtils.getErrorMessage(response, "Không thể tải chi tiết hóa đơn thuê: " + response.code());
+                    error.setValue(msg);
                 }
             }
 

@@ -7,7 +7,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +17,7 @@ import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.rentinvoice.response.UserRentInvoiceDetailResponse;
 import com.ptithcm.apt.viewmodel.bill.UserBillViewModel;
 import com.ptithcm.apt.viewmodel.bill.UserBillViewModelFactory;
+import com.ptithcm.apt.utils.ToastUtils;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
@@ -97,7 +97,7 @@ public class UserRentInvoiceDetailFragment extends Fragment {
 
         // Lắng nghe lỗi
         viewModel.error.observe(getViewLifecycleOwner(), msg -> {
-            if (msg != null) Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+            if (msg != null) ToastUtils.showErrorToast(requireContext(), msg);
         });
 
         // Gọi API lấy chi tiết
