@@ -29,7 +29,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface AdminBillApiService {
-    @GET("api/v1/admin/bills")
+    @GET("api/v1/bills")
     Call<ApiResponse<PageResponse<BillListResponse>>> getBillsByAdmin(
             @Query("month") Integer month,
             @Query("year") Integer year,
@@ -38,7 +38,7 @@ public interface AdminBillApiService {
             @Query("page") Integer page,
             @Query("size") Integer size);
 
-    @GET("api/v1/admin/bills/{id}")
+    @GET("api/v1/bills/{id}")
     Call<ApiResponse<AdminBillDetailResponse>> getBillDetail(@Path("id") Long id);
 
     // Lấy danh sách căn hộ
@@ -46,7 +46,7 @@ public interface AdminBillApiService {
     Call<PageResponse<BillApartmentResponse>> getBillApartments(@Query("page") int page);
 
     // Lấy chỉ số cũ
-    @GET("api/v1/admin/monthly-metrics")
+    @GET("api/v1/monthly-metrics")
     Call<ApiResponse<BillPreviousMonthlyMetricResponse>> getPreviousMetrics(
             @Query("apartmentId") Long apartmentId
     );
@@ -57,10 +57,10 @@ public interface AdminBillApiService {
             @Query("date") String date
     );
 
-    @POST("api/v1/admin/bills")
+    @POST("api/v1/bills")
     Call<ApiResponse<CreateBillResponse>> createBill(@Body CreateBillRequest request);
 
-    @GET("api/v1/admin/rent-invoices")
+    @GET("api/v1/rent-invoices")
     Call<ApiResponse<PageResponse<RentInvoiceListResponse>>> getRentInvoices(
             @Query("month") Integer month,
             @Query("year") Integer year,
@@ -69,16 +69,16 @@ public interface AdminBillApiService {
             @Query("page") Integer page,
             @Query("size") Integer size);
 
-    @GET("api/v1/admin/rent-invoices/{id}")
+    @GET("api/v1/rent-invoices/{id}")
     Call<ApiResponse<RentInvoiceDetailResponse>> getRentInvoiceDetail(@Path("id") Long id);
 
-    @PATCH("api/v1/admin/bills/{id}/status")
+    @PATCH("api/v1/bills/{id}/status")
     Call<ApiResponse<UpdateBillStatusResponse>> updateBillStatus(
             @Path("id") Long id,
             @Body UpdateBillStatusRequest request
     );
 
-    @PATCH("api/v1/admin/rent-invoices/{id}/status")
+    @PATCH("api/v1/rent-invoices/{id}/status")
     Call<ApiResponse<UpdateRentInvoiceStatusResponse>> updateRentInvoiceStatus(
             @Path("id") Long rentInvoiceId,
             @Body UpdateRentInvoiceStatusRequest request

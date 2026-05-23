@@ -8,6 +8,6 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 
 public interface MonthlyMetricService {
-    @GET("api/public/v1/admin/bills/{id}")
+    @GET("api/public/v1/bills/{id}")
     Call<ApiResponse<AdminBillDetailResponse>> getBillDetail(@Path("id") Long id);
 }

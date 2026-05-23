@@ -17,7 +17,7 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface UserBillApiService {
-    @GET("api/v1/me/bills")
+    @GET("api/v1/bills/me")
     Call<ApiResponse<PageResponse<UserBillListResponse>>> getMyBills(
             @Query("month") Integer month,
             @Query("year") Integer year,
@@ -30,10 +30,10 @@ public interface UserBillApiService {
     @GET("api/v1/residents/me")
     Call<List<UserBillApartmentResponse>> getMyApartments();
 
-    @GET("api/v1/me/bills/{id}")
+    @GET("api/v1/bills/me/{id}")
     Call<ApiResponse<UserBillDetailResponse>> getBillDetail(@Path("id") Long id);
 
-    @GET("api/v1/me/rent-invoices")
+    @GET("api/v1/rent-invoices/me")
     Call<ApiResponse<PageResponse<UserRentInvoiceListResponse>>> getMyRentInvoices(
             @Query("month") Integer month,
             @Query("year") Integer year,
@@ -43,6 +43,6 @@ public interface UserBillApiService {
             @Query("size") int size
     );
 
-    @GET("api/v1/me/rent-invoices/{id}")
+    @GET("api/v1/rent-invoices/me/{id}")
     Call<ApiResponse<UserRentInvoiceDetailResponse>> getRentInvoiceDetail(@Path("id") int id);
 }
