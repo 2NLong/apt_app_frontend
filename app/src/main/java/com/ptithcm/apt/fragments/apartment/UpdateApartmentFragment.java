@@ -38,7 +38,6 @@ public class UpdateApartmentFragment extends Fragment {
 
     private Long apartmentId;
     private TextInputEditText edtRoomNumber, edtFloor, edtArea;
-    private Spinner spinnerStatus;
     private Button btnSave, btnCancel;
     private Toolbar toolbar;
     MaterialButton btnViewResidents;
@@ -80,7 +79,6 @@ public class UpdateApartmentFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            // Hứng ID từ trang Danh sách gửi sang
             apartmentId = getArguments().getLong("APARTMENT_ID");
         }
     }
@@ -107,11 +105,9 @@ public class UpdateApartmentFragment extends Fragment {
         btnViewResidents = view.findViewById(R.id.btn_view_residents);
 
         btnViewResidents.setOnClickListener(v -> {
-            // Truyền ID phòng sang để màn hình sau biết cần lấy cư dân của phòng nào
             Bundle bundle = new Bundle();
             bundle.putLong("APARTMENT_ID", apartmentId);
 
-            // Chuyển sang màn hình Danh sách cư dân (bạn tự tạo class này sau)
             ResidentListInApartmentFragment residentFragment = new ResidentListInApartmentFragment();
             residentFragment.setArguments(bundle);
 
@@ -134,7 +130,6 @@ public class UpdateApartmentFragment extends Fragment {
         edtRoomNumber = view.findViewById(R.id.edt_update_room_number);
         edtFloor = view.findViewById(R.id.edt_update_floor);
         edtArea = view.findViewById(R.id.edt_update_area);
-        spinnerStatus = view.findViewById(R.id.spinner_update_status);
         btnSave = view.findViewById(R.id.btn_update_save);
         btnCancel = view.findViewById(R.id.btn_update_cancel);
     }
@@ -143,7 +138,6 @@ public class UpdateApartmentFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
                 android.R.layout.simple_spinner_item, statusDisplay);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerStatus.setAdapter(adapter);
     }
 
     private void fetchApartmentDetails(Long id) {
@@ -168,10 +162,8 @@ public class UpdateApartmentFragment extends Fragment {
         edtFloor.setText(String.valueOf(apartment.getFloor()));
         edtArea.setText(String.valueOf(apartment.getArea()));
 
-        // Tìm vị trí của statusRaw để set cho Spinner
         for (int i = 0; i < statusRaw.length; i++) {
             if (statusRaw[i].equals(apartment.getStatus())) {
-                spinnerStatus.setSelection(i);
                 break;
             }
         }
@@ -182,7 +174,6 @@ public class UpdateApartmentFragment extends Fragment {
         String roomNumber = edtRoomNumber.getText().toString().trim();
         String floorStr = edtFloor.getText().toString().trim();
         String areaStr = edtArea.getText().toString().trim();
-        String status = statusRaw[spinnerStatus.getSelectedItemPosition()];
 
         // 2. Kiểm tra rỗng
         if (roomNumber.isEmpty() || floorStr.isEmpty() || areaStr.isEmpty()) {
@@ -196,7 +187,6 @@ public class UpdateApartmentFragment extends Fragment {
             updateData.setRoomNumber(roomNumber);
             updateData.setFloor(Integer.parseInt(floorStr));
             updateData.setArea(Double.parseDouble(areaStr));
-            updateData.setStatus(status);
 
             // 4. Vô hiệu hóa nút Lưu để chống spam
             btnSave.setEnabled(false);
@@ -249,10 +239,9 @@ public class UpdateApartmentFragment extends Fragment {
         text.setText(message);
 
         Toast toast = new Toast(getContext());
-        toast.setDuration(Toast.LENGTH_LONG); // Hiện lâu một chút cho người dùng kịp đọc
+        toast.setDuration(Toast.LENGTH_LONG);
         toast.setView(layout);
 
-        // Bạn có thể chỉnh vị trí hiện ở giữa màn hình nếu muốn
          toast.setGravity(Gravity.TOP, 0, 0);
 
         toast.show();

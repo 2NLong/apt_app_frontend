@@ -99,21 +99,6 @@
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:text="Trạng thái căn hộ:"
-                    android:textColor="#666666"
-                    android:textSize="14sp" />
-
-                <Spinner
-                    android:id="@+id/spinner_update_status"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:layout_marginTop="8dp"
-                    android:background="@android:drawable/btn_dropdown"
-                    android:padding="8dp" />
 
                 <Button
                     android:id="@+id/btn_update_save"

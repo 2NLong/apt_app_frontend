@@ -13,6 +13,7 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.apartment.Apartment;
 import com.ptithcm.apt.models.contract.ContractRequest;
@@ -29,57 +30,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CreateContractFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CreateContractFragment extends Fragment {
 
     private RadioGroup rgRole;
     private TextInputEditText edtRoomNumber, edtFullName, edtCccd, edtEmail, edtPrice;
     private TextInputEditText edtDob, edtStartDate, edtEndDate;
-    private Button btnCreate;
     private TextInputEditText edtPhone, edtDepositAmount;
-    private Long apartmentId = -1L;
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private Button btnCreate;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private TextInputLayout tilPrice, tilDeposit, tilEndDate;
+    private TextInputLayout tilCccd, tilEmail, tilDob;
 
     public CreateContractFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment CreateContractFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static CreateContractFragment newInstance(String param1, String param2) {
-        CreateContractFragment fragment = new CreateContractFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
@@ -87,38 +49,52 @@ public class CreateContractFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_create_contract, container, false);
 
         initViews(view);
-        setupEvents();
+        setupEvents(view);
 
         return view;
     }
 
     private void initViews(View view) {
         rgRole = view.findViewById(R.id.rg_role);
+
         edtRoomNumber = view.findViewById(R.id.edt_roomNumber);
         edtFullName = view.findViewById(R.id.edt_fullName);
         edtCccd = view.findViewById(R.id.edt_cccd);
         edtEmail = view.findViewById(R.id.edt_email);
         edtPrice = view.findViewById(R.id.edt_rentalPrice);
-
         edtPhone = view.findViewById(R.id.edt_phone);
         edtDepositAmount = view.findViewById(R.id.edt_depositAmount);
-
         edtDob = view.findViewById(R.id.edt_dob);
         edtStartDate = view.findViewById(R.id.edt_startDate);
         edtEndDate = view.findViewById(R.id.edt_endDate);
 
+        tilPrice = view.findViewById(R.id.til_price);
+        tilDeposit = view.findViewById(R.id.til_deposit);
+        tilEndDate = view.findViewById(R.id.til_end_date);
+
+        tilCccd = view.findViewById(R.id.til_cccd);
+        tilEmail = view.findViewById(R.id.til_email);
+        tilDob = view.findViewById(R.id.til_dob);
+
         btnCreate = view.findViewById(R.id.btn_create_contract);
     }
 
-    private void setupEvents() {
+    private void setupEvents(View view) {
+        view.findViewById(R.id.toolbar_create_contract).setOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
         rgRole.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.rb_owner) {
-                edtPrice.setHint("Giá trị căn hộ (Mua đứt)");
-                edtEndDate.setText(""); // Mua đứt thường không có ngày kết thúc
-                edtEndDate.setEnabled(false);
+                tilPrice.setHint("Giá mua căn hộ (VNĐ)");
+                tilDeposit.setVisibility(View.GONE);
+                tilEndDate.setVisibility(View.GONE);
+                edtDepositAmount.setText("");
+                edtEndDate.setText("");
             } else {
-                edtPrice.setHint("Tiền thuê hàng tháng");
-                edtEndDate.setEnabled(true);
+                tilPrice.setHint("Tiền thuê mỗi tháng (VNĐ)");
+                tilDeposit.setVisibility(View.VISIBLE);
+                tilEndDate.setVisibility(View.VISIBLE);
             }
         });
 
@@ -146,10 +122,100 @@ public class CreateContractFragment extends Fragment {
         String dob = edtDob.getText().toString().trim();
         String startDate = edtStartDate.getText().toString().trim();
 
+        String priceStr = edtPrice.getText().toString().trim().replaceAll("[,.]", "");
+        String depositStr = edtDepositAmount.getText().toString().trim().replaceAll("[,.]", "");
+        String endDateStr = edtEndDate.getText().toString().trim();
+
+        tilCccd.setError(null);
+        tilEmail.setError(null);
+        tilDob.setError(null);
+
         if (roomNumber.isEmpty() || fullName.isEmpty() || cccd.isEmpty() || email.isEmpty() || dob.isEmpty() || startDate.isEmpty()) {
             Toast.makeText(getContext(), "Vui lòng nhập đủ các thông tin bắt buộc!", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        boolean isValid = true;
+
+        if (!cccd.matches("\\d{12}")) {
+            tilCccd.setError("CCCD phải bao gồm đúng 12 chữ số!");
+            edtCccd.requestFocus();
+            isValid = false;
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            tilEmail.setError("Vui lòng nhập đúng định dạng Email!");
+            edtEmail.requestFocus();
+            isValid = false;
+        }
+
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault());
+            java.util.Date dobDate = sdf.parse(dob);
+            java.util.Calendar birthCal = java.util.Calendar.getInstance();
+            birthCal.setTime(dobDate);
+
+            java.util.Calendar today = java.util.Calendar.getInstance();
+
+            int age = today.get(java.util.Calendar.YEAR) - birthCal.get(java.util.Calendar.YEAR);
+            if (today.get(java.util.Calendar.DAY_OF_YEAR) < birthCal.get(java.util.Calendar.DAY_OF_YEAR)) {
+                age--;
+            }
+
+            if (age < 18) {
+                tilDob.setError("Người đại diện lập hợp đồng phải từ đủ 18 tuổi!");
+                edtDob.requestFocus();
+                isValid = false;
+            }
+        } catch (Exception e) {
+            tilDob.setError("Ngày sinh không hợp lệ!");
+            isValid = false;
+        }
+
+        boolean isOwner = rgRole.getCheckedRadioButtonId() == R.id.rb_owner;
+
+        if (isOwner) {
+            if (priceStr.isEmpty()) {
+                tilPrice.setError("Vui lòng nhập giá mua căn hộ!");
+                if (isValid) edtPrice.requestFocus();
+                isValid = false;
+            }
+        } else {
+            if (priceStr.isEmpty()) {
+                tilPrice.setError("Vui lòng nhập tiền thuê mỗi tháng!");
+                if (isValid) edtPrice.requestFocus();
+                isValid = false;
+            }
+            if (depositStr.isEmpty()) {
+                tilDeposit.setError("Vui lòng nhập số tiền đặt cọc!");
+                if (isValid) edtDepositAmount.requestFocus();
+                isValid = false;
+            }
+            if (endDateStr.isEmpty()) {
+                tilEndDate.setError("Vui lòng chọn ngày kết thúc hợp đồng!");
+                isValid = false;
+            } else {
+                try {
+                    java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault());
+                    java.util.Date start = sdf.parse(startDate);
+                    java.util.Date end = sdf.parse(endDateStr);
+                    if (!end.after(start)) {
+                        tilEndDate.setError("Ngày kết thúc phải sau ngày bắt đầu!");
+                        isValid = false;
+                    }
+                } catch (Exception e) {
+                    tilEndDate.setError("Ngày kết thúc không hợp lệ!");
+                    isValid = false;
+                }
+            }
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        btnCreate.setEnabled(false);
+        btnCreate.setText("Đang xử lý...");
 
         ApartmentApiService aptApi = RetrofitClient.getInstance().createService(ApartmentApiService.class);
         aptApi.searchApartments(roomNumber).enqueue(new Callback<List<Apartment>>() {
@@ -157,15 +223,18 @@ public class CreateContractFragment extends Fragment {
             public void onResponse(Call<List<Apartment>> call, Response<List<Apartment>> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
                     Long apartmentId = response.body().get(0).getId();
-
                     submitContractToBackend(apartmentId);
                 } else {
+                    btnCreate.setEnabled(true);
+                    btnCreate.setText("LẬP HỢP ĐỒNG");
                     Toast.makeText(getContext(), "Không tìm thấy phòng số " + roomNumber, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Apartment>> call, Throwable t) {
+                btnCreate.setEnabled(true);
+                btnCreate.setText("LẬP HỢP ĐỒNG");
                 Toast.makeText(getContext(), "Lỗi kết nối khi tìm phòng", Toast.LENGTH_SHORT).show();
             }
         });
@@ -174,10 +243,10 @@ public class CreateContractFragment extends Fragment {
     private void submitContractToBackend(Long apartmentId) {
         String role = rgRole.getCheckedRadioButtonId() == R.id.rb_owner ? "OWNER" : "TENANT";
 
-        String priceStr = edtPrice.getText().toString().trim();
+        String priceStr = edtPrice.getText().toString().trim().replaceAll("[,.]", "");
         BigDecimal price = priceStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(priceStr);
 
-        String depositStr = edtDepositAmount.getText().toString().trim();
+        String depositStr = edtDepositAmount.getText().toString().trim().replaceAll("[,.]", "");
         BigDecimal deposit = depositStr.isEmpty() ? BigDecimal.ZERO : new BigDecimal(depositStr);
 
         String endDateStr = edtEndDate.getText().toString().trim();
@@ -197,20 +266,31 @@ public class CreateContractFragment extends Fragment {
         );
 
         ContractApiService contractApi = RetrofitClient.getInstance().createService(ContractApiService.class);
+
         contractApi.createContract(request).enqueue(new Callback<Resident>() {
             @Override
             public void onResponse(Call<Resident> call, Response<Resident> response) {
+                btnCreate.setEnabled(true);
+                btnCreate.setText("LẬP HỢP ĐỒNG");
+
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Lập hợp đồng thành công!", Toast.LENGTH_LONG).show();
                     getParentFragmentManager().popBackStack();
                 } else {
-                    Toast.makeText(getContext(), "Lỗi lập hợp đồng! Xem lại trạng thái phòng.", Toast.LENGTH_LONG).show();
+                    try {
+                        String errorMsg = response.errorBody().string();
+                        Toast.makeText(getContext(), "Lỗi: " + errorMsg, Toast.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(getContext(), "Lỗi lập hợp đồng! Xem lại trạng thái phòng.", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Resident> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi kết nối mạng", Toast.LENGTH_SHORT).show();
+                btnCreate.setEnabled(true);
+                btnCreate.setText("LẬP HỢP ĐỒNG");
+                Toast.makeText(getContext(), "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

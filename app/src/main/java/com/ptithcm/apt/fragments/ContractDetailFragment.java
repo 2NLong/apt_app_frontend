@@ -3,6 +3,7 @@ package com.ptithcm.apt.fragments;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.models.contract.ContractResponse;
+// Nhớ đảm bảo bạn đã import đúng đường dẫn model này từ lúc làm tính năng Danh sách cư dân
+import com.ptithcm.apt.models.resident.ResidentListResponse;
 import com.ptithcm.apt.network.api.ContractApiService;
 import com.ptithcm.apt.network.api.ResidentApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
@@ -24,70 +27,33 @@ import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ContractDetailFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ContractDetailFragment extends Fragment {
 
     private TextView tvStatus, tvResidentName, tvPhone, tvCccd;
     private TextView tvRoom, tvRole, tvRentalPrice, tvDeposit, tvDates;
+
+    // ĐÃ THÊM: Các biến cho phần Thông tin Chủ hộ
+    private TextView tvOwnerTitle, tvOwnerName, tvOwnerPhone;
+    private CardView cvOwnerInfo;
 
     private Long contractId = -1L;
     private Button btnMoveOut;
     private Long currentResidentId;
     private Long currentApartmentId;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public ContractDetailFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ContractDetailFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ContractDetailFragment newInstance(String param1, String param2) {
-        ContractDetailFragment fragment = new ContractDetailFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view  = inflater.inflate(R.layout.fragment_contract_detail,container,false);
         if(getArguments() != null){
             contractId = getArguments().getLong("CONTRACT_ID",-1L);
@@ -122,6 +88,11 @@ public class ContractDetailFragment extends Fragment {
         tvDeposit = view.findViewById(R.id.tv_detail_deposit);
         tvDates = view.findViewById(R.id.tv_detail_dates);
         btnMoveOut = view.findViewById(R.id.btn_move_out);
+
+        tvOwnerTitle = view.findViewById(R.id.tv_title_owner_info);
+        cvOwnerInfo = view.findViewById(R.id.cv_owner_info);
+        tvOwnerName = view.findViewById(R.id.tv_detail_owner_name);
+        tvOwnerPhone = view.findViewById(R.id.tv_detail_owner_phone);
     }
 
     private void fetchContractDetail(Long id){
@@ -133,7 +104,7 @@ public class ContractDetailFragment extends Fragment {
                 if(response.isSuccessful() && response.body() != null){
                     displayData(response.body());
                 }else{
-                    Toast.makeText(getContext(),"Khong the tai chi tiet hop dong",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(),"Không thể tải chi tiết hợp đồng",Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -154,7 +125,17 @@ public class ContractDetailFragment extends Fragment {
         tvCccd.setText(data.getCitizenIdentity() != null ? data.getCitizenIdentity() : "Chưa cập nhật");
 
         tvRoom.setText("Phòng " + data.getRoomNumber());
-        tvRole.setText("OWNER".equals(data.getRole()) ? "CHỦ HỘ" : "NGƯỜI THUÊ");
+
+        if ("OWNER".equals(data.getRole())) {
+            tvRole.setText("CHỦ HỘ");
+            tvOwnerTitle.setVisibility(View.GONE);
+            cvOwnerInfo.setVisibility(View.GONE);
+        } else {
+            tvRole.setText("NGƯỜI THUÊ");
+            tvOwnerTitle.setVisibility(View.VISIBLE);
+            cvOwnerInfo.setVisibility(View.VISIBLE);
+            fetchOwnerInfo(currentApartmentId);
+        }
 
         tvRentalPrice.setText(data.getRentalPrice() != null ? formatter.format(data.getRentalPrice()) : "0");
         tvDeposit.setText(data.getDepositAmount() != null ? formatter.format(data.getDepositAmount()) : "0");
@@ -163,7 +144,6 @@ public class ContractDetailFragment extends Fragment {
         String end = data.getContractEnd() != null ? data.getContractEnd() : "...";
         tvDates.setText(start + " đến " + end);
 
-        // 1. Lấy ngày hôm nay theo định dạng yyyy-MM-dd
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String todayStr = sdf.format(new Date());
 
@@ -180,13 +160,36 @@ public class ContractDetailFragment extends Fragment {
         if (isStillValid) {
             tvStatus.setText("ĐANG HIỆU LỰC");
             tvStatus.setBackgroundResource(R.drawable.bg_button);
-            tvStatus.setTextColor(Color.parseColor("#A63C4F")); // Chữ đỏ
+            tvStatus.setTextColor(Color.parseColor("#A63C4F"));
         } else {
             tvStatus.setText("ĐÃ KẾT THÚC / HỦY");
             tvStatus.setBackgroundResource(R.drawable.bg_button);
-            tvStatus.setTextColor(Color.parseColor("#666666")); // Chữ xám đậm
+            tvStatus.setTextColor(Color.parseColor("#666666"));
             btnMoveOut.setVisibility(View.GONE);
         }
+    }
+
+    private void fetchOwnerInfo(Long aptId) {
+        ResidentApiService apiService = RetrofitClient.getInstance().createService(ResidentApiService.class);
+
+        apiService.getResidentsInApartment(aptId).enqueue(new Callback<List<ResidentListResponse>>() {
+            @Override
+            public void onResponse(Call<List<ResidentListResponse>> call, Response<List<ResidentListResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    for (ResidentListResponse resident : response.body()) {
+                        if ("OWNER".equals(resident.getRole())) {
+                            tvOwnerName.setText(resident.getFullName());
+                            tvOwnerPhone.setText(resident.getPhone() != null ? resident.getPhone() : "Chưa cập nhật");
+                            return;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<ResidentListResponse>> call, Throwable t) {
+            }
+        });
     }
 
     private void showMoveOutConfirmDialog() {

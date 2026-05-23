@@ -35,7 +35,6 @@ import androidx.appcompat.widget.Toolbar;
 public class AddApartmentFragment extends Fragment {
 
     private TextInputEditText edtRoomNumber, edtFloor, edtArea;
-    private Spinner spinnerStatus;
     private Button btnSave;
     private Toolbar toolbarAdd;
     private String[] statusRaw = { "AVAILABLE" };
@@ -57,7 +56,6 @@ public class AddApartmentFragment extends Fragment {
         edtRoomNumber = view.findViewById(R.id.edt_add_room_number);
         edtFloor = view.findViewById(R.id.edt_add_floor);
         edtArea = view.findViewById(R.id.edt_add_area);
-        spinnerStatus = view.findViewById(R.id.spinner_add_status);
         btnSave = view.findViewById(R.id.btn_add_save);
         toolbarAdd = view.findViewById(R.id.toolbar_add);
     }
@@ -69,9 +67,7 @@ public class AddApartmentFragment extends Fragment {
                 statusRaw);
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerStatus.setAdapter(adapter);
 
-        spinnerStatus.setEnabled(false);
     }
 
     /**
