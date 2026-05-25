@@ -28,6 +28,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.bill.AdminBillAdapter;
 import com.ptithcm.apt.adapters.rentinvoice.AdminRentAdapter;
+import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.fragments.bill.AdminBillDetailFragment;
 import com.ptithcm.apt.fragments.bill.AdminCreateBillFragment;
@@ -35,6 +36,7 @@ import com.ptithcm.apt.fragments.rentinvoice.AdminRentInvoiceDetailFragment;
 import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
 import com.ptithcm.apt.models.bill.response.BillApartmentResponse;
 import com.ptithcm.apt.models.bill.response.BillListResponse;
+import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.utils.DialogUtils;
 import com.ptithcm.apt.utils.ToastUtils;
 import com.ptithcm.apt.viewmodel.bill.AdminBillViewModel;
@@ -50,6 +52,12 @@ public class AdminBillFragment extends Fragment {
     private Integer currentSelectedYear = null;
     private BillStatus currentSelectedStatus = BillStatus.UNPAID;
     private Long currentSelectedApartmentId = null;
+    private String currentSearchRoomNumber = null;
+
+    // Pagination variables
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 5;
+    private int totalPages = 1;
 
     private AdminBillViewModel viewModel;
     private AdminBillAdapter adapter;
@@ -59,12 +67,19 @@ public class AdminBillFragment extends Fragment {
     private RecyclerView recyclerView;
     private FloatingActionButton fabAdd;
     private AutoCompleteTextView spinnerApartmentFilter;
+    private TextInputEditText etSearchRoom;
     private TabLayout tabLayout;
     private Chip chipDate;
     private InvoiceType currentType = InvoiceType.SERVICE;
     private AdminRentAdapter rentAdapter;
     private MaterialCardView cardService, cardRent;
     private TextView tvServiceBill, tvRentBill;
+
+    // Pagination Views
+    private View layoutPagination;
+    private View btnPrevPage;
+    private View btnNextPage;
+    private TextView tvPageInfo;
 
     public AdminBillFragment() {
     }
@@ -85,6 +100,7 @@ public class AdminBillFragment extends Fragment {
         initViewModel();
         setupRecyclerView();
         setupApartmentFilter();
+        setupSearchFilter();
         setupTabsAndChips();
         setupListeners();
         observeViewModel();
@@ -101,10 +117,17 @@ public class AdminBillFragment extends Fragment {
         recyclerView = view.findViewById(R.id.rvAdminBills);
         fabAdd = view.findViewById(R.id.fabAddBill);
         spinnerApartmentFilter = view.findViewById(R.id.spinnerApartmentFilter);
+        etSearchRoom = view.findViewById(R.id.etSearchRoom);
         tabLayout = view.findViewById(R.id.tabLayoutAdmin);
         chipDate = view.findViewById(R.id.chipDateFilter);
         tvServiceBill = view.findViewById(R.id.tvServiceBill);
         tvRentBill = view.findViewById(R.id.tvRentBill);
+
+        // Pagination Views
+        layoutPagination = view.findViewById(R.id.layoutPagination);
+        btnPrevPage = view.findViewById(R.id.btnPrevPage);
+        btnNextPage = view.findViewById(R.id.btnNextPage);
+        tvPageInfo = view.findViewById(R.id.tvPageInfo);
     }
 
     private void initViewModel() {
@@ -163,7 +186,7 @@ public class AdminBillFragment extends Fragment {
             BillApartmentResponse selected = (BillApartmentResponse) parent.getItemAtPosition(
                     position);
             currentSelectedApartmentId = selected.getId();
-            fetchBillsWithFullFilters();
+            resetPageAndFetch();
         });
 
         // Sự kiện xóa text để reset filter
@@ -180,9 +203,53 @@ public class AdminBillFragment extends Fragment {
             public void afterTextChanged(android.text.Editable s) {
                 if (s.toString().isEmpty() && currentSelectedApartmentId != null) {
                     currentSelectedApartmentId = null;
-                    fetchBillsWithFullFilters();
+                    resetPageAndFetch();
                 }
             }
+        });
+    }
+
+    private final android.os.Handler searchHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable searchRunnable;
+
+    private void setupSearchFilter() {
+        etSearchRoom.addTextChangedListener(new android.text.TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(android.text.Editable s) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                searchRunnable = () -> {
+                    String query = s.toString().trim();
+                    currentSearchRoomNumber = query.isEmpty() ? null : query;
+                    resetPageAndFetch();
+                };
+                searchHandler.postDelayed(searchRunnable, 500); // Debounce search for 500ms
+            }
+        });
+
+        etSearchRoom.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                if (searchRunnable != null) {
+                    searchHandler.removeCallbacks(searchRunnable);
+                }
+                String query = etSearchRoom.getText().toString().trim();
+                currentSearchRoomNumber = query.isEmpty() ? null : query;
+                resetPageAndFetch();
+                android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) 
+                        requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+                if (imm != null) {
+                    imm.hideSoftInputFromWindow(etSearchRoom.getWindowToken(), 0);
+                }
+                return true;
+            }
+            return false;
         });
     }
 
@@ -203,7 +270,7 @@ public class AdminBillFragment extends Fragment {
                             currentSelectedStatus = BillStatus.LATE;
                             break;
                     }
-                    fetchBillsWithFullFilters();
+                    resetPageAndFetch();
                 }
 
                 @Override
@@ -226,7 +293,7 @@ public class AdminBillFragment extends Fragment {
                     currentSelectedMonth = null;
                     currentSelectedYear = null;
                     updateChipText();
-                    fetchBillsWithFullFilters();
+                    resetPageAndFetch();
                 }
             });
         }
@@ -237,20 +304,35 @@ public class AdminBillFragment extends Fragment {
             currentType = InvoiceType.SERVICE;
             updateToggleUI();
             recyclerView.setAdapter(adapter);
-            fetchBillsWithFullFilters();
+            resetPageAndFetch();
         });
 
         cardRent.setOnClickListener(v -> {
             currentType = InvoiceType.RENT;
             updateToggleUI();
             recyclerView.setAdapter(rentAdapter);
-            fetchBillsWithFullFilters();
+            resetPageAndFetch();
         });
 
         fabAdd.setOnClickListener(v -> {
             getParentFragmentManager().beginTransaction().replace(R.id.admin_fragment_container,
                     new AdminCreateBillFragment()).addToBackStack(
                     null).commit();
+        });
+
+        // Pagination buttons
+        btnPrevPage.setOnClickListener(v -> {
+            if (currentPage > 0) {
+                currentPage--;
+                fetchBillsWithFullFilters();
+            }
+        });
+
+        btnNextPage.setOnClickListener(v -> {
+            if (currentPage < totalPages - 1) {
+                currentPage++;
+                fetchBillsWithFullFilters();
+            }
         });
     }
 
@@ -353,41 +435,79 @@ public class AdminBillFragment extends Fragment {
         });
     }
 
+    private void resetPageAndFetch() {
+        currentPage = 0;
+        fetchBillsWithFullFilters();
+    }
+
     private void fetchBillsWithFullFilters() {
         if (currentType == InvoiceType.SERVICE) {
             viewModel.fetchBills(currentSelectedMonth,
                     currentSelectedYear,
                     currentSelectedApartmentId,
-                    currentSelectedStatus);
+                    currentSelectedStatus,
+                    currentSearchRoomNumber,
+                    currentPage,
+                    PAGE_SIZE);
         } else {
             viewModel.fetchRentInvoices(currentSelectedMonth,
                     currentSelectedYear,
                     currentSelectedApartmentId,
-                    currentSelectedStatus);
+                    currentSelectedStatus,
+                    currentSearchRoomNumber,
+                    currentPage,
+                    PAGE_SIZE);
         }
     }
 
-    private void updateUI(List<BillListResponse> bills) {
-        if (bills == null || bills.isEmpty()) {
+    private void updateUI(PageResponse<BillListResponse> pageResponse) {
+        if (pageResponse == null || pageResponse.getContent() == null || pageResponse.getContent().isEmpty()) {
             adapter.updateList(new ArrayList<>());
             recyclerView.setVisibility(View.GONE);
             layoutEmpty.setVisibility(View.VISIBLE);
+            totalPages = 1;
+            currentPage = 0;
+            updatePaginationUI();
         } else {
-            adapter.updateList(bills);
+            adapter.updateList(pageResponse.getContent());
             recyclerView.setVisibility(View.VISIBLE);
             layoutEmpty.setVisibility(View.GONE);
+            totalPages = pageResponse.getTotalPages();
+            currentPage = pageResponse.getPage();
+            updatePaginationUI();
         }
     }
 
-    private void updateRentUI(List<RentInvoiceListResponse> rents) {
-        if (rents == null || rents.isEmpty()) {
+    private void updateRentUI(PageResponse<RentInvoiceListResponse> pageResponse) {
+        if (pageResponse == null || pageResponse.getContent() == null || pageResponse.getContent().isEmpty()) {
             rentAdapter.updateList(new ArrayList<>());
             recyclerView.setVisibility(View.GONE);
             layoutEmpty.setVisibility(View.VISIBLE);
+            totalPages = 1;
+            currentPage = 0;
+            updatePaginationUI();
         } else {
-            rentAdapter.updateList(rents);
+            rentAdapter.updateList(pageResponse.getContent());
             recyclerView.setVisibility(View.VISIBLE);
             layoutEmpty.setVisibility(View.GONE);
+            totalPages = pageResponse.getTotalPages();
+            currentPage = pageResponse.getPage();
+            updatePaginationUI();
+        }
+    }
+
+    private void updatePaginationUI() {
+        if (totalPages <= 1) {
+            layoutPagination.setVisibility(View.GONE);
+        } else {
+            layoutPagination.setVisibility(View.VISIBLE);
+            tvPageInfo.setText("Trang " + (currentPage + 1) + " / " + totalPages);
+            btnPrevPage.setEnabled(currentPage > 0);
+            btnNextPage.setEnabled(currentPage < totalPages - 1);
+            
+            // Adjust alpha to visually show enabled/disabled states
+            btnPrevPage.setAlpha(currentPage > 0 ? 1.0f : 0.4f);
+            btnNextPage.setAlpha(currentPage < totalPages - 1 ? 1.0f : 0.4f);
         }
     }
 
@@ -435,7 +555,7 @@ public class AdminBillFragment extends Fragment {
             currentSelectedMonth = pickerMonth.getValue();
             currentSelectedYear = pickerYear.getValue();
             updateChipText();
-            fetchBillsWithFullFilters();
+            resetPageAndFetch();
             dialog.dismiss();
         });
 
