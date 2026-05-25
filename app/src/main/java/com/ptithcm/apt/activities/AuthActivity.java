@@ -71,18 +71,30 @@ public class AuthActivity extends AppCompatActivity {
                 .findFragmentById(R.id.nav_host_fragment);
 
         if (navHostFragment != null) {
-            // navHostFragment sẽ tự nạp startDestination từ auth_nav_graph (LoginFragment)
         }
     }
 
     private void navigateToMain() {
         String role = sessionManager.getRole();
         Intent intent;
-        if ("ROLE_USER".equals(role)) {
-            intent = new Intent(this, MainActivity.class);
-        } else {
-            intent = new Intent(this, AdminActivity.class);
+
+        if (role == null) {
+            setupNavigation();
+            return;
         }
+
+        switch (role.toUpperCase()) {
+            case "ROLE_ADMIN":
+            case "ROLE_ACCOUNTANT":
+            case "ROLE_STAFF":
+                intent = new Intent(this, AdminActivity.class);
+                break;
+            case "ROLE_USER":
+            default:
+                intent = new Intent(this, MainActivity.class);
+                break;
+        }
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();

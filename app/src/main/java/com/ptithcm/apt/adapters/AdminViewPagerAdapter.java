@@ -10,33 +10,48 @@ import com.ptithcm.apt.fragments.admin.AdminHomeFragment;
 import com.ptithcm.apt.fragments.admin.AdminServiceConfigFragment;
 import com.ptithcm.apt.fragments.admin.AdminNotificationFragment;
 
-public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
-    public AdminViewPagerAdapter(@NonNull FragmentManager fm) {
-        super(fm);
-    }
+import java.util.ArrayList;
+import java.util.List;
 
-    public AdminViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
-        super(fm, behavior);
+public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
+
+    private final List<Fragment> fragmentList = new ArrayList<>();
+
+    public AdminViewPagerAdapter(@NonNull FragmentManager fm, String role) {
+        super(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
+
+        if (role == null) role = "";
+
+        switch (role.toUpperCase()) {
+            case "ROLE_STAFF":
+                fragmentList.add(new AdminHomeFragment());
+                fragmentList.add(new AdminNotificationFragment());
+                break;
+
+            case "ROLE_ACCOUNTANT":
+                fragmentList.add(new AdminServiceConfigFragment());
+                fragmentList.add(new AdminBillFragment());
+                fragmentList.add(new AdminNotificationFragment());
+                break;
+
+            case "ROLE_ADMIN":
+            default:
+                fragmentList.add(new AdminHomeFragment());
+                fragmentList.add(new AdminServiceConfigFragment());
+                fragmentList.add(new AdminBillFragment());
+                fragmentList.add(new AdminNotificationFragment());
+                break;
+        }
     }
 
     @NonNull
     @Override
     public Fragment getItem(int position) {
-        switch (position){
-            case 0:
-                return new AdminHomeFragment();
-            case 1:
-                return new AdminServiceConfigFragment();
-            case 2:
-                return new AdminBillFragment();
-            case 3:
-                return new AdminNotificationFragment();
-        }
-        return null;
+        return fragmentList.get(position);
     }
 
     @Override
     public int getCount() {
-        return 4;
+        return fragmentList.size();
     }
 }

@@ -5,6 +5,15 @@ public class RoleTranslator {
         if (role == null)
             return "---";
         switch (role.toUpperCase()) {
+            case "ROLE_ADMIN":
+                return "Quản trị viên";
+            case "ROLE_ACCOUNTANT":
+                return "Kế toán tòa nhà";
+            case "ROLE_STAFF":
+                return "Nhân viên vận hành";
+            case "ROLE_USER":
+                return "Cư dân";
+
             case "OWNER":
                 return "Chủ sở hữu";
             case "TENANT":
