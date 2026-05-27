@@ -2,6 +2,7 @@ package com.ptithcm.apt.fragments;
 
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog; // Thêm import này cho AlertDialog
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -18,27 +19,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.ptithcm.apt.R;
 import com.ptithcm.apt.adapters.ResidentAdapter;
+
+import com.ptithcm.apt.models.apartment.Apartment;
 import com.ptithcm.apt.models.resident.ResidentPageResponse;
+import com.ptithcm.apt.network.api.ApartmentApiService;
 import com.ptithcm.apt.network.api.ResidentApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ManageResidentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ManageResidentFragment extends Fragment {
 
     private Toolbar toolbar;
@@ -54,15 +53,12 @@ public class ManageResidentFragment extends Fragment {
     private int totalPages = 1;
     private String currentKeyword = null;
 
-    // Biến chống spam gọi API khi gõ tìm kiếm
     private Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable searchRunnable;
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
 
@@ -70,15 +66,6 @@ public class ManageResidentFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ManageResidentFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static ManageResidentFragment newInstance(String param1, String param2) {
         ManageResidentFragment fragment = new ManageResidentFragment();
         Bundle args = new Bundle();
@@ -205,6 +192,7 @@ public class ManageResidentFragment extends Fragment {
             }
         });
     }
+
     private void showAddMemberDialog() {
         final EditText input = new EditText(getContext());
         input.setHint("Nhập Số phòng (Ví dụ: 101, 202)");
@@ -213,30 +201,73 @@ public class ManageResidentFragment extends Fragment {
         int padding = (int) (16 * getResources().getDisplayMetrics().density);
         input.setPadding(padding, padding, padding, padding);
 
-        new MaterialAlertDialogBuilder(requireContext())
+        // 1. Tạo dialog nhưng không gọi .show() ngay
+        AlertDialog dialog = new MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Thêm Thành viên mới")
                 .setMessage("Vui lòng nhập Số phòng mà cư dân này sẽ chuyển vào:")
                 .setView(input)
-                .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
-                .setPositiveButton("Tiếp tục", (dialog, which) -> {
-                    String roomNumber = input.getText().toString().trim();
+                .setNegativeButton("Hủy", (d, which) -> d.dismiss())
+                .setPositiveButton("Tiếp tục", null) // Set null để tước quyền tự đóng
+                .create();
 
-                    if (roomNumber.isEmpty()) {
-                        Toast.makeText(getContext(), "Vui lòng nhập Số phòng!", Toast.LENGTH_SHORT).show();
-                        return;
+        dialog.show();
+
+        // 2. Ép sự kiện OnClick thủ công cho nút Tiếp tục sau khi bảng đã hiện
+        Button btnPositive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        btnPositive.setOnClickListener(v -> {
+            String roomNumber = input.getText().toString().trim();
+
+            if (roomNumber.isEmpty()) {
+                Toast.makeText(getContext(), "Vui lòng nhập Số phòng!", Toast.LENGTH_SHORT).show();
+                return; // Lỗi rỗng -> Báo lỗi, bảng không bị đóng
+            }
+
+            // Đổi giao diện nút bấm để khóa người dùng spam click
+            btnPositive.setText("Đang kiểm tra...");
+            btnPositive.setEnabled(false);
+
+            // 3. Gọi API kiểm tra phòng
+            ApartmentApiService apiService = RetrofitClient.getInstance().createService(ApartmentApiService.class);
+            apiService.searchApartments(roomNumber).enqueue(new Callback<List<Apartment>>() {
+                @Override
+                public void onResponse(Call<List<Apartment>> call, Response<List<Apartment>> response) {
+                    btnPositive.setText("Tiếp tục");
+                    btnPositive.setEnabled(true);
+
+                    if (response.isSuccessful() && response.body() != null && !response.body().isEmpty()) {
+                        boolean isExactMatch = false;
+                        for (Apartment apt : response.body()) {
+                            if (apt.getRoomNumber().equals(roomNumber)) {
+                                isExactMatch = true;
+                                break;
+                            }
+                        }
+
+                        if (isExactMatch) {
+                            dialog.dismiss();
+                            Bundle bundle = new Bundle();
+                            bundle.putString("ROOM_NUMBER", roomNumber);
+                            Fragment addFragment = new AddMemberFragment();
+                            addFragment.setArguments(bundle);
+                            requireActivity().getSupportFragmentManager().beginTransaction()
+                                    .replace(R.id.admin_fragment_container, addFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        } else {
+                            Toast.makeText(getContext(), "Phòng " + roomNumber + " không tồn tại!", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Phòng " + roomNumber + " không tồn tại!", Toast.LENGTH_SHORT).show();
                     }
+                }
 
-                    Bundle bundle = new Bundle();
-                    bundle.putString("ROOM_NUMBER", roomNumber);
-
-                    Fragment addFragment = new AddMemberFragment();
-                    addFragment.setArguments(bundle);
-
-                    requireActivity().getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.admin_fragment_container, addFragment)
-                            .addToBackStack(null)
-                            .commit();
-                })
-                .show();
+                @Override
+                public void onFailure(Call<List<Apartment>> call, Throwable t) {
+                    btnPositive.setText("Tiếp tục");
+                    btnPositive.setEnabled(true);
+                    Toast.makeText(getContext(), "Lỗi mạng, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+                }
+            });
+        });
     }
 }

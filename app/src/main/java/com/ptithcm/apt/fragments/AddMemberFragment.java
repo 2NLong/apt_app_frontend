@@ -97,12 +97,11 @@ public class AddMemberFragment extends Fragment {
 
     private void showDatePicker() {
         Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR) - 20; // Mặc định mở ra lùi lại 20 năm
+        int year = calendar.get(Calendar.YEAR) - 20;
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
         DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, selectedYear, selectedMonth, selectedDay) -> {
-            // Format về chuẩn yyyy-MM-dd cho Spring Boot
             selectedDob = String.format(Locale.getDefault(), "%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
             btnSelectDob.setText(selectedDob);
         }, year, month, day);

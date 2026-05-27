@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,11 +26,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import androidx.appcompat.widget.Toolbar;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AddApartmentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class AddApartmentFragment extends Fragment {
 
     private TextInputEditText edtRoomNumber, edtFloor, edtArea;
@@ -39,17 +33,37 @@ public class AddApartmentFragment extends Fragment {
     private Toolbar toolbarAdd;
     private String[] statusRaw = { "AVAILABLE" };
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     public AddApartmentFragment() {
         // Required empty public constructor
+    }
+
+    public static AddApartmentFragment newInstance(String param1, String param2) {
+        AddApartmentFragment fragment = new AddApartmentFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_add_apartment, container, false);
+
+        initViews(view);
+        setupSpinner();
+
+        toolbarAdd.setNavigationOnClickListener(v -> {
+            getParentFragmentManager().popBackStack();
+        });
+
+        btnSave.setOnClickListener(v -> handleAddApartment());
+
+        return view;
     }
 
     private void initViews(View view) {
@@ -65,92 +79,39 @@ public class AddApartmentFragment extends Fragment {
                 requireContext(),
                 android.R.layout.simple_spinner_item,
                 statusRaw);
-
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment AddApartmentFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static AddApartmentFragment newInstance(String param1, String param2) {
-        AddApartmentFragment fragment = new AddApartmentFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_apartment, container, false);
-
-        initViews(view);
-        setupSpinner();
-
-        toolbarAdd.setNavigationOnClickListener(v -> {
-            getParentFragmentManager().popBackStack();
-        });
-
-        btnSave.setOnClickListener(v -> handleAddApartment());
-
-        return view;
     }
 
     private void handleAddApartment() {
-        // 1. Lấy dữ liệu từ EditText
         String room = edtRoomNumber.getText().toString().trim();
         String floor = edtFloor.getText().toString().trim();
         String area = edtArea.getText().toString().trim();
         String status = statusRaw[0];
 
-        // 2. Kiểm tra rỗng (Validation)
         if (room.isEmpty() || floor.isEmpty() || area.isEmpty()) {
-            Toast.makeText(getContext(), "Vui lòng nhập đủ thông tin", Toast.LENGTH_SHORT).show();
+            showErrorToast("Vui lòng nhập đủ thông tin");
             return;
         }
 
-        // 3. Tạo đối tượng Apartment để gửi đi
         Apartment newApt = new Apartment();
         newApt.setRoomNumber(room);
         newApt.setFloor(Integer.parseInt(floor));
         newApt.setArea(Double.parseDouble(area));
         newApt.setStatus(status);
 
-        // 4. Gọi API POST
         ApartmentApiService apiService = RetrofitClient.getInstance().createService(ApartmentApiService.class);
         apiService.createApartment(newApt).enqueue(new Callback<Apartment>() {
             @Override
             public void onResponse(Call<Apartment> call, Response<Apartment> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Thêm căn hộ thành công!", Toast.LENGTH_SHORT).show();
+                    showSuccessToast("Thêm căn hộ thành công!");
                     getParentFragmentManager().popBackStack();
                 } else {
                     try {
                         String errorBody = response.errorBody().string();
                         JSONObject jsonObject = new JSONObject(errorBody);
                         String message = jsonObject.optString("message", "Lỗi dữ liệu!");
-
-                        // Gọi hàm Toast đỏ
                         showErrorToast(message);
-
                     } catch (Exception e) {
                         showErrorToast("Lỗi hệ thống!");
                     }
@@ -159,25 +120,37 @@ public class AddApartmentFragment extends Fragment {
 
             @Override
             public void onFailure(Call<Apartment> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                showErrorToast("Lỗi: " + t.getMessage());
             }
         });
     }
 
-    private void showErrorToast(String message) {
-        LayoutInflater inflater = getLayoutInflater();
-        View layout = inflater.inflate(R.layout.layout_custom_toast, null);
 
-        TextView text = layout.findViewById(R.id.tv_toast_message);
+    private void showSuccessToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_success, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_success);
         text.setText(message);
 
-        Toast toast = new Toast(getContext());
-        toast.setDuration(Toast.LENGTH_LONG); // Hiện lâu một chút cho người dùng kịp đọc
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
         toast.setView(layout);
-
-        // Bạn có thể chỉnh vị trí hiện ở giữa màn hình nếu muốn
         toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+    }
 
+    private void showErrorToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_error, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_error);
+        text.setText(message);
+
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.setGravity(Gravity.TOP, 0, 0);
         toast.show();
     }
 }

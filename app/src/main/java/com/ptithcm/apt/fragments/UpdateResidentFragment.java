@@ -5,10 +5,12 @@ import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -27,11 +29,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link UpdateResidentFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class UpdateResidentFragment extends Fragment {
 
     private Toolbar toolbar;
@@ -41,28 +38,13 @@ public class UpdateResidentFragment extends Fragment {
     private Long residentId = -1L;
     private ResidentDetailResponse currentResidentData;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     public UpdateResidentFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UpdateResidentFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static UpdateResidentFragment newInstance(String param1, String param2) {
         UpdateResidentFragment fragment = new UpdateResidentFragment();
         Bundle args = new Bundle();
@@ -76,8 +58,7 @@ public class UpdateResidentFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            residentId = getArguments().getLong("RESIDENT_ID", -1L);
         }
     }
 
@@ -86,18 +67,13 @@ public class UpdateResidentFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_update_resident, container, false);
 
-        // Lấy ID từ màn hình danh sách truyền sang
-        if (getArguments() != null) {
-            residentId = getArguments().getLong("RESIDENT_ID", -1L);
-        }
-
         initViews(view);
         setupEvents();
 
         if (residentId != -1L) {
             loadDetail();
         } else {
-            Toast.makeText(getContext(), "Lỗi: Không nhận được ID Cư dân", Toast.LENGTH_SHORT).show();
+            showErrorToast("Lỗi: Không nhận được ID Cư dân");
         }
 
         return view;
@@ -134,28 +110,33 @@ public class UpdateResidentFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<ResidentDetailResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi tải dữ liệu", Toast.LENGTH_SHORT).show();
+                showErrorToast("Lỗi kết nối tải dữ liệu!");
             }
         });
     }
 
     private void handleMoveOutClick() {
         if (currentResidentData == null || currentResidentData.getResidencies() == null || currentResidentData.getResidencies().isEmpty()) {
-            Toast.makeText(getContext(), "Cư dân này hiện không ở phòng nào!", Toast.LENGTH_SHORT).show();
+            showErrorToast("Cư dân này hiện không lưu trú tại phòng nào!");
             return;
         }
 
         List<ResidentDetailResponse.ResidencyInfo> residencies = currentResidentData.getResidencies();
 
-        // 1. Nếu chỉ có 1 phòng -> Bật xác nhận luôn
+        // Nếu chỉ ở 1 phòng, hỏi luôn
         if (residencies.size() == 1) {
             showMoveOutConfirm(residencies.get(0));
         }
-        // 2. Nếu có nhiều phòng -> Bật popup chọn phòng muốn chuyển đi
+        // Nếu ở nhiều phòng, hiển thị danh sách để chọn
         else {
             String[] roomNames = new String[residencies.size()];
             for (int i = 0; i < residencies.size(); i++) {
-                roomNames[i] = "Phòng " + residencies.get(i).getRoomNumber() + " (" + residencies.get(i).getRole() + ")";
+                String roleVN = "Khác";
+                if ("OWNER".equals(residencies.get(i).getRole())) roleVN = "Chủ hộ";
+                else if ("TENANT".equals(residencies.get(i).getRole())) roleVN = "Người thuê";
+                else if ("MEMBER".equals(residencies.get(i).getRole())) roleVN = "Thành viên";
+
+                roomNames[i] = "Phòng " + residencies.get(i).getRoomNumber() + " (" + roleVN + ")";
             }
 
             new MaterialAlertDialogBuilder(requireContext())
@@ -168,8 +149,8 @@ public class UpdateResidentFragment extends Fragment {
     }
 
     private void showMoveOutConfirm(ResidentDetailResponse.ResidencyInfo roomInfo) {
-        String message = roomInfo.getIsHead() != null && roomInfo.getIsHead()
-                ? "CẢNH BÁO: Đây là Chủ hộ! Nếu thực hiện chuyển đi, TẤT CẢ thành viên trong phòng " + roomInfo.getRoomNumber() + " sẽ bị hệ thống cho dọn đi theo. Bạn chắc chứ?"
+        String message = (roomInfo.getIsHead() != null && roomInfo.getIsHead())
+                ? "CẢNH BÁO: Đây là Chủ hộ/Đại diện! Nếu chuyển đi, TẤT CẢ thành viên trong phòng " + roomInfo.getRoomNumber() + " sẽ phải dọn đi theo. Bạn chắc chứ?"
                 : "Xác nhận cho cư dân " + currentResidentData.getFullName() + " chuyển ra khỏi phòng " + roomInfo.getRoomNumber() + "?";
 
         new MaterialAlertDialogBuilder(requireContext())
@@ -186,7 +167,7 @@ public class UpdateResidentFragment extends Fragment {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Đã xử lý chuyển đi thành công", Toast.LENGTH_SHORT).show();
+                    showSuccessToast("Đã xử lý chuyển đi thành công!");
                     getParentFragmentManager().popBackStack();
                 } else {
                     handleError(response);
@@ -194,7 +175,7 @@ public class UpdateResidentFragment extends Fragment {
             }
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                showErrorToast("Lỗi mạng: " + t.getMessage());
             }
         });
     }
@@ -206,7 +187,7 @@ public class UpdateResidentFragment extends Fragment {
         String email = edtEmail.getText().toString().trim();
 
         if (name.isEmpty() || cccd.isEmpty() || email.isEmpty()) {
-            Toast.makeText(getContext(), "Vui lòng nhập đủ các thông tin bắt buộc!", Toast.LENGTH_SHORT).show();
+            showErrorToast("Vui lòng nhập đủ các thông tin bắt buộc!");
             return;
         }
 
@@ -214,12 +195,18 @@ public class UpdateResidentFragment extends Fragment {
 
         UpdateResidentRequest request = new UpdateResidentRequest(name, dob, phone, cccd, email);
 
+        btnSave.setEnabled(false);
+        btnSave.setText("Đang lưu...");
+
         ResidentApiService apiService = RetrofitClient.getInstance().createService(ResidentApiService.class);
         apiService.updateResident(residentId, request).enqueue(new Callback<ResidentDetailResponse>() {
             @Override
             public void onResponse(Call<ResidentDetailResponse> call, Response<ResidentDetailResponse> response) {
+                btnSave.setEnabled(true);
+                btnSave.setText("LƯU THAY ĐỔI");
+
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Cập nhật thông tin thành công!", Toast.LENGTH_SHORT).show();
+                    showSuccessToast("Cập nhật thông tin thành công!");
                     getParentFragmentManager().popBackStack();
                 } else {
                     handleError(response);
@@ -228,7 +215,9 @@ public class UpdateResidentFragment extends Fragment {
 
             @Override
             public void onFailure(Call<ResidentDetailResponse> call, Throwable t) {
-                Toast.makeText(getContext(), "Lỗi mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnSave.setEnabled(true);
+                btnSave.setText("LƯU THAY ĐỔI");
+                showErrorToast("Lỗi mạng: " + t.getMessage());
             }
         });
     }
@@ -236,9 +225,38 @@ public class UpdateResidentFragment extends Fragment {
     private void handleError(Response<?> response) {
         try {
             JSONObject json = new JSONObject(response.errorBody().string());
-            Toast.makeText(getContext(), json.optString("message", "Lỗi xử lý"), Toast.LENGTH_LONG).show();
+            String message = json.optString("message", "Có lỗi xảy ra khi xử lý!");
+            showErrorToast(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            showErrorToast("Có lỗi xảy ra khi xử lý!");
         }
+    }
+
+    private void showSuccessToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_success, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_success);
+        text.setText(message);
+
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+    }
+
+    private void showErrorToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_error, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_error);
+        text.setText(message);
+
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
     }
 }

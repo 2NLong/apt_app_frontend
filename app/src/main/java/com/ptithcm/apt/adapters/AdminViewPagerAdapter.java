@@ -29,7 +29,6 @@ public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
                 break;
 
             case "ROLE_ACCOUNTANT":
-                fragmentList.add(new AdminServiceConfigFragment());
                 fragmentList.add(new AdminBillFragment());
                 fragmentList.add(new AdminNotificationFragment());
                 break;

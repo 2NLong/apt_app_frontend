@@ -63,7 +63,8 @@ public class AdminActivity extends AppCompatActivity {
 
         // Thiết lập tiêu điểm kích hoạt mặc định dựa trên màn hình chính của từng chức danh khi vào hệ thống
         if ("ROLE_ACCOUNTANT".equals(currentRole.toUpperCase())) {
-            bottomNavigationView.setSelectedItemId(R.id.admin_nav_metric);
+            // Kế toán mặc định vào màn hình Hóa đơn (Bill)
+            bottomNavigationView.setSelectedItemId(R.id.admin_nav_bill);
         } else {
             bottomNavigationView.setSelectedItemId(R.id.admin_nav_home);
         }
@@ -117,6 +118,8 @@ public class AdminActivity extends AppCompatActivity {
                 break;
             case "ROLE_ACCOUNTANT":
                 bottomNavigationView.getMenu().findItem(R.id.admin_nav_home).setVisible(false);
+                // Ẩn thêm menu Chỉ số đối với Kế toán
+                bottomNavigationView.getMenu().findItem(R.id.admin_nav_metric).setVisible(false);
                 break;
             case "ROLE_ADMIN":
             default:
@@ -124,6 +127,7 @@ public class AdminActivity extends AppCompatActivity {
                 break;
         }
     }
+
     private int getPageIndexByRole(int itemId, String role) {
         String r = role.toUpperCase();
         if ("ROLE_STAFF".equals(r)) {
@@ -131,9 +135,9 @@ public class AdminActivity extends AppCompatActivity {
             if (itemId == R.id.admin_nav_notification) return 1;
         }
         else if ("ROLE_ACCOUNTANT".equals(r)) {
-            if (itemId == R.id.admin_nav_metric) return 0;
-            if (itemId == R.id.admin_nav_bill) return 1;
-            if (itemId == R.id.admin_nav_notification) return 2;
+            // Cập nhật lại chỉ mục cho Kế toán (Chỉ còn 2 trang)
+            if (itemId == R.id.admin_nav_bill) return 0;
+            if (itemId == R.id.admin_nav_notification) return 1;
         }
         else { // Trường hợp quyền hệ thống ROLE_ADMIN
             if (itemId == R.id.admin_nav_home) return 0;
@@ -154,9 +158,8 @@ public class AdminActivity extends AppCompatActivity {
         }
         else if ("ROLE_ACCOUNTANT".equals(r)) {
             switch (position) {
-                case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_metric).setChecked(true); break;
-                case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_bill).setChecked(true); break;
-                case 2: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
+                case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_bill).setChecked(true); break;
+                case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
             }
         }
         else { // Trường hợp quyền hệ thống ROLE_ADMIN

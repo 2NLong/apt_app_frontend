@@ -5,11 +5,13 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -21,6 +23,8 @@ import com.ptithcm.apt.models.resident.Resident;
 import com.ptithcm.apt.network.api.ApartmentApiService;
 import com.ptithcm.apt.network.api.ContractApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
+
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.Calendar;
@@ -131,7 +135,7 @@ public class CreateContractFragment extends Fragment {
         tilDob.setError(null);
 
         if (roomNumber.isEmpty() || fullName.isEmpty() || cccd.isEmpty() || email.isEmpty() || dob.isEmpty() || startDate.isEmpty()) {
-            Toast.makeText(getContext(), "Vui lòng nhập đủ các thông tin bắt buộc!", Toast.LENGTH_SHORT).show();
+            showErrorToast("Vui lòng nhập đủ các thông tin bắt buộc!");
             return;
         }
 
@@ -227,7 +231,7 @@ public class CreateContractFragment extends Fragment {
                 } else {
                     btnCreate.setEnabled(true);
                     btnCreate.setText("LẬP HỢP ĐỒNG");
-                    Toast.makeText(getContext(), "Không tìm thấy phòng số " + roomNumber, Toast.LENGTH_LONG).show();
+                    showErrorToast("Không tìm thấy phòng số " + roomNumber);
                 }
             }
 
@@ -235,7 +239,7 @@ public class CreateContractFragment extends Fragment {
             public void onFailure(Call<List<Apartment>> call, Throwable t) {
                 btnCreate.setEnabled(true);
                 btnCreate.setText("LẬP HỢP ĐỒNG");
-                Toast.makeText(getContext(), "Lỗi kết nối khi tìm phòng", Toast.LENGTH_SHORT).show();
+                showErrorToast("Lỗi kết nối khi tìm phòng: " + t.getMessage());
             }
         });
     }
@@ -274,14 +278,16 @@ public class CreateContractFragment extends Fragment {
                 btnCreate.setText("LẬP HỢP ĐỒNG");
 
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Lập hợp đồng thành công!", Toast.LENGTH_LONG).show();
+                    showSuccessToast("Lập hợp đồng thành công!");
                     getParentFragmentManager().popBackStack();
                 } else {
                     try {
                         String errorMsg = response.errorBody().string();
-                        Toast.makeText(getContext(), "Lỗi: " + errorMsg, Toast.LENGTH_LONG).show();
+                        JSONObject jsonObject = new JSONObject(errorMsg);
+                        String message = jsonObject.optString("message", "Dữ liệu hợp đồng không hợp lệ!");
+                        showErrorToast(message);
                     } catch (Exception e) {
-                        Toast.makeText(getContext(), "Lỗi lập hợp đồng! Xem lại trạng thái phòng.", Toast.LENGTH_LONG).show();
+                        showErrorToast("Lỗi lập hợp đồng! Xem lại trạng thái phòng.");
                     }
                 }
             }
@@ -290,8 +296,36 @@ public class CreateContractFragment extends Fragment {
             public void onFailure(Call<Resident> call, Throwable t) {
                 btnCreate.setEnabled(true);
                 btnCreate.setText("LẬP HỢP ĐỒNG");
-                Toast.makeText(getContext(), "Lỗi kết nối mạng: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                showErrorToast("Lỗi kết nối mạng: " + t.getMessage());
             }
         });
+    }
+
+    private void showSuccessToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_success, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_success);
+        text.setText(message);
+
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_SHORT);
+        toast.setView(layout);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
+    }
+
+    private void showErrorToast(String message) {
+        LayoutInflater inflater = getLayoutInflater();
+        View layout = inflater.inflate(R.layout.layout_toast_error, null);
+
+        TextView text = layout.findViewById(R.id.tv_toast_message_error);
+        text.setText(message);
+
+        Toast toast = new Toast(requireActivity().getApplicationContext());
+        toast.setDuration(Toast.LENGTH_LONG);
+        toast.setView(layout);
+        toast.setGravity(Gravity.TOP, 0, 0);
+        toast.show();
     }
 }
