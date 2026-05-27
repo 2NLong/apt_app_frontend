@@ -35,13 +35,13 @@ public class AdminBillRepository {
         this.apiService = apiService;
     }
 
-    public void getBills(Integer month, Integer year,Long apartmentId, BillStatus status, Integer page, Integer size,
-                         MutableLiveData<List<BillListResponse>> billsData,
+    public void getBills(Integer month, Integer year, Long apartmentId, BillStatus status, String roomNumber, Integer page, Integer size,
+                         MutableLiveData<PageResponse<BillListResponse>> billsData,
                          MutableLiveData<String> errorMessage,
                          MutableLiveData<Boolean> isLoading) {
         
         isLoading.postValue(true);
-        apiService.getBillsByAdmin(month, year, apartmentId, status, page, size)
+        apiService.getBillsByAdmin(month, year, apartmentId, status, roomNumber, page, size)
                 .enqueue(new Callback<ApiResponse<PageResponse<BillListResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<PageResponse<BillListResponse>>> call, Response<ApiResponse<PageResponse<BillListResponse>>> response) {
@@ -49,7 +49,7 @@ public class AdminBillRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<PageResponse<BillListResponse>> apiResponse = response.body();
                     if (apiResponse.getData() != null) {
-                        billsData.postValue(apiResponse.getData().getContent());
+                        billsData.postValue(apiResponse.getData());
                     } else {
                         errorMessage.postValue("Không có dữ liệu");
                     }
@@ -177,20 +177,20 @@ public class AdminBillRepository {
     }
 
     // AdminBillRepository.java
-    public void getRentInvoices(Integer month, Integer year, Long apartmentId, RentStatus status, Integer page, Integer size,
-                                MutableLiveData<List<RentInvoiceListResponse>> rentData,
+    public void getRentInvoices(Integer month, Integer year, Long apartmentId, RentStatus status, String roomNumber, Integer page, Integer size,
+                                MutableLiveData<PageResponse<RentInvoiceListResponse>> rentData,
                                 MutableLiveData<String> errorMessage,
                                 MutableLiveData<Boolean> isLoading) {
 
         isLoading.postValue(true);
-        apiService.getRentInvoices(month, year, apartmentId, status, page, size)
+        apiService.getRentInvoices(month, year, apartmentId, status, roomNumber, page, size)
                 .enqueue(new Callback<ApiResponse<PageResponse<RentInvoiceListResponse>>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<PageResponse<RentInvoiceListResponse>>> call, Response<ApiResponse<PageResponse<RentInvoiceListResponse>>> response) {
                         isLoading.postValue(false);
                         if (response.isSuccessful() && response.body() != null) {
                             if (response.body().getData() != null) {
-                                rentData.postValue(response.body().getData().getContent());
+                                rentData.postValue(response.body().getData());
                             } else {
                                 errorMessage.postValue("Không có dữ liệu tiền thuê");
                             }

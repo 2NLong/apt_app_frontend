@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel;
 import com.ptithcm.apt.enums.BillStatus;
 import com.ptithcm.apt.enums.RentStatus;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
+import com.ptithcm.apt.models.auth.response.PageResponse;
 import com.ptithcm.apt.models.bill.response.CreateBillResponse;
 import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceDetailResponse;
 import com.ptithcm.apt.models.rentinvoice.response.RentInvoiceListResponse;
@@ -28,8 +29,8 @@ public class AdminBillViewModel extends ViewModel {
     private final AdminBillRepository repository;
 
     // LiveData cho Danh sách (AdminBillFragment)
-    private final MutableLiveData<List<BillListResponse>> _bills = new MutableLiveData<>();
-    public LiveData<List<BillListResponse>> bills = _bills;
+    private final MutableLiveData<PageResponse<BillListResponse>> _bills = new MutableLiveData<>();
+    public LiveData<PageResponse<BillListResponse>> bills = _bills;
 
     private final MutableLiveData<String> _error = new MutableLiveData<>();
     public LiveData<String> error = _error;
@@ -74,13 +75,13 @@ public class AdminBillViewModel extends ViewModel {
         repository.createBill(request, _isLoading, _isCreateSuccess, _error);
     }
 
-    private final MutableLiveData<List<RentInvoiceListResponse>> _rentInvoices = new MutableLiveData<>();
-    public LiveData<List<RentInvoiceListResponse>> rentInvoices = _rentInvoices;
-
-    public void fetchRentInvoices(Integer month, Integer year, Long apartmentId, BillStatus status) {
+    private final MutableLiveData<PageResponse<RentInvoiceListResponse>> _rentInvoices = new MutableLiveData<>();
+    public LiveData<PageResponse<RentInvoiceListResponse>> rentInvoices = _rentInvoices;
+ 
+    public void fetchRentInvoices(Integer month, Integer year, Long apartmentId, BillStatus status, String roomNumber, Integer page, Integer size) {
         RentStatus rentStatus = RentStatus.valueOf(status.name());
-
-        repository.getRentInvoices(month, year, apartmentId, rentStatus, 0, 50,
+ 
+        repository.getRentInvoices(month, year, apartmentId, rentStatus, roomNumber, page, size,
                 _rentInvoices, _error, _isLoading);
     }
 
@@ -113,8 +114,8 @@ public class AdminBillViewModel extends ViewModel {
         this.repository = repository;
     }
 
-    public void fetchBills(Integer month, Integer year, Long apartmentId, BillStatus status) {
-        repository.getBills(month, year, apartmentId, status, 0, 50, _bills, _error, _isLoading);
+    public void fetchBills(Integer month, Integer year, Long apartmentId, BillStatus status, String roomNumber, Integer page, Integer size) {
+        repository.getBills(month, year, apartmentId, status, roomNumber, page, size, _bills, _error, _isLoading);
     }
 
     public void fetchBillDetail(Long id) {

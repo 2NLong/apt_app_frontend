@@ -35,6 +35,7 @@ public interface AdminBillApiService {
             @Query("year") Integer year,
             @Query("apartmentId") Long apartmentId,
             @Query("status") BillStatus status,
+            @Query("roomNumber") String roomNumber,
             @Query("page") Integer page,
             @Query("size") Integer size);
 
@@ -66,6 +67,7 @@ public interface AdminBillApiService {
             @Query("year") Integer year,
             @Query("apartmentId") Long apartmentId,
             @Query("status") RentStatus status,
+            @Query("roomNumber") String roomNumber,
             @Query("page") Integer page,
             @Query("size") Integer size);
 
