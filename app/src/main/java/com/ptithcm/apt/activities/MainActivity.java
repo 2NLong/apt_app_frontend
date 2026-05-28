@@ -39,11 +39,8 @@ public class MainActivity extends AppCompatActivity {
                 case R.id.nav_bills:
                     viewPager.setCurrentItem(1);
                     return true;
-                case R.id.nav_notifications:
-                    viewPager.setCurrentItem(2);
-                    return true;
                 case R.id.nav_profile:
-                    viewPager.setCurrentItem(3);
+                    viewPager.setCurrentItem(2);
                     return true;
             }
             return false;
@@ -65,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
                         bottomNavigationView.setSelectedItemId(R.id.nav_bills);
                         break;
                     case 2:
-                        bottomNavigationView.setSelectedItemId(R.id.nav_notifications);
-                        break;
-                    case 3:
                         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
                         break;
                 }
