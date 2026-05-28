@@ -132,18 +132,15 @@ public class AdminActivity extends AppCompatActivity {
         String r = role.toUpperCase();
         if ("ROLE_STAFF".equals(r)) {
             if (itemId == R.id.admin_nav_home) return 0;
-            if (itemId == R.id.admin_nav_notification) return 1;
         }
         else if ("ROLE_ACCOUNTANT".equals(r)) {
             // Cập nhật lại chỉ mục cho Kế toán (Chỉ còn 2 trang)
             if (itemId == R.id.admin_nav_bill) return 0;
-            if (itemId == R.id.admin_nav_notification) return 1;
         }
         else { // Trường hợp quyền hệ thống ROLE_ADMIN
             if (itemId == R.id.admin_nav_home) return 0;
             if (itemId == R.id.admin_nav_metric) return 1;
             if (itemId == R.id.admin_nav_bill) return 2;
-            if (itemId == R.id.admin_nav_notification) return 3;
         }
         return -1;
     }
@@ -153,13 +150,11 @@ public class AdminActivity extends AppCompatActivity {
         if ("ROLE_STAFF".equals(r)) {
             switch (position) {
                 case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_home).setChecked(true); break;
-                case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
             }
         }
         else if ("ROLE_ACCOUNTANT".equals(r)) {
             switch (position) {
                 case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_bill).setChecked(true); break;
-                case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
             }
         }
         else { // Trường hợp quyền hệ thống ROLE_ADMIN
@@ -167,7 +162,6 @@ public class AdminActivity extends AppCompatActivity {
                 case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_home).setChecked(true); break;
                 case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_metric).setChecked(true); break;
                 case 2: bottomNavigationView.getMenu().findItem(R.id.admin_nav_bill).setChecked(true); break;
-                case 3: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
             }
         }
     }

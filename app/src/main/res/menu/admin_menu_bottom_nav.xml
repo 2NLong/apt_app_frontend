@@ -16,10 +16,6 @@
         android:icon="@drawable/ic_receipt"
         android:title="Hóa đơn" />
 
-    <item
-        android:id="@+id/admin_nav_notification"
-        android:icon="@drawable/ic_notifications"
-        android:title="Thông báo" />
 
     <item
         android:id="@+id/admin_nav_logout"

@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 import com.ptithcm.apt.fragments.admin.AdminBillFragment;
 import com.ptithcm.apt.fragments.admin.AdminHomeFragment;
 import com.ptithcm.apt.fragments.admin.AdminServiceConfigFragment;
-import com.ptithcm.apt.fragments.admin.AdminNotificationFragment;
+// Đã xóa import AdminNotificationFragment vì tạm thời chưa dùng đến
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +25,10 @@ public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
         switch (role.toUpperCase()) {
             case "ROLE_STAFF":
                 fragmentList.add(new AdminHomeFragment());
-                fragmentList.add(new AdminNotificationFragment());
                 break;
 
             case "ROLE_ACCOUNTANT":
                 fragmentList.add(new AdminBillFragment());
-                fragmentList.add(new AdminNotificationFragment());
                 break;
 
             case "ROLE_ADMIN":
@@ -38,7 +36,6 @@ public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
                 fragmentList.add(new AdminHomeFragment());
                 fragmentList.add(new AdminServiceConfigFragment());
                 fragmentList.add(new AdminBillFragment());
-                fragmentList.add(new AdminNotificationFragment());
                 break;
         }
     }
