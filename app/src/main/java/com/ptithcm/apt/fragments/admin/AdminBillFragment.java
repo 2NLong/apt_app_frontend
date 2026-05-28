@@ -132,7 +132,7 @@ public class AdminBillFragment extends Fragment {
 
     private void initViewModel() {
         AdminBillViewModelFactory factory = new AdminBillViewModelFactory();
-        viewModel = new ViewModelProvider(this, factory).get(AdminBillViewModel.class);
+        viewModel = new ViewModelProvider(this, (ViewModelProvider.Factory) factory).get(AdminBillViewModel.class);
     }
 
     private void setupRecyclerView() {
