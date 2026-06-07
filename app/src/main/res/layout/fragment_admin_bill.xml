@@ -212,87 +212,83 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <FrameLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvAdminBills"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="64dp" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvAdminBills"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp" />
-
-            <LinearLayout
-                android:id="@+id/layoutEmpty"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="gone">
-                <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
-                    android:src="@drawable/ic_empty_bill"
-                    app:tint="#CCCCCC" />
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="Không tìm thấy hóa đơn nào"
-                    android:textColor="#999999"
-                    android:textSize="16sp" />
-            </LinearLayout>
-        </FrameLayout>
-
-        <!-- Thanh chuyển trang -->
         <LinearLayout
-            android:id="@+id/layoutPagination"
+            android:id="@+id/layoutEmpty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="8dp"
-            android:background="@color/white"
-            android:elevation="8dp">
-
-            <ImageButton
-                android:id="@+id/btnPrevPage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron_left"
-                app:tint="@color/primary"
-                android:contentDescription="Trang trước" />
-
+            android:layout_gravity="top"
+            android:layout_marginTop="80dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_empty_bill"
+                app:tint="#CCCCCC" />
             <TextView
-                android:id="@+id/tvPageInfo"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Trang 1 / 1"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#333333" />
-
-            <ImageButton
-                android:id="@+id/btnNextPage"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron_right"
-                app:tint="@color/primary"
-                android:contentDescription="Trang sau" />
+                android:layout_marginTop="16dp"
+                android:text="Không tìm thấy hóa đơn nào"
+                android:textColor="#999999"
+                android:textSize="16sp" />
         </LinearLayout>
+    </FrameLayout>
+
+    <!-- Thanh chuyển trang -->
+    <LinearLayout
+        android:id="@+id/layoutPagination"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@color/white"
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnPrevPage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_left"
+            app:tint="@color/primary"
+            android:contentDescription="Trang trước" />
+
+        <TextView
+            android:id="@+id/tvPageInfo"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Trang 1 / 1"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#333333" />
+
+        <ImageButton
+            android:id="@+id/btnNextPage"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_chevron_right"
+            app:tint="@color/primary"
+            android:contentDescription="Trang sau" />
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
