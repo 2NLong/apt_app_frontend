@@ -19,6 +19,7 @@ public class UserBillListResponse {
     private String tenantName;
     private String dueDate;
 
+
     public UserBillListResponse() {
     }
 
@@ -153,4 +154,4 @@ public class UserBillListResponse {
     public void setWaterFee(BigDecimal waterFee) {
         this.waterFee = waterFee;
     }
-}
+}

@@ -82,22 +82,15 @@ public class UserBillAdapter extends RecyclerView.Adapter<UserBillAdapter.ViewHo
         String role = bill.getViewerRole();
         String tenantName = bill.getTenantName();
 
-        if ("OWNER".equals(role)) {
+        if ("OWNER".equals(role) && tenantName != null && !tenantName.trim().isEmpty()) {
             holder.tvRole.setVisibility(View.VISIBLE);
             holder.tvRole.setText("Vai trò: Chủ sở hữu");
 
             holder.tvTenant.setVisibility(View.VISIBLE);
-            if (tenantName != null && !tenantName.isEmpty()) {
-                holder.tvTenant.setText("Khách thuê: " + tenantName);
-                holder.tvTenant.setTextColor(Color.parseColor("#616161"));
-            } else {
-                holder.tvTenant.setText("Trạng thái: Đang trống");
-                holder.tvTenant.setTextColor(Color.GRAY);
-            }
+            holder.tvTenant.setText("Khách thuê: " + tenantName);
+            holder.tvTenant.setTextColor(Color.parseColor("#616161"));
         } else {
-            // Trường hợp TENANT hoặc HEAD (Người trực tiếp ở)
-            holder.tvRole.setVisibility(View.VISIBLE);
-            holder.tvRole.setText("Vai trò: Khách thuê");
+            holder.tvRole.setVisibility(View.GONE);
             holder.tvTenant.setVisibility(View.GONE);
         }
     }
