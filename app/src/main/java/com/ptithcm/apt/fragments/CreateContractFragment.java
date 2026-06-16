@@ -5,6 +5,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.ptithcm.apt.models.contract.ContractRequest;
 import com.ptithcm.apt.models.resident.Resident;
 import com.ptithcm.apt.network.api.ApartmentApiService;
 import com.ptithcm.apt.network.api.ContractApiService;
+import com.ptithcm.apt.network.api.ResidentApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
 
 import org.json.JSONObject;
@@ -41,6 +44,7 @@ public class CreateContractFragment extends Fragment {
     private TextInputEditText edtDob, edtStartDate, edtEndDate;
     private TextInputEditText edtPhone, edtDepositAmount;
     private Button btnCreate;
+    private Button btnCheckCccd;
 
     private TextInputLayout tilPrice, tilDeposit, tilEndDate;
     private TextInputLayout tilCccd, tilEmail, tilDob;
@@ -81,6 +85,7 @@ public class CreateContractFragment extends Fragment {
         tilDob = view.findViewById(R.id.til_dob);
 
         btnCreate = view.findViewById(R.id.btn_create_contract);
+        btnCheckCccd = view.findViewById(R.id.btn_check_cccd);
     }
 
     private void setupEvents(View view) {
@@ -106,7 +111,90 @@ public class CreateContractFragment extends Fragment {
         edtStartDate.setOnClickListener(v -> showDatePicker(edtStartDate));
         edtEndDate.setOnClickListener(v -> showDatePicker(edtEndDate));
 
+        btnCheckCccd.setOnClickListener(v -> {
+            String cccd = edtCccd.getText().toString().trim();
+            if (cccd.length() != 12) {
+                tilCccd.setError("Vui lòng nhập đủ 12 số CCCD!");
+                return;
+            }
+            tilCccd.setError(null);
+            checkResidentExist(cccd);
+        });
+
+        edtCccd.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                setFormFieldsEnabled(true);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
         btnCreate.setOnClickListener(v -> processContractCreation());
+    }
+
+    private void checkResidentExist(String cccd) {
+        btnCheckCccd.setEnabled(false);
+        btnCheckCccd.setText("...");
+
+        ResidentApiService residentApi = RetrofitClient.getInstance().createService(ResidentApiService.class);
+        residentApi.checkResidentByCccd(cccd).enqueue(new Callback<Resident>() {
+            @Override
+            public void onResponse(Call<Resident> call, Response<Resident> response) {
+                btnCheckCccd.setEnabled(true);
+                btnCheckCccd.setText("Check");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Resident resident = response.body();
+
+                    edtFullName.setText(resident.getFullName());
+                    edtPhone.setText(resident.getPhone());
+                    edtEmail.setText(resident.getEmail());
+
+                    String rawDob = String.valueOf(resident.getDob());
+                    try {
+                        java.text.SimpleDateFormat serverFormat = new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.ENGLISH);
+                        java.util.Date date = serverFormat.parse(rawDob);
+
+                        java.text.SimpleDateFormat appFormat = new java.text.SimpleDateFormat("dd-MM-yyyy", java.util.Locale.getDefault());
+                        edtDob.setText(appFormat.format(date));
+                    } catch (Exception e) {
+                        android.util.Log.e("DOB_ERROR", "Lỗi parse ngày tháng: " + e.getMessage());
+                        edtDob.setText(rawDob);
+                    }
+                    setFormFieldsEnabled(false);
+                    showSuccessToast("Tìm thấy thông tin! Đã tự động điền.");
+                } else if (response.code() == 404) {
+                    showSuccessToast("Cư dân mới. Vui lòng nhập thông tin!");
+                    setFormFieldsEnabled(true);
+                } else {
+                    showErrorToast("Lỗi kiểm tra dữ liệu!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Resident> call, Throwable t) {
+                btnCheckCccd.setEnabled(true);
+                btnCheckCccd.setText("Check");
+                showErrorToast("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    private void setFormFieldsEnabled(boolean enabled) {
+        edtFullName.setEnabled(enabled);
+        edtDob.setEnabled(enabled);
+        edtPhone.setEnabled(enabled);
+        edtEmail.setEnabled(enabled);
+
+        int color = enabled ? android.graphics.Color.TRANSPARENT : android.graphics.Color.parseColor("#EFEFEF");
+        edtFullName.setBackgroundColor(color);
+        edtDob.setBackgroundColor(color);
+        edtPhone.setBackgroundColor(color);
+        edtEmail.setBackgroundColor(color);
     }
 
     private void showDatePicker(TextInputEditText editText) {

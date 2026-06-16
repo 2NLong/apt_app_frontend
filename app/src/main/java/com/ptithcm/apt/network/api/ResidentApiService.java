@@ -1,6 +1,7 @@
 package com.ptithcm.apt.network.api;
 
 import com.ptithcm.apt.models.resident.MemberRequest;
+import com.ptithcm.apt.models.resident.Resident;
 import com.ptithcm.apt.models.resident.ResidentDetailResponse;
 import com.ptithcm.apt.models.resident.ResidentListResponse;
 import com.ptithcm.apt.models.resident.ResidentPageResponse;
@@ -50,4 +51,7 @@ public interface ResidentApiService {
     //Lấy cư dân sống trong 1 căn hộ
     @GET("api/v1/residents/apartments/{apartmentId}")
     Call<List<ResidentListResponse>> getResidentsInApartment(@Path("apartmentId") Long apartmentId);
+
+    @GET("api/v1/residents/check/{cccd}")
+    Call<Resident> checkResidentByCccd(@Path("cccd") String cccd);
 }
