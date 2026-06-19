@@ -12,6 +12,11 @@
         android:title="Hóa đơn" />
 
     <item
+        android:id="@+id/client_notification"
+        android:icon="@drawable/ic_notifications"
+        android:title="Thông Báo" />
+
+    <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_person"
         android:title="Cá nhân" />

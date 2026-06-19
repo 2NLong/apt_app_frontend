@@ -29,12 +29,14 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return new BillsFragment();
             case 2:
                 return new ProfileFragment();
+            case 3:
+                return new NotificationFragment();
         }
         return null;
     }
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 }

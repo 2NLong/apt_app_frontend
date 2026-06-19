@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 
+import com.ptithcm.apt.fragments.NotificationFragment;
 import com.ptithcm.apt.fragments.admin.AdminBillFragment;
 import com.ptithcm.apt.fragments.admin.AdminHomeFragment;
+import com.ptithcm.apt.fragments.admin.AdminNotificationFragment;
 import com.ptithcm.apt.fragments.admin.AdminServiceConfigFragment;
 // Đã xóa import AdminNotificationFragment vì tạm thời chưa dùng đến
 
@@ -36,6 +38,8 @@ public class AdminViewPagerAdapter extends FragmentStatePagerAdapter {
                 fragmentList.add(new AdminHomeFragment());
                 fragmentList.add(new AdminServiceConfigFragment());
                 fragmentList.add(new AdminBillFragment());
+                fragmentList.add(new AdminNotificationFragment());
+
                 break;
         }
     }
