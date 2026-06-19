@@ -141,6 +141,7 @@ public class AdminActivity extends AppCompatActivity {
             if (itemId == R.id.admin_nav_home) return 0;
             if (itemId == R.id.admin_nav_metric) return 1;
             if (itemId == R.id.admin_nav_bill) return 2;
+            if (itemId == R.id.admin_nav_notification) return 3;
         }
         return -1;
     }
@@ -162,6 +163,7 @@ public class AdminActivity extends AppCompatActivity {
                 case 0: bottomNavigationView.getMenu().findItem(R.id.admin_nav_home).setChecked(true); break;
                 case 1: bottomNavigationView.getMenu().findItem(R.id.admin_nav_metric).setChecked(true); break;
                 case 2: bottomNavigationView.getMenu().findItem(R.id.admin_nav_bill).setChecked(true); break;
+                case 3: bottomNavigationView.getMenu().findItem(R.id.admin_nav_notification).setChecked(true); break;
             }
         }
     }
