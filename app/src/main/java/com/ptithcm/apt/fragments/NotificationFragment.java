@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.card.MaterialCardView;
@@ -160,13 +161,14 @@ public class NotificationFragment extends Fragment {
                 }
 
                 for (NotificationResponse item : notifications) {
-                    addInfoCard(
+                    MaterialCardView card = addInfoCard(
                             notificationList,
                             item.getTitle(),
                             item.getContent(),
                             formatDate(item.getCreatedAt()),
                             Boolean.TRUE.equals(item.getIsRead()) ? "Đã đọc" : "Chưa đọc"
                     );
+                    card.setOnClickListener(v -> showNotificationDetail(item));
                 }
             }
 
@@ -195,13 +197,14 @@ public class NotificationFragment extends Fragment {
                 }
 
                 for (ComplaintResponse item : complaints) {
-                    addInfoCard(
+                    MaterialCardView card = addInfoCard(
                             complaintList,
                             item.getTitle(),
                             translateCategory(item.getCategory()) + " - " + item.getContent(),
                             formatDate(item.getCreatedAt()),
                             translateStatus(item.getStatus())
                     );
+                    card.setOnClickListener(v -> showComplaintDetail(item));
                 }
             }
 
@@ -244,7 +247,7 @@ public class NotificationFragment extends Fragment {
         });
     }
 
-    private void addInfoCard(LinearLayout parent, String title, String content, String time, String status) {
+    private MaterialCardView addInfoCard(LinearLayout parent, String title, String content, String time, String status) {
         MaterialCardView card = new MaterialCardView(requireContext());
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -295,6 +298,47 @@ public class NotificationFragment extends Fragment {
         body.addView(timeView);
         card.addView(body);
         parent.addView(card, 0);
+        return card;
+    }
+
+    private void showNotificationDetail(NotificationResponse item) {
+        String message = "Tiêu đề: " + safe(item.getTitle())
+                + "\n\nNội dung:\n" + safe(item.getContent())
+                + "\n\nGửi tới: " + getNotificationTargetText(item)
+                + "\nNgày gửi: " + formatDate(item.getCreatedAt())
+                + "\nTrạng thái: " + (Boolean.TRUE.equals(item.getIsRead()) ? "Đã đọc" : "Chưa đọc");
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Chi tiết thông báo")
+                .setMessage(message)
+                .setPositiveButton("Đóng", null)
+                .show();
+    }
+
+    private void showComplaintDetail(ComplaintResponse item) {
+        String message = "Tiêu đề: " + safe(item.getTitle())
+                + "\n\nNội dung:\n" + safe(item.getContent())
+                + "\n\nCăn hộ: " + safe(item.getRoomNumber())
+                + "\nLoại: " + translateCategory(item.getCategory())
+                + "\nTrạng thái: " + translateStatus(item.getStatus())
+                + "\nNgày gửi: " + formatDate(item.getCreatedAt());
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Chi tiết khiếu nại")
+                .setMessage(message)
+                .setPositiveButton("Đóng", null)
+                .show();
+    }
+
+    private String getNotificationTargetText(NotificationResponse item) {
+        if (item.getTargetSummary() != null && !item.getTargetSummary().trim().isEmpty()) {
+            return item.getTargetSummary();
+        }
+        return "Căn hộ của bạn";
+    }
+
+    private String safe(String value) {
+        return value == null || value.trim().isEmpty() ? "Không có dữ liệu" : value;
     }
 
     private int getStatusColor(String status) {

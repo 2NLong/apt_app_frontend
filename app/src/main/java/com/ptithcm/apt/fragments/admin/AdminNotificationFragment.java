@@ -1,9 +1,12 @@
 package com.ptithcm.apt.fragments.admin;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.card.MaterialCardView;
@@ -23,10 +27,13 @@ import com.ptithcm.apt.models.complaint.ComplaintResponse;
 import com.ptithcm.apt.models.complaint.UpdateComplaintStatusRequest;
 import com.ptithcm.apt.models.notification.CreateNotificationRequest;
 import com.ptithcm.apt.models.notification.NotificationResponse;
+import com.ptithcm.apt.models.notification.NotificationTargetResponse;
 import com.ptithcm.apt.network.api.ComplaintApiService;
 import com.ptithcm.apt.network.api.NotificationApiService;
 import com.ptithcm.apt.network.retrofit.RetrofitClient;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -38,10 +45,15 @@ public class AdminNotificationFragment extends Fragment {
     private LinearLayout adminComplaintList;
     private LinearLayout adminNotificationList;
     private Spinner targetSpinner;
+    private Spinner notificationApartmentFilter;
+    private TextView recipientPreview;
+    private EditText notificationDateFilter;
     private EditText titleInput;
     private EditText contentInput;
     private NotificationApiService notificationApiService;
     private ComplaintApiService complaintApiService;
+    private final List<NotificationTargetResponse> notificationTargets = new ArrayList<>();
+    private final List<NotificationResponse> adminNotifications = new ArrayList<>();
 
     @Nullable
     @Override
@@ -57,12 +69,16 @@ public class AdminNotificationFragment extends Fragment {
         adminComplaintList = view.findViewById(R.id.list_admin_complaints);
         adminNotificationList = view.findViewById(R.id.list_admin_notifications);
         targetSpinner = view.findViewById(R.id.spinner_notification_target);
+        notificationApartmentFilter = view.findViewById(R.id.spinner_notification_apartment_filter);
+        recipientPreview = view.findViewById(R.id.text_notification_recipient_preview);
+        notificationDateFilter = view.findViewById(R.id.input_notification_date_filter);
         titleInput = view.findViewById(R.id.input_notification_title);
         contentInput = view.findViewById(R.id.input_notification_content);
         notificationApiService = RetrofitClient.getInstance().createService(NotificationApiService.class);
         complaintApiService = RetrofitClient.getInstance().createService(ComplaintApiService.class);
 
         setupTargetSpinner();
+        setupNotificationFilters();
         loadComplaints();
         loadNotifications();
 
@@ -71,12 +87,126 @@ public class AdminNotificationFragment extends Fragment {
     }
 
     private void setupTargetSpinner() {
+        notificationTargets.clear();
+        setTargetSpinnerLabels(Collections.singletonList("Đang tải danh sách chủ hộ..."));
+        targetSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateRecipientPreview();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                updateRecipientPreview();
+            }
+        });
+        loadNotificationTargets();
+    }
+
+    private void setupNotificationFilters() {
+        setNotificationFilterLabels(Collections.singletonList("Tất cả căn hộ"));
+        notificationApartmentFilter.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                renderAdminNotifications();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                renderAdminNotifications();
+            }
+        });
+
+        notificationDateFilter.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                renderAdminNotifications();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
+    private void loadNotificationTargets() {
+        notificationApiService.getNotificationTargets().enqueue(new Callback<ApiResponse<List<NotificationTargetResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<NotificationTargetResponse>>> call,
+                                   Response<ApiResponse<List<NotificationTargetResponse>>> response) {
+                if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) {
+                    renderTargetSpinner();
+                    Toast.makeText(requireContext(), "Không tải được danh sách chủ hộ", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                for (NotificationTargetResponse target : response.body().getData()) {
+                    if (!hasNotificationTarget(target.getApartmentId())) {
+                        notificationTargets.add(target);
+                    }
+                }
+                renderTargetSpinner();
+                renderNotificationFilterSpinner();
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<List<NotificationTargetResponse>>> call, Throwable t) {
+                renderTargetSpinner();
+                Toast.makeText(requireContext(), "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void renderTargetSpinner() {
+        List<String> labels = new ArrayList<>();
+        labels.add("Tất cả chủ hộ đang hoạt động");
+        for (NotificationTargetResponse target : notificationTargets) {
+            String roomNumber = target.getRoomNumber() != null ? target.getRoomNumber() : String.valueOf(target.getApartmentId());
+            labels.add("Căn " + roomNumber);
+        }
+        setTargetSpinnerLabels(labels);
+        updateRecipientPreview();
+    }
+
+    private void renderNotificationFilterSpinner() {
+        List<String> labels = new ArrayList<>();
+        labels.add("Tất cả căn hộ");
+        for (NotificationTargetResponse target : notificationTargets) {
+            String roomNumber = target.getRoomNumber() != null ? target.getRoomNumber() : String.valueOf(target.getApartmentId());
+            labels.add("Căn " + roomNumber);
+        }
+        setNotificationFilterLabels(labels);
+    }
+
+    private void setTargetSpinnerLabels(List<String> labels) {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 requireContext(),
                 android.R.layout.simple_spinner_dropdown_item,
-                new String[]{"Tất cả cư dân", "Căn A101", "Căn A102", "Tầng 1", "Tầng 2"}
+                labels
         );
         targetSpinner.setAdapter(adapter);
+    }
+
+    private void setNotificationFilterLabels(List<String> labels) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                labels
+        );
+        notificationApartmentFilter.setAdapter(adapter);
+    }
+
+    private boolean hasNotificationTarget(Long apartmentId) {
+        for (NotificationTargetResponse target : notificationTargets) {
+            if (target.getApartmentId() != null && target.getApartmentId().equals(apartmentId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void loadComplaints() {
@@ -109,32 +239,75 @@ public class AdminNotificationFragment extends Fragment {
     }
 
     private void loadNotifications() {
-        adminNotificationList.removeAllViews();
         notificationApiService.getAllNotifications().enqueue(new Callback<ApiResponse<List<NotificationResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<NotificationResponse>>> call,
                                    Response<ApiResponse<List<NotificationResponse>>> response) {
                 if (!response.isSuccessful() || response.body() == null || response.body().getData() == null) {
+                    adminNotificationList.removeAllViews();
                     addInfoCard(adminNotificationList, "Không tải được thông báo", "Vui lòng thử lại sau.", "", "");
                     return;
                 }
 
-                List<NotificationResponse> notifications = response.body().getData();
-                if (notifications.isEmpty()) {
-                    addInfoCard(adminNotificationList, "Chưa có thông báo", "Các thông báo đã gửi sẽ hiển thị tại đây.", "", "");
-                    return;
-                }
-
-                for (NotificationResponse item : notifications) {
-                    addInfoCard(adminNotificationList, item.getTitle(), item.getContent(), formatDate(item.getCreatedAt()), "Đã gửi");
-                }
+                adminNotifications.clear();
+                adminNotifications.addAll(response.body().getData());
+                renderAdminNotifications();
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<NotificationResponse>>> call, Throwable t) {
+                adminNotificationList.removeAllViews();
                 addInfoCard(adminNotificationList, "Không kết nối được máy chủ", t.getLocalizedMessage(), "", "");
             }
         });
+    }
+
+    private void renderAdminNotifications() {
+        if (adminNotificationList == null) {
+            return;
+        }
+
+        adminNotificationList.removeAllViews();
+        String dateFilter = notificationDateFilter.getText().toString().trim();
+        String roomFilter = getSelectedFilterRoomNumber();
+        int renderedCount = 0;
+
+        for (NotificationResponse item : adminNotifications) {
+            if (!matchesDateFilter(item, dateFilter) || !matchesRoomFilter(item, roomFilter)) {
+                continue;
+            }
+
+            MaterialCardView card = addInfoCard(adminNotificationList, item.getTitle(), item.getContent(), formatDate(item.getCreatedAt()), "Đã gửi");
+            card.setOnClickListener(v -> showNotificationDetail(item));
+            renderedCount++;
+        }
+
+        if (renderedCount == 0) {
+            addInfoCard(adminNotificationList, "Không có thông báo phù hợp", "Thử đổi ngày hoặc căn hộ lọc.", "", "");
+        }
+    }
+
+    private boolean matchesDateFilter(NotificationResponse item, String dateFilter) {
+        if (dateFilter.isEmpty()) {
+            return true;
+        }
+        String createdAt = item.getCreatedAt();
+        return createdAt != null && createdAt.startsWith(dateFilter);
+    }
+
+    private boolean matchesRoomFilter(NotificationResponse item, String roomFilter) {
+        if (roomFilter == null) {
+            return true;
+        }
+        return item.getRoomNumbers() != null && item.getRoomNumbers().contains(roomFilter);
+    }
+
+    private String getSelectedFilterRoomNumber() {
+        int selectedPosition = notificationApartmentFilter.getSelectedItemPosition();
+        if (selectedPosition <= 0 || selectedPosition > notificationTargets.size()) {
+            return null;
+        }
+        return notificationTargets.get(selectedPosition - 1).getRoomNumber();
     }
 
     private void sendNotification() {
@@ -146,7 +319,28 @@ public class AdminNotificationFragment extends Fragment {
             return;
         }
 
-        CreateNotificationRequest request = new CreateNotificationRequest(title, content, "ALL", null);
+        String targetType = "ALL";
+        List<Long> apartmentIds = null;
+        int selectedPosition = targetSpinner.getSelectedItemPosition();
+        if (selectedPosition > 0 && selectedPosition <= notificationTargets.size()) {
+            targetType = "SPECIFIC";
+            apartmentIds = Collections.singletonList(notificationTargets.get(selectedPosition - 1).getApartmentId());
+        }
+
+        CreateNotificationRequest request = new CreateNotificationRequest(title, content, targetType, apartmentIds);
+        confirmSendNotification(request, getSelectedTargetLabel());
+    }
+
+    private void confirmSendNotification(CreateNotificationRequest request, String targetLabel) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xác nhận gửi thông báo")
+                .setMessage("Gửi thông báo này tới " + targetLabel + "?")
+                .setNegativeButton("Hủy", null)
+                .setPositiveButton("Gửi", (dialog, which) -> submitNotification(request))
+                .show();
+    }
+
+    private void submitNotification(CreateNotificationRequest request) {
         notificationApiService.createNotification(request).enqueue(new Callback<ApiResponse<NotificationResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<NotificationResponse>> call,
@@ -166,6 +360,33 @@ public class AdminNotificationFragment extends Fragment {
                 Toast.makeText(requireContext(), "Không kết nối được máy chủ", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void updateRecipientPreview() {
+        if (recipientPreview == null) {
+            return;
+        }
+
+        int selectedPosition = targetSpinner.getSelectedItemPosition();
+        if (selectedPosition <= 0 || selectedPosition > notificationTargets.size()) {
+            recipientPreview.setText("Người nhận: Tất cả chủ hộ đang hoạt động (" + notificationTargets.size() + " người)");
+            return;
+        }
+
+        NotificationTargetResponse target = notificationTargets.get(selectedPosition - 1);
+        recipientPreview.setText("Người nhận: " + safe(target.getResidentName())
+                + "\nCăn " + safe(target.getRoomNumber())
+                + " · " + safe(target.getResidentEmail()));
+    }
+
+    private String getSelectedTargetLabel() {
+        int selectedPosition = targetSpinner.getSelectedItemPosition();
+        if (selectedPosition <= 0 || selectedPosition > notificationTargets.size()) {
+            return "tất cả chủ hộ đang hoạt động";
+        }
+
+        NotificationTargetResponse target = notificationTargets.get(selectedPosition - 1);
+        return "căn " + safe(target.getRoomNumber()) + " (" + safe(target.getResidentName()) + ")";
     }
 
     private void addComplaintCard(ComplaintResponse item) {
@@ -222,6 +443,7 @@ public class AdminNotificationFragment extends Fragment {
             doneButton.setOnClickListener(v -> markComplaintDone(item.getId()));
         }
 
+        card.setOnClickListener(v -> showComplaintDetail(item));
         card.addView(body);
         adminComplaintList.addView(card);
     }
@@ -247,7 +469,7 @@ public class AdminNotificationFragment extends Fragment {
                 });
     }
 
-    private void addInfoCard(LinearLayout parent, String title, String content, String time, String status) {
+    private MaterialCardView addInfoCard(LinearLayout parent, String title, String content, String time, String status) {
         MaterialCardView card = new MaterialCardView(requireContext());
         LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -298,6 +520,36 @@ public class AdminNotificationFragment extends Fragment {
         body.addView(timeView);
         card.addView(body);
         parent.addView(card, 0);
+        return card;
+    }
+
+    private void showNotificationDetail(NotificationResponse item) {
+        String message = "Tiêu đề: " + safe(item.getTitle())
+                + "\n\nNội dung:\n" + safe(item.getContent())
+                + "\n\nGửi tới: " + getNotificationTargetText(item)
+                + "\nNgày gửi: " + formatDate(item.getCreatedAt());
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Chi tiết thông báo")
+                .setMessage(message)
+                .setPositiveButton("Đóng", null)
+                .show();
+    }
+
+    private void showComplaintDetail(ComplaintResponse item) {
+        String message = "Tiêu đề: " + safe(item.getTitle())
+                + "\n\nNội dung:\n" + safe(item.getContent())
+                + "\n\nCăn hộ: " + safe(item.getRoomNumber())
+                + "\nNgười gửi: " + safe(item.getResidentName())
+                + "\nLoại: " + translateCategory(item.getCategory())
+                + "\nTrạng thái: " + translateStatus(item.getStatus())
+                + "\nNgày gửi: " + formatDate(item.getCreatedAt());
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Chi tiết khiếu nại")
+                .setMessage(message)
+                .setPositiveButton("Đóng", null)
+                .show();
     }
 
     private int getStatusColor(String status) {
@@ -320,6 +572,22 @@ public class AdminNotificationFragment extends Fragment {
     private String translateStatus(String status) {
         if ("DONE".equals(status)) return "Hoàn thành";
         return "Đã tiếp nhận";
+    }
+
+    private String translateTargetType(String targetType) {
+        if ("SPECIFIC".equals(targetType)) return "Căn hộ được chọn";
+        return "Tất cả chủ hộ";
+    }
+
+    private String getNotificationTargetText(NotificationResponse item) {
+        if (item.getTargetSummary() != null && !item.getTargetSummary().trim().isEmpty()) {
+            return item.getTargetSummary();
+        }
+        return translateTargetType(item.getTargetType());
+    }
+
+    private String safe(String value) {
+        return value == null || value.trim().isEmpty() ? "Không có dữ liệu" : value;
     }
 
     private String formatDate(String value) {

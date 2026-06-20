@@ -3,6 +3,7 @@ package com.ptithcm.apt.network.api;
 import com.ptithcm.apt.models.auth.response.ApiResponse;
 import com.ptithcm.apt.models.notification.CreateNotificationRequest;
 import com.ptithcm.apt.models.notification.NotificationResponse;
+import com.ptithcm.apt.models.notification.NotificationTargetResponse;
 
 import java.util.List;
 
@@ -15,6 +16,9 @@ import retrofit2.http.POST;
 public interface NotificationApiService {
     @GET("api/v1/notifications")
     Call<ApiResponse<List<NotificationResponse>>> getAllNotifications();
+
+    @GET("api/v1/notifications/targets")
+    Call<ApiResponse<List<NotificationTargetResponse>>> getNotificationTargets();
 
     @GET("api/v1/notifications/my")
     Call<ApiResponse<List<NotificationResponse>>> getMyNotifications();

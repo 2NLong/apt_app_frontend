@@ -105,7 +105,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="6dp"
-                            android:text="ALL"
+                            android:text="Chủ hộ"
                             android:textColor="@color/secondary"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -113,7 +113,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="ĐỐI TƯỢNG"
+                            android:text="NHẬN TIN"
                             android:textColor="@color/text_body"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -149,6 +149,16 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_marginTop="14dp" />
+
+                <TextView
+                    android:id="@+id/text_notification_recipient_preview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingMultiplier="1.2"
+                    android:text="Người nhận: Tất cả chủ hộ đang hoạt động"
+                    android:textColor="@color/text_body"
+                    android:textSize="13sp" />
 
                 <EditText
                     android:id="@+id/input_notification_title"
@@ -210,6 +220,31 @@
                 android:textColor="@color/text_title"
                 android:textSize="18sp"
                 android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_card_white"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <EditText
+                    android:id="@+id/input_notification_date_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="Lọc theo ngày: yyyy-mm-dd"
+                    android:inputType="date"
+                    android:paddingHorizontal="12dp"
+                    android:textSize="13sp" />
+
+                <Spinner
+                    android:id="@+id/spinner_notification_apartment_filter"
+                    android:layout_width="match_parent"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="8dp" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/list_admin_notifications"
