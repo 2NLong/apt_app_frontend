@@ -40,6 +40,10 @@ public class NotificationResponse {
         return isRead;
     }
 
+    public void setIsRead(Boolean isRead) {
+        this.isRead = isRead;
+    }
+
     public String getCreatedAt() {
         return createdAt;
     }

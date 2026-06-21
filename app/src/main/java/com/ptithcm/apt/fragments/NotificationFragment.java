@@ -168,7 +168,7 @@ public class NotificationFragment extends Fragment {
                             formatDate(item.getCreatedAt()),
                             Boolean.TRUE.equals(item.getIsRead()) ? "Đã đọc" : "Chưa đọc"
                     );
-                    card.setOnClickListener(v -> showNotificationDetail(item));
+                    card.setOnClickListener(v -> markNotificationReadAndShow(item));
                 }
             }
 
@@ -302,17 +302,48 @@ public class NotificationFragment extends Fragment {
     }
 
     private void showNotificationDetail(NotificationResponse item) {
+        showNotificationDetail(item, Boolean.TRUE.equals(item.getIsRead()));
+    }
+
+    private void showNotificationDetail(NotificationResponse item, boolean isRead) {
         String message = "Tiêu đề: " + safe(item.getTitle())
                 + "\n\nNội dung:\n" + safe(item.getContent())
                 + "\n\nGửi tới: " + getNotificationTargetText(item)
                 + "\nNgày gửi: " + formatDate(item.getCreatedAt())
-                + "\nTrạng thái: " + (Boolean.TRUE.equals(item.getIsRead()) ? "Đã đọc" : "Chưa đọc");
+                + "\nTrạng thái: " + (isRead ? "Đã đọc" : "Chưa đọc");
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Chi tiết thông báo")
                 .setMessage(message)
                 .setPositiveButton("Đóng", null)
                 .show();
+    }
+
+    private void markNotificationReadAndShow(NotificationResponse item) {
+        if (Boolean.TRUE.equals(item.getIsRead())) {
+            showNotificationDetail(item, true);
+            return;
+        }
+
+        notificationApiService.markMyNotificationAsRead(item.getId()).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful()) {
+                    item.setIsRead(true);
+                    showNotificationDetail(item, true);
+                    loadMyNotifications();
+                } else {
+                    showNotificationDetail(item, false);
+                    Toast.makeText(requireContext(), "Không thể cập nhật trạng thái đọc", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                showNotificationDetail(item, false);
+                Toast.makeText(requireContext(), "Không thể cập nhật trạng thái đọc", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showComplaintDetail(ComplaintResponse item) {
